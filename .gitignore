@@ -1,6 +1,30 @@
+# use glob syntax.
+syntax: glob
 *.class
+*~
+*.bak
+*.off
+*.old
+.DS_Store
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# stupid eclipse:
+bin
+
+# building
+target
+
+# Eclipse
+.classpath
+.project
+.settings
+
+# IDEA
+.idea
+*.iml
+*.ipr
+*.iws
+
+# Project-specific
+data-files
+data-bdb
+test-data
