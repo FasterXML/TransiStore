@@ -82,7 +82,7 @@ public class BasicTSEntryConverter
     
     @Override
     public final StoredEntry<BasicTSKey> entryFromStorable(final Storable raw) {
-        return entryFromStorable(_vkey(raw.getKey()), raw);
+        return entryFromStorable(_key(raw.getKey()), raw);
     }
 
     @Override
@@ -212,7 +212,7 @@ public class BasicTSEntryConverter
         throw new IllegalArgumentException("Bad Vagabond metadata (key "+key+"): "+msg);
     }
     
-    protected BasicTSKey _vkey(StorableKey rawKey) {
+    protected BasicTSKey _key(StorableKey rawKey) {
         return _keyConverter.rawToEntryKey(rawKey);
     }
 }
