@@ -1,5 +1,6 @@
 package com.fasterxml.transistore.service;
 
+import com.fasterxml.clustermate.api.EntryKeyConverter;
 import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.bdb.BDBConverters;
 import com.fasterxml.clustermate.service.store.EntryLastAccessed;
@@ -27,7 +28,7 @@ public class BasicTSEntryConverter
 
     public final static int METADATA_LENGTH = 20;
 
-    protected final BasicTSKeyConverter _keyConverter;
+    protected final EntryKeyConverter<BasicTSKey> _keyConverter;
 
     /*
     /**********************************************************************
@@ -35,7 +36,11 @@ public class BasicTSEntryConverter
     /**********************************************************************
      */
 
-    public BasicTSEntryConverter(BasicTSKeyConverter keyConverter) {
+    public BasicTSEntryConverter() {
+        this(BasicTSKeyConverter.defaultInstance());
+    }
+    
+    public BasicTSEntryConverter(EntryKeyConverter<BasicTSKey> keyConverter) {
         _keyConverter = keyConverter;
     }
 
@@ -46,7 +51,7 @@ public class BasicTSEntryConverter
      */
 
     @Override
-    public BasicTSKeyConverter keyConverter() {
+    public EntryKeyConverter<BasicTSKey> keyConverter() {
         return _keyConverter;
     }
     
