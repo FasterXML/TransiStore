@@ -88,7 +88,7 @@ public class LargeFileTest extends JaxrsStoreTestBase
             fail("Odd path: "+path);
         }
         String last = path.substring(path.lastIndexOf('/')+1);
-        assertEquals("0000:BIG_::data_big_1.L", last);
+        assertEquals("0000::data_big_1.L", last);
 
         assertEquals(Compression.LZF, entry.getCompression());
         assertEquals(BIG_DATA.length, entry.getActualUncompressedLength());

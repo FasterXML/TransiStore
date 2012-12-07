@@ -75,8 +75,8 @@ public class BasicTSKeyConverter
         return rawKey.with(new WithBytesCallback<BasicTSKey>() {
             @Override
             public BasicTSKey withBytes(byte[] buffer, int offset, int length) {
-                int groupIdLength = ((buffer[++offset] & 0xFF) << 8)
-                        | (buffer[++offset] & 0xFF);
+                int groupIdLength = ((buffer[offset] & 0xFF) << 8)
+                        | (buffer[offset+1] & 0xFF);
                 return new BasicTSKey(rawKey, groupIdLength);
             }
         });

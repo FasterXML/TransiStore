@@ -16,9 +16,17 @@ public class BasicTSKeyTest  extends TestCase
 
     public void testKeyWithGroup()
     {
-        BasicTSKey key = _keyConverter.construct("gruppo", "/another/key");
+        final String PARTITION_STR = "gruppo";
+        final String PATH = "/another/key";
+        BasicTSKey key = _keyConverter.construct(PARTITION_STR, PATH);
         
-        assertEquals("6:gruppo/another/key", key.toString());
-        assertEquals("gruppo", key.getPartitionId());
+        assertEquals("6:"+PARTITION_STR+PATH, key.toString());
+        assertEquals(PARTITION_STR, key.getPartitionId());
+        byte[] b = key.asBytes();
+        assertEquals(2 + PARTITION_STR.length() + PATH.length(), b.length);
+
+        BasicTSKey key2 = _keyConverter.construct(b);
+        assertEquals(PARTITION_STR, key2.getPartitionId());
+        assertEquals("gruppo/another/key", key2.getExternalPath());
     }
 }

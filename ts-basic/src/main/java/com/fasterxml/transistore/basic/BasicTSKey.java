@@ -69,8 +69,8 @@ public class BasicTSKey
      */
 
     /**
-     * Accessor for getting full path, where groupId is the prefix, and local
-     * part follows right after group id.
+     * Accessor for getting full path, where partition id is the prefix,
+     * and path follows it right after.
      */
     public String getExternalPath()
     {
@@ -105,7 +105,7 @@ public class BasicTSKey
      * Note that method can only be called when there is a group id; otherwise
      * a {@link IllegalStateException} will be thrown.
      */
-    public <T> T withPartitionId(WithBytesCallback<T> cb)
+    public <T> T withPartitionPrefix(WithBytesCallback<T> cb)
     {
         if (_partitionIdLength <= 0) {
             throw new IllegalStateException("Key does not have a partition id, can not call this method");

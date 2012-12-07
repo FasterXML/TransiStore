@@ -32,7 +32,7 @@ public class BasicTSLastAccessStore
             case NONE:
                 return null;
             case GROUPED: // important: not just group id, but also client id
-                return key.withPartitionId(BDBConverters.simpleConverter);
+                return key.withPartitionPrefix(BDBConverters.simpleConverter);
             case INDIVIDUAL: // whole key, including client id, group id length
                 return key.asStorableKey().with(BDBConverters.simpleConverter);
             }
