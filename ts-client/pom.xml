@@ -12,23 +12,23 @@
   </description>
 
   <dependencies>
-    <!-- Need Jackson for data-binding -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${version.jackson}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson}</version>
-    </dependency>
-
-    <!--  also using common stuff from StoreMate/ClusterMate -->
+    <!--  Cross-module deps -->
     <dependency>
       <groupId>com.fasterxml.transistore</groupId>
       <artifactId>transistore-basic</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <!--  also using common stuff from StoreMate/ClusterMate -->
+    <dependency>
+      <groupId>com.fasterxml.clustermate</groupId>
+      <artifactId>clustermate-client</artifactId>
+      <version>${version.clustermate}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.clustermate</groupId>
+      <artifactId>clustermate-client-ahc</artifactId>
+      <version>${version.clustermate}</version>
     </dependency>
   </dependencies>
 </project>
