@@ -33,9 +33,9 @@ import com.yammer.dropwizard.config.Environment;
  * Main service class that sets up service configuration, bootstrapping things
  * and initializing life-cycle components and resources.
  */
-public class VagabondDWService
+public class BasicTSServiceOnDW
     extends DWBasedService<BasicTSKey, StoredEntry<BasicTSKey>,
-        BasicTSServiceConfig, VagabondDWConfig>
+        BasicTSServiceConfig, BasicTSServiceConfigForDW>
 {
     /*
     /**********************************************************************
@@ -43,17 +43,17 @@ public class VagabondDWService
     /**********************************************************************
      */
 
-    protected VagabondDWService(TimeMaster timings) {
+    protected BasicTSServiceOnDW(TimeMaster timings) {
         this(timings, false);
     }
 
-    protected VagabondDWService(TimeMaster timings, boolean testMode) {
+    protected BasicTSServiceOnDW(TimeMaster timings, boolean testMode) {
         super(timings, testMode);
         
     }
 
     @Override
-    public void initialize(Bootstrap<VagabondDWConfig> bootstrap) {
+    public void initialize(Bootstrap<BasicTSServiceConfigForDW> bootstrap) {
         super.initialize(bootstrap);
         // and FreeMarker for more dynamic pages?
 //      addBundle(new com.yammer.dropwizard.views.ViewBundle());
@@ -64,7 +64,7 @@ public class VagabondDWService
     
     public static void main(String[] args) throws Exception
     {
-        new VagabondDWService(TimeMaster.nonTestInstance()).run(args);
+        new BasicTSServiceOnDW(TimeMaster.nonTestInstance()).run(args);
     }
     
     /*

@@ -11,15 +11,15 @@ import com.fasterxml.clustermate.dw.DWConfigBase;
  * Wrapper class used when embedding configuration to be used for
  * DropWizard-based service
  */
-public class VagabondDWConfig
-    extends DWConfigBase<BasicTSServiceConfig, VagabondDWConfig>
+public class BasicTSServiceConfigForDW
+    extends DWConfigBase<BasicTSServiceConfig, BasicTSServiceConfigForDW>
 {
     /**
      * We will define explicit constructor to define custom overrides
      * to DropWizard default settings; these can then be overridden
      * by JSON config file (and System properties).
      */
-    public VagabondDWConfig() {
+    public BasicTSServiceConfigForDW() {
         v.storeBackendType = BDBJEBuilder.class;
     }
 

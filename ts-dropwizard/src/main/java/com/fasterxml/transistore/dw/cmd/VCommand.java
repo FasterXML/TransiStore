@@ -16,7 +16,7 @@ import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.clustermate.service.store.StoredEntryConverter;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.dw.VagabondDWConfig;
+import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 import com.fasterxml.transistore.service.store.BasicTSStores;
@@ -42,25 +42,25 @@ public abstract class VCommand<T extends Configuration> extends ConfiguredComman
     /**********************************************************************
      */
     
-    protected BasicTSStores openReadOnlyStores(VagabondDWConfig configuration)
+    protected BasicTSStores openReadOnlyStores(BasicTSServiceConfigForDW configuration)
         throws IOException
     {
         return _openStores(configuration, false);
     }
 
-    protected BasicTSStores openReadWriteStores(VagabondDWConfig configuration)
+    protected BasicTSStores openReadWriteStores(BasicTSServiceConfigForDW configuration)
         throws IOException
     {
         return _openStores(configuration, true);
     }
 
-    protected BasicTSStores openReadWriteStores(VagabondDWConfig configuration, int cacheMegs)
+    protected BasicTSStores openReadWriteStores(BasicTSServiceConfigForDW configuration, int cacheMegs)
         throws IOException
     {
         return _openStores(configuration, true);
     }
     
-    protected BasicTSStores _openStores(VagabondDWConfig configuration,
+    protected BasicTSStores _openStores(BasicTSServiceConfigForDW configuration,
             boolean writeAccess)
         throws IOException
     {
@@ -73,7 +73,7 @@ public abstract class VCommand<T extends Configuration> extends ConfiguredComman
         return stores;
     }
 
-    protected BasicTSStores _constructStores(VagabondDWConfig configuration)
+    protected BasicTSStores _constructStores(BasicTSServiceConfigForDW configuration)
         throws IOException
     {
         TimeMaster tm = TimeMaster.nonTestInstance();

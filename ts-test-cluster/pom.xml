@@ -15,6 +15,11 @@
     <!--  Cross-module deps -->
     <dependency>
       <groupId>com.fasterxml.transistore</groupId>
+      <artifactId>transistore-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.transistore</groupId>
       <artifactId>transistore-dropwizard</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -23,6 +28,11 @@
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-service</artifactId>
+      <version>${version.clustermate}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.clustermate</groupId>
+      <artifactId>clustermate-client</artifactId>
       <version>${version.clustermate}</version>
     </dependency>
   </dependencies>

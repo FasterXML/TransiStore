@@ -13,22 +13,22 @@ import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.dw.VagabondDWConfig;
+import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
 /**
  * Command that can be used to dump first parts of BDB contents
  * for debugging; by default first 100 entries will be output.
  */
-public class CommandDumpBDB extends VCommand<VagabondDWConfig>
+public class CommandDumpBDB extends VCommand<BasicTSServiceConfigForDW>
 {
     public CommandDumpBDB() {
         super("dump", "Command to dump contents of Entity BDB store");
     }
 
     @Override
-    protected void run(Bootstrap<VagabondDWConfig> bootstrap,
+    protected void run(Bootstrap<BasicTSServiceConfigForDW> bootstrap,
             Namespace namespace,
-            VagabondDWConfig configuration) throws Exception
+            BasicTSServiceConfigForDW configuration) throws Exception
     {
         Stores<BasicTSKey, StoredEntry<BasicTSKey>> stores = openReadOnlyStores(configuration);
         AdminStorableStore store = (AdminStorableStore) stores.getEntryStore();

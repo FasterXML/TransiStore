@@ -4,7 +4,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.storemate.store.AdminStorableStore;
-import com.fasterxml.transistore.dw.VagabondDWConfig;
+import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
 import com.yammer.dropwizard.config.Bootstrap;
 
@@ -12,7 +12,7 @@ import com.yammer.dropwizard.config.Bootstrap;
  * Command for cleaning up all the entry data from BDB (but not
  * store metadata)
  */
-public class CommandCleanBDB extends VCommand<VagabondDWConfig>
+public class CommandCleanBDB extends VCommand<BasicTSServiceConfigForDW>
 {
     public CommandCleanBDB() {
         super("nuke",
@@ -20,9 +20,9 @@ public class CommandCleanBDB extends VCommand<VagabondDWConfig>
     }
 
     @Override
-    protected void run(Bootstrap<VagabondDWConfig> bootstrap,
+    protected void run(Bootstrap<BasicTSServiceConfigForDW> bootstrap,
             Namespace namespace,
-            VagabondDWConfig configuration) throws Exception
+            BasicTSServiceConfigForDW configuration) throws Exception
     {
         // use bigger cache, 40 megs, since we may need to traverse quite a bit
         Stores<?,?> stores = openReadWriteStores(configuration, 40);
