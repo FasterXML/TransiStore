@@ -14,13 +14,13 @@
   <dependencies>
     <!-- Cross-module deps -->
     <dependency>
-        <groupId>com.force.transistore</groupId>
+        <groupId>com.fasterxml.transistore</groupId>
         <artifactId>transistore-service</artifactId>
         <version>${project.version}</version>
     </dependency>
     <!--  will be running as DropWizard service, for now -->
     <dependency>
-        <groupId>com.force.transistore</groupId>
+        <groupId>com.fasterxml.transistore</groupId>
         <artifactId>transistore-dropwizard</artifactId>
         <version>${project.version}</version>
     </dependency>

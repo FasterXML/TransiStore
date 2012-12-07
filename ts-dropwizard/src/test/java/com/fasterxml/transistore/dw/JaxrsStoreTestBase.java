@@ -19,7 +19,6 @@ import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
 import com.fasterxml.storemate.store.impl.StorableStoreImpl;
 
-import com.fasterxml.clustermate.api.EntryKeyConverter;
 import com.fasterxml.clustermate.api.KeySpace;
 import com.fasterxml.clustermate.api.NodeDefinition;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
