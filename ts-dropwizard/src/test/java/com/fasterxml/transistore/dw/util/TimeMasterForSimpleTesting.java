@@ -19,15 +19,14 @@ public class TimeMasterForSimpleTesting extends TimeMaster
      */
     protected final Object _blocked = new Object();
 
-    public TimeMasterForSimpleTesting(long startTime)
-    {
+    public TimeMasterForSimpleTesting(long startTime) {
         _currentTime = new AtomicLong(startTime);
     }
 
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Basic API
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Basic API
+    /**********************************************************************
      */
     
     @Override
@@ -55,9 +54,9 @@ public class TimeMasterForSimpleTesting extends TimeMaster
     }
 
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Extended API for test code
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Extended API for test code
+    /**********************************************************************
      */
 
     public long getMaxSleepTimeNeeded()
@@ -123,10 +122,4 @@ public class TimeMasterForSimpleTesting extends TimeMaster
         }
         return this;
     }
-
-    /*
-    ///////////////////////////////////////////////////////////////////////
-    // Internal methods
-    ///////////////////////////////////////////////////////////////////////
-     */
 }

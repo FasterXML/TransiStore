@@ -120,7 +120,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
             // Then add said content
             int origSize = MAX_PAYLOAD_IN_MEMORY + 100;
             final byte[] CONTENT = biggerSomewhatCompressibleData(origSize);
-            File file = File.createTempFile("test", "vagabond.txt");
+            File file = File.createTempFile("test", "test-data.txt");
             file.deleteOnExit();
             FileOutputStream fout = new FileOutputStream(file);
             fout.write(CONTENT);

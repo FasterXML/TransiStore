@@ -15,9 +15,9 @@ public class FakeHttpResponse extends ServiceResponse
     protected Map<String,String> _headers;
 
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Basic implementation
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Basic implementation
+    /**********************************************************************
      */
 
     @Override
@@ -70,9 +70,9 @@ public class FakeHttpResponse extends ServiceResponse
     }
 
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Extended API
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Extended API
+    /**********************************************************************
      */
 
     public String getContentType() {
@@ -85,8 +85,7 @@ public class FakeHttpResponse extends ServiceResponse
     public boolean hasInlinedData() {
         return (_streamingContent != null) && (((StreamingResponseContentImpl) _streamingContent).inline());
     }
-    
-    public Object getEntity() { return _entity; }
+
     public StreamingResponseContent getStreamingContent() {
         return _streamingContent;
     }

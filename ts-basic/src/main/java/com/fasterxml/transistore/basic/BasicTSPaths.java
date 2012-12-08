@@ -6,7 +6,8 @@ import com.fasterxml.clustermate.api.RequestPathBuilder;
 import com.fasterxml.clustermate.api.RequestPathStrategy;
 
 /**
- * Vagabond-specific implementation of {@link RequestPathStrategy}.
+ * {@link RequestPathStrategy} implementation for
+ * Basic TransiStore configuration.
  *<p>
  * Paths are mapped as follows:
  *<ul>
@@ -44,9 +45,9 @@ public class BasicTSPaths extends RequestPathStrategy
     protected final static String SECOND_SEGMENT_SYNC_PULL = "pull";
     
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Path building
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Path building
+    /**********************************************************************
      */
     
     @Override
@@ -75,9 +76,9 @@ public class BasicTSPaths extends RequestPathStrategy
     }
 
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Path matching (decoding)
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Path matching (decoding)
+    /**********************************************************************
      */
 
     @Override
@@ -109,9 +110,9 @@ public class BasicTSPaths extends RequestPathStrategy
     }
     
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Internal methods
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Internal methods
+    /**********************************************************************
      */
     
     protected <K extends RequestPathBuilder> K _storePath(K nodeRoot) {

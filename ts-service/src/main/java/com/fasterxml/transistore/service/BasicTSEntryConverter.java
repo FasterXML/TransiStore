@@ -214,7 +214,7 @@ public class BasicTSEntryConverter
     
     protected void _badData(final BasicTSKey key, String msg)
     {
-        throw new IllegalArgumentException("Bad Vagabond metadata (key "+key+"): "+msg);
+        throw new IllegalArgumentException("Bad BasicTSKey metadata (key "+key+"): "+msg);
     }
     
     protected BasicTSKey _key(StorableKey rawKey) {

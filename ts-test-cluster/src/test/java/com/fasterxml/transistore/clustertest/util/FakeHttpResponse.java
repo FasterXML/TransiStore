@@ -13,9 +13,9 @@ public class FakeHttpResponse extends ServiceResponse
     protected Map<String,String> _headers;
 
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Basic implementation
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Basic implementation
+    /**********************************************************************
      */
 
     @Override
@@ -68,9 +68,9 @@ public class FakeHttpResponse extends ServiceResponse
     }
     
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Extended API
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Extended API
+    /**********************************************************************
      */
     
     public boolean hasFile() {
@@ -80,7 +80,6 @@ public class FakeHttpResponse extends ServiceResponse
         return (_streamingContent != null) && (((StreamingResponseContentImpl) _streamingContent).inline());
     }
     
-    public Object getEntity() { return _entity; }
     public StreamingResponseContentImpl getStreamingContent() {
         return (StreamingResponseContentImpl) _streamingContent;
     }

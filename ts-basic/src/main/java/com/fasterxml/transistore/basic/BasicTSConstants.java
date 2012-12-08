@@ -1,7 +1,7 @@
 package com.fasterxml.transistore.basic;
 
 /**
- * Container for Vagabond-specific constants.
+ * Container for constants used with Basic TransiStore configuration.
  */
 public interface BasicTSConstants
 {

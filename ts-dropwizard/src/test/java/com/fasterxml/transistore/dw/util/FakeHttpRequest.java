@@ -61,9 +61,9 @@ public class FakeHttpRequest extends ServiceRequest
     }
 
     /*
-    ///////////////////////////////////////////////////////////////////////
-    // Additional methods for tests
-    ///////////////////////////////////////////////////////////////////////
+    /**********************************************************************
+    /* Additional methods for tests
+    /**********************************************************************
      */
 
     public FakeHttpRequest setAcceptedCompression(String value) {

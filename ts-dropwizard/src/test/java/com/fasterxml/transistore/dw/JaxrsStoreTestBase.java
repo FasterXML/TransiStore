@@ -72,7 +72,7 @@ public abstract class JaxrsStoreTestBase extends TestCase
         // BDB and file store settings:
         File testRoot = getTestScratchDir(testSuffix, cleanUp);
         BasicTSServiceConfig config = new BasicTSServiceConfig();
-        config.metadataDirectory = new File(testRoot, "bdb-vagabond");
+        config.metadataDirectory = new File(testRoot, "bdb-basictest");
         config.storeConfig.dataRootForFiles = new File(testRoot, "files");
         // shorten sync grace period to 5 seconds for tests:
         config.cfgSyncGracePeriod = new TimeSpan("5s");

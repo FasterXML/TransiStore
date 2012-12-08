@@ -10,7 +10,7 @@ import com.fasterxml.clustermate.api.EntryKeyConverter;
 import com.fasterxml.clustermate.api.RequestPathBuilder;
 
 /**
- * Vagabond implementation of {@link EntryKeyConverter}.
+ * Default {@link EntryKeyConverter} used with Basic TransiStore types.
  *<p>
  * In addition class implements encoding and decoding of the entry keys
  * (of type {@link BasicTSKey}): uses {@link BasicTSConstants#V_QUERY_PARAM_CLIENT_ID}
@@ -32,7 +32,7 @@ public class BasicTSKeyConverter
      * and for content.
      */
     protected final BlockHasher32 _hasher;
-    
+
     /*
     /**********************************************************************
     /* Life-cycle

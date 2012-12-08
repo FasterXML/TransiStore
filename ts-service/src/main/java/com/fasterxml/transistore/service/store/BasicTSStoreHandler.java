@@ -16,7 +16,7 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey, StoredEntry<Ba
 
     /*
     /**********************************************************************
-    /* Vagabond-specific handling, conversions
+    /* Extracting last-accessed/updated info from key
     /**********************************************************************
      */
 
@@ -29,7 +29,7 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey, StoredEntry<Ba
 
     /*
     /**********************************************************************
-    /* Vagabond-specific handling, last-accessed updates
+    /* Updates to last-accessed/updated info
     /**********************************************************************
      */
         

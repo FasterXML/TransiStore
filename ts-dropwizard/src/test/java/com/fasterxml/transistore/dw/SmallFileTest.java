@@ -152,15 +152,6 @@ public class SmallFileTest extends JaxrsStoreTestBase
         // check headers first: most importantly, must declare that we are served gzipped stuff:
         assertEquals("gzip", response.getHeader("Content-Encoding"));
 
-        // and should also get something for 'last cluster update', although no real state:
-        /* 11-Jul-2012, tatu: Actually this only gets added if we go through actual
-         *   resource, and not store (store has no concept of cluster, or access).
-         *   Need to figure out better place to do this.
-         */
-        /*
-        Object value = response.getHeader(VagabondConstants.HTTP_HEADER_LAST_CLUSTER_UPDATE);
-        assertNotNull(value);
-        */
         assertTrue(response.hasInlinedData());
         byte[] compData = collectOutput(response);
         final int COMP_LEN = compData.length;
