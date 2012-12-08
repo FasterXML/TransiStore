@@ -4,18 +4,18 @@ import com.fasterxml.clustermate.service.ServiceRequest;
 import com.force.vagabond.clustertest.ClusterTestBase;
 import com.force.vagabond.clustertest.util.FakeHttpRequest;
 
-public class TestVagabondPaths extends ClusterTestBase
+public class TestBasicPaths extends ClusterTestBase
 {
     public void testSimple()
     {
-        ServiceRequest req = new FakeHttpRequest("/v/store/list");
+        ServiceRequest req = new FakeHttpRequest("/ts/store/list");
         // with leading slash, should get one empty Segment first:
         assertEquals("", req.nextPathSegment());
 
-        assertFalse(req.matchPathSegment("vee"));
-        assertTrue(req.matchPathSegment("v"));
+        assertFalse(req.matchPathSegment("tse"));
+        assertTrue(req.matchPathSegment("ts"));
 
-        assertFalse(req.matchPathSegment("v"));
+        assertFalse(req.matchPathSegment("ts"));
         assertFalse(req.matchPathSegment("sto"));
         assertFalse(req.matchPathSegment("storey"));
         assertTrue(req.matchPathSegment("store"));

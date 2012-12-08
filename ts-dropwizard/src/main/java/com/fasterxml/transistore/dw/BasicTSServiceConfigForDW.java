@@ -20,19 +20,19 @@ public class BasicTSServiceConfigForDW
      * by JSON config file (and System properties).
      */
     public BasicTSServiceConfigForDW() {
-        v.storeBackendType = BDBJEBuilder.class;
+        ts.storeBackendType = BDBJEBuilder.class;
     }
 
     /**
-     * Configuration Object that contains all Vagabond-specific
+     * Configuration Object that contains all TS-specific
      * settings (and none of DropWizard standard ones)
      */
     @NotNull
     @Valid
-    public BasicTSServiceConfig v = new BasicTSServiceConfig();
+    public BasicTSServiceConfig ts = new BasicTSServiceConfig();
 
     @Override
     public BasicTSServiceConfig getServiceConfig() {
-        return v;
+        return ts;
     }
 }

@@ -17,6 +17,13 @@ import com.fasterxml.transistore.service.BasicTSEntryConverter;
 public class BasicTSServiceConfig
     extends ServiceConfig
 {
+    /**
+     * By default, we'll use "/ts/" as the service root.
+     */
+    protected final static String[] DEFAULT_SERVICE_ROOT = new String[] {
+        "ts"
+    };
+    
     protected RequestPathStrategy _requestPathStrategy;
 
     protected StoredEntryConverter<?,?> _entryConverter;
@@ -31,7 +38,7 @@ public class BasicTSServiceConfig
 
     public BasicTSServiceConfig(StoredEntryConverter<?,?> entryConverter,
             RequestPathStrategy paths) {
-        super();
+        super(DEFAULT_SERVICE_ROOT);
         _entryConverter = entryConverter;
         _requestPathStrategy = paths;
     }
@@ -50,7 +57,6 @@ public class BasicTSServiceConfig
     @Override
     public StoredEntryConverter<?,?> getEntryConverter() {
         return _entryConverter;
-//        return new BasicTSEntryConverter(BasicTSKeyConverter.defaultInstance());
     }
     
     /*
