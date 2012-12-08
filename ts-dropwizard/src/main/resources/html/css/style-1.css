@@ -1,0 +1,263 @@
+body {
+  background-color: #FFF;
+  background-image: url('../gfx/bg-green.gif');
+  /* slight greenish tilt to black to go with background */
+  color: #020; 
+}
+
+h1 {
+  color: #040; 
+}	
+
+textarea { /* Use full black for data */
+  color: black;
+}
+
+table {
+  border-style: none;
+  padding: 0px;
+  margin: 0px;
+  outline-width: 0px;
+}
+
+tr {
+  padding: 0px;
+  margin: 0px;
+}
+td {
+  padding: 0px;
+  margin: 0px;
+}
+
+/* Simple navigation menu for main-level tabs */
+
+#navcontainer ul
+{
+  margin: 0;
+  padding: 0;
+  border: 1px;
+  list-style-type: none;
+  text-align: left;
+}
+
+#navcontainer ul li { display: inline; }
+
+#navcontainer ul li a
+{
+  text-decoration: none;
+  padding: .2em 1em;
+  color: #F0FFE0;
+  background-color: #063;
+}
+
+#navcontainer ul li a:hover
+{
+  color: #F0FFE0;
+  background-color: #396;
+}
+
+.chosenTab
+{
+  padding: .2em 1em;
+  color: #fff;
+  background-color: #396;
+  font-weight: bold;
+}	
+
+/* Need to make link colors fit with background, greenish shade
+ */
+
+a:link { /* unvisited link */
+	color:#082;
+}
+a:visited {  /* visited link: same as unvisited */
+	color:#082;
+}
+a:hover {  /* mouse over link */
+	color:#4E6;
+}
+a:active {  /* selected link */
+	color:#6F8;
+}
+
+a.id:link {
+	color:#222;
+}
+a.id:visited {
+	color:#222;
+}
+a.id:hover {  /* mouse over link */
+	color:#444;
+}
+a.id:active {  /* selected link */
+	color:#666;
+}
+
+.outputTable {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  border-collapse: collapse;
+  padding: 1px;
+  margin: 1px;
+  font-size: 14px;
+}
+
+.infoTable {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #060;
+  border-collapse: collapse;
+  outline-width: 1px;
+  padding: 1px;
+  margin: 1px;
+  font-size: 16px;
+}
+
+.infoRow {
+  padding: 1px;
+  border-width: 1px;
+  border-color: #080;
+  border-style: dotted;
+}
+
+.infoCell {
+  padding: 1px;
+  border-width: 1px;
+  border-color: #080;
+  border-style: dotted;
+}
+
+.dataRow {
+  /* Use full black for data */
+  color: black;
+  vertical-align:text-top;
+  text-align: right;
+}
+
+.dataHeader {
+  white-space: nowrap;
+  border-style: dotted;
+  border-width: 1px;
+  border-color: #003010;
+  text-align: center;
+}
+
+.idColumn {
+  border-style: solid;
+  border-width: 1px;
+  background-color: #F0FFE0;
+}
+
+.totalCell {
+  white-space: nowrap;
+  text-align: center;
+  background-color: #F0F0F0;
+}
+
+/* Table cell used for log-like data; yellow bg (like totals); dotted cell separators */
+.logCell {
+  white-space: nowrap;
+  border-width: 1px;
+  border-style: dotted;
+  background-color: #F8F898;
+}
+
+/* table cell used for count/time/size costs estimates; no wrapping */
+.costGroup1 {
+  white-space: nowrap;
+  border-width: 1px 0px 1px 1px;
+  background-color: #FFFFB0;
+}
+.costGroup2 {
+  white-space: nowrap;
+  border-width: 1px 0px 1px 0px;
+  background-color: #F8F898;
+}
+.costGroup3 {
+  white-space: nowrap;
+  border-width: 1px 0px 1px 0px;
+  background-color: #F0F080;
+}
+.costGroup4 {
+  white-space: nowrap;
+  border-width: 1px 0px 1px 0px;
+  background-color: #E4E470;
+}
+
+.costTotal {
+  font-weight: bold;
+  white-space: nowrap;
+  border-width: 2px 0px 2px 1px;
+  color: #444;
+  background-color: #EEE;
+}
+
+.spamCost { /* Metric entry for non-empty spam count */
+  color: #C00;
+  font-weight: 600; /* between normal (400) and bold (700) */
+}
+	
+tr.dataRow > td {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  padding: 1px;
+  margin: 0px;
+}
+	
+.nowrap {
+  white-space: nowrap;
+}
+
+.tableHeader {
+  width: 60px;
+  white-space: nowrap;
+  text-decoration: underline;
+/*  background-color: #E8E8E8; */
+  color: #202020;
+}
+.tableHeaderPadding {
+  height: 6px;
+}
+.tableLookupCell {
+  width: 60px;
+  white-space: nowrap;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.edgeTop {
+   border-width: 2px;
+   border-style: dotted none none none;
+}
+.edgeTopLeft {
+   border-width: 2px;
+   border-style: dotted none none dotted;
+}
+.edgeTopRight {
+   border-width: 2px;
+   border-style: dotted dotted none none;
+}
+
+.edgeLeft {
+   border-width: 2px;
+   border-style: none none none dotted;
+}
+.edgeRight {
+   border-width: 2px;
+   border-style: none dotted none none;
+}
+
+.edgeBottom {
+   border-width: 2px;
+   border-style: none none dotted none;
+}
+.edgeBottomLeft {
+   border-width: 2px;
+   border-style: none none dotted dotted;
+}
+.edgeBottomRight {
+   border-width: 2px;
+   border-style: none dotted dotted none;
+}
