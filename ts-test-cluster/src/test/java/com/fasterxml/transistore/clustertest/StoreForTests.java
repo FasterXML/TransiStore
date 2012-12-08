@@ -1,4 +1,4 @@
-package com.force.vagabond.clustertest;
+package com.fasterxml.transistore.clustertest;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -16,10 +16,10 @@ import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 import com.fasterxml.transistore.dw.BasicTSServiceOnDW;
 
-import com.force.vagabond.clustertest.util.TimeMasterForClusterTesting;
 
 /**
  * Specialized sub-class of {@link BasicTSServiceOnDW} used by unit tests.

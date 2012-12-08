@@ -1,4 +1,4 @@
-package com.force.vagabond.clustertest.single;
+package com.fasterxml.transistore.clustertest.single;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -10,11 +10,11 @@ import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
+import com.fasterxml.transistore.clustertest.ClusterTestBase;
+import com.fasterxml.transistore.clustertest.StoreForTests;
+import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-import com.force.vagabond.clustertest.ClusterTestBase;
-import com.force.vagabond.clustertest.StoreForTests;
-import com.force.vagabond.clustertest.util.TimeMasterForClusterTesting;
 
 /**
  * Tests to verify that we can use byte ranges to access part of content.

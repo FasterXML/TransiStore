@@ -1,4 +1,4 @@
-package com.force.vagabond.clustertest.single;
+package com.fasterxml.transistore.clustertest.single;
 
 import java.io.*;
 import java.util.Arrays;
@@ -15,11 +15,11 @@ import com.fasterxml.transistore.client.BasicTSClientBootstrapper;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
+import com.fasterxml.transistore.clustertest.ClusterTestBase;
+import com.fasterxml.transistore.clustertest.StoreForTests;
+import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-import com.force.vagabond.clustertest.StoreForTests;
-import com.force.vagabond.clustertest.ClusterTestBase;
-import com.force.vagabond.clustertest.util.TimeMasterForClusterTesting;
 
 /**
  * Set of simple (CRUD) tests for a single-node system, running within

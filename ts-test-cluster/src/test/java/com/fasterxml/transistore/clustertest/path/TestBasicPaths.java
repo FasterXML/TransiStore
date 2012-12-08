@@ -1,8 +1,8 @@
-package com.force.vagabond.clustertest.path;
+package com.fasterxml.transistore.clustertest.path;
 
 import com.fasterxml.clustermate.service.ServiceRequest;
-import com.force.vagabond.clustertest.ClusterTestBase;
-import com.force.vagabond.clustertest.util.FakeHttpRequest;
+import com.fasterxml.transistore.clustertest.ClusterTestBase;
+import com.fasterxml.transistore.clustertest.util.FakeHttpRequest;
 
 public class TestBasicPaths extends ClusterTestBase
 {

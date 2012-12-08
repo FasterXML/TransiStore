@@ -1,4 +1,4 @@
-package com.force.vagabond.clustertest.util;
+package com.fasterxml.transistore.clustertest.util;
 
 import java.util.*;
 

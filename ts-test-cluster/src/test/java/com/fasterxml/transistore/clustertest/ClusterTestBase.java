@@ -1,4 +1,4 @@
-package com.force.vagabond.clustertest;
+package com.fasterxml.transistore.clustertest;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
+import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-import com.force.vagabond.clustertest.util.FakeHttpResponse;
 
 /**
  * Shared base class for unit tests; contains shared utility methods.

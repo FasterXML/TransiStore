@@ -1,4 +1,4 @@
-package com.force.vagabond.clustertest.dual;
+package com.fasterxml.transistore.clustertest.dual;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -25,11 +25,11 @@ import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
+import com.fasterxml.transistore.clustertest.ClusterTestBase;
+import com.fasterxml.transistore.clustertest.StoreForTests;
+import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-import com.force.vagabond.clustertest.StoreForTests;
-import com.force.vagabond.clustertest.ClusterTestBase;
-import com.force.vagabond.clustertest.util.TimeMasterForClusterTesting;
 
 /**
  * Simple CRUD tests for two-node setup (with 100% overlapping key range),
