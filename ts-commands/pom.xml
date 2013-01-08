@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion> 
+  <parent>
+    <groupId>com.fasterxml.transistore</groupId>
+    <artifactId>transistore-parent</artifactId>
+    <version>0.5.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>transistore-commands</artifactId>
+  <name>TransiStore Commands</name>
+  <packaging>jar</packaging>
+  <description>Package that contains CLI, commands to invoke from shell.
+  </description>
+
+  <dependencies>
+    <!--  Cross-module deps -->
+    <dependency>
+      <groupId>com.fasterxml.transistore</groupId>
+      <artifactId>transistore-basic</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!--  also using common stuff from StoreMate/ClusterMate -->
+    <dependency>
+      <groupId>com.fasterxml.clustermate</groupId>
+      <artifactId>clustermate-client</artifactId>
+      <version>${version.clustermate}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.clustermate</groupId>
+      <artifactId>clustermate-client-ahc</artifactId>
+      <version>${version.clustermate}</version>
+    </dependency>
+
+    <!--  and then other stuff -->
+	<dependency>
+	  <groupId>io.airlift</groupId>
+	  <artifactId>airline</artifactId>
+	  <version>0.5-SNAPSHOT</version>
+	</dependency>
+
+  </dependencies>
+</project>

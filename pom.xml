@@ -22,8 +22,9 @@
     <module>ts-dropwizard</module>
     <!--  test module(s) -->
     <module>ts-test-cluster</module>
-    <!--  and then full "fat JAR" deployabe package(s)
+    <!--  and then deployabe package(s)
       -->
+    <module>ts-commands</module>
     <module>ts-server</module>
   </modules>
 
