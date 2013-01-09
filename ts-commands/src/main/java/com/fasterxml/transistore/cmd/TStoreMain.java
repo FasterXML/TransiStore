@@ -8,7 +8,7 @@ public class TStoreMain
 {
     public static void main(String[] args)
     {
-        CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
+        CliBuilder<Runnable> builder = Cli.<Runnable>builder("tstore")
                 .withDescription("Main tstore command for listing, copying and removing files")
                 .withDefaultCommand(Help.class)
                 .withCommands(Help.class, ListCmd.class);
