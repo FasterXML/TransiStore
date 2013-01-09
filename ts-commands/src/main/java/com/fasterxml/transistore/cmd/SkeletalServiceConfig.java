@@ -6,7 +6,8 @@ import com.fasterxml.storemate.shared.IpAndPort;
 
 /**
  * Skeletal copy of the service configuration, used by local command-line
- * tools to get basic information, but without requiring a dep.
+ * tools to get basic information, but without requiring a dependency to
+ * definition (plus ignoring stuff that is not relevant to client side).
  */
 public class SkeletalServiceConfig
 {
