@@ -13,8 +13,8 @@ import com.fasterxml.clustermate.api.RequestPathBuilder;
  * Default {@link EntryKeyConverter} used with Basic TransiStore types.
  *<p>
  * In addition class implements encoding and decoding of the entry keys
- * (of type {@link BasicTSKey}): uses {@link BasicTSConstants#V_QUERY_PARAM_CLIENT_ID}
- * and {@link BasicTSConstants#V_QUERY_PARAM_PARTITION_ID} in addition to path
+ * (of type {@link BasicTSKey}): uses {@link BasicTSConstants#TS_QUERY_PARAM_PARTITION_ID}
+ * in addition to path
  * (which is regular filename).
  */
 public class BasicTSKeyConverter
@@ -111,7 +111,8 @@ public class BasicTSKeyConverter
      * 
      * @param fullKey Full concatenated id.
      * @param partitionIdLengthInBytes Length of partition id included before path
-     * @return
+     * 
+     * @return Constructed key
      */
     public BasicTSKey construct(String fullKey, int partitionIdLengthInBytes)
     {
@@ -180,7 +181,7 @@ public class BasicTSKeyConverter
         int partitionIdLen = key.getPartitionIdLength();
         if (partitionIdLen > 0) {
             String partitionId = key.getPartitionId();
-            b = (B) b.addParameter(BasicTSConstants.V_QUERY_PARAM_PARTITION_ID, partitionId);
+            b = (B) b.addParameter(BasicTSConstants.TS_QUERY_PARAM_PARTITION_ID, partitionId);
             // and then remove partition id to leave path
             path = path.substring(partitionId.length());
         }
@@ -192,7 +193,7 @@ public class BasicTSKeyConverter
     @Override
     public <P extends DecodableRequestPath> BasicTSKey extractFromPath(P path)
     {
-        final String partitionId = path.getQueryParameter(BasicTSConstants.V_QUERY_PARAM_PARTITION_ID);
+        final String partitionId = path.getQueryParameter(BasicTSConstants.TS_QUERY_PARAM_PARTITION_ID);
         // but ignore empty one
         final String filename = path.getDecodedPath();
         if (partitionId != null) {

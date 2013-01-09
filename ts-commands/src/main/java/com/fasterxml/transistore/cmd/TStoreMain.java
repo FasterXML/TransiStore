@@ -9,19 +9,14 @@ public class TStoreMain
     public static void main(String[] args)
     {
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("git")
-                .withDescription("the stupid content tracker")
-                .withDefaultCommand(Help.class)
-                .withCommands(Help.class,
-                        ListCmd.class);
-        /*
                 .withDescription("Main tstore command for listing, copying and removing files")
                 .withDefaultCommand(Help.class)
                 .withCommands(Help.class, ListCmd.class);
-        */
 
+        // If we wanted something like "git [options] remote add [options]", we'd add:
         /*
-        builder.withGroup("remote")
-                .withDescription("Manage set of tracked repositories")
+        builder.withGroup("list")
+                .withDescription("List stored entries in specified partition")
                 .withDefaultCommand(RemoteShow.class)
                 .withCommands(RemoteShow.class, RemoteAdd.class);
                 */

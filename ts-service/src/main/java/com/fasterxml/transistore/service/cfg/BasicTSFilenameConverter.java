@@ -7,7 +7,7 @@ import com.fasterxml.storemate.store.file.DefaultFilenameConverter;
 import com.fasterxml.transistore.basic.BasicTSKey;
 
 /**
- * We need a custom converter since basic {@link EntryKey} does not
+ * We need a custom converter since basic <code>EntryKey</code> does not
  * have functionality for generic "as String" functionality.
  * Plus we could make filenames bit more aesthetically pleasing...
  */
