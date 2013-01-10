@@ -10,11 +10,11 @@
   }
 
   ,"ts" : {
-    "metadataDirectory" : "data-vagabond/"
+    "metadataDirectory" : "data-tstore-nodes/"
     ,"cfgSyncGracePeriod" : "10s"
 
     ,"storeConfig" : {
-      "dataRootForFiles" : "data-files/"
+      "dataRootForFiles" : "data-tstore-blobs/"
 
       ,"compressionEnabled" : true
       ,"maxInlinedStorageSize" : 2000
@@ -23,7 +23,7 @@
     }
     ,"storeBackendType" : "com.fasterxml.storemate.backend.bdbje.BDBJEBuilder"
     ,"storeBackendConfig" : {
-      "dataRoot" : "data-bdb/"
+      "dataRoot" : "data-tstore-entries/"
       ,"cacheSize" : "32MB"
     }
 
