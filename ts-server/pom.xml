@@ -8,7 +8,8 @@
   <artifactId>transistore-server</artifactId>
   <name>TransiStore Server</name>
   <packaging>jar</packaging>
-  <description>Full deployment of default TransiStore service, using basic storage types.
+  <description>Full deployment of default TransiStore service, using basic storage types,
+  packaged as "fat jar" with its dependencies.
   </description>
 
   <dependencies>
@@ -44,48 +45,6 @@
                 </excludes>
             </filter>
         </filters>
-        <relocations>
-        <!-- 12-Jun-2012, tatu: We actually need to relocate most of the stuff
-            to let us run in the big monolithic beast during tests...
-         -->
-            <!--  Looks like Jersey is unshade-able? -->
-            <!--
-            <relocation>
-                <pattern>com.sun.jersey</pattern>
-                <shadedPattern>shaded.jersey</shadedPattern>
-            </relocation>
-            -->
-            <relocation>
-                <pattern>com</pattern>
-                <shadedPattern>shadedcom</shadedPattern>
-		<excludes>
-		    <!--  Should not relocate main TransiStore code,
-		          plus Jersey appears "unshadeable".
-		          And Jackson annotations don't shade well either, it seems
-		      -->
-                    <exclude>com.fasterxml.storemate.**</exclude>
-                    <exclude>com.fasterxml.transistore.**</exclude>
-                    <exclude>com.sun.jersey.**</exclude>
-                    <exclude>com.fasterxml.jackson.annotation.**</exclude>
-                </excludes>
-            </relocation>
-            <relocation>
-                <pattern>org</pattern>
-                <shadedPattern>shadedorg</shadedPattern>
-                <excludes>
-                    <!-- Observed non-shadeable pieces :
-                           Joda (suspected)
-                           Hibernate validator due to resource embedding
-                           org.xml for SAX API
-                           org.ietf.jgss: some crap AHC insists on...
-                     -->
-                    <exclude>org.joda.**</exclude>
-                    <exclude>org.hibernate.validator.**</exclude>
-                    <exclude>org.xml.**</exclude>
-                    <exclude>org.ietf.**</exclude>
-                </excludes>
-            </relocation>
-        </relocations>
       </configuration>
       <executions>
         <execution>
@@ -97,7 +56,7 @@
                 <transformers>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                        <mainClass>com.fasterxml.transistore.server.BasicTransiStoreService</mainClass>
+                        <mainClass>com.fasterxml.transistore.dw.BasicTSServiceOnDW</mainClass>
                     </transformer>
                 </transformers>
             </configuration>
@@ -106,16 +65,4 @@
     </plugin>
    </plugins>
   </build>
-
-   <!-- Ugh. Oracle can't push to central repo? May need this for BDB-JE -->
-<!--
-  <repositories>
-     <repository>
-         <id>oracleReleases</id>
-         <name>Oracle Released Java Packages</name>
-         <url>http://download.oracle.com/maven</url>
-         <layout>default</layout>
-     </repository>
-  </repositories>
--->
 </project>

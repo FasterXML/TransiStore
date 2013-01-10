@@ -1,0 +1,37 @@
+{
+  "http" : {
+    "port" : 9090
+    ,"adminPort" : 9090
+    ,"gzip" : {
+      "enabled" : false
+    }
+    ,"maxIdleTime" : "30 seconds"
+    ,"shutdownGracePeriod" : "5 seconds"
+  }
+
+  ,"ts" : {
+    "metadataDirectory" : "data-vagabond/"
+    ,"cfgSyncGracePeriod" : "10s"
+
+    ,"storeConfig" : {
+      "dataRootForFiles" : "data-files/"
+
+      ,"compressionEnabled" : true
+      ,"maxInlinedStorageSize" : 2000
+      ,"minUncompressedSizeForCompression" : 250
+      ,"maxUncompressedSizeForGZIP" : 8000
+    }
+    ,"storeBackendType" : "com.fasterxml.storemate.backend.bdbje.BDBJEBuilder"
+    ,"storeBackendConfig" : {
+      "dataRoot" : "data-bdb/"
+      ,"cacheSize" : "32MB"
+    }
+
+    ,"cluster" : {
+      "type" : "SIMPLE_LINEAR"
+      ,"clusterKeyspaceSize" : 1024
+      ,"numberOfCopies" : 1
+      ,"clusterNodes" : [ "localhost:9090" ]
+    }
+  }
+}
