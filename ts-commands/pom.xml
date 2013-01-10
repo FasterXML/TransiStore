@@ -38,27 +38,7 @@
 
   <build>
     <plugins>
-      <!--  and make it real actual executable! -->
-      <plugin>
-	   <groupId>org.skife.maven</groupId>
-	   <artifactId>really-executable-jar-maven-plugin</artifactId>
-	   <version>1.0.5</version>
-	   <configuration>
-	     <!-- value of flags will be interpolated into the java invocation -->
-	     <!-- as "java $flags -jar ..." -->
-	     <programFile>tstore</programFile>
-	     <flags>-Xmx200m</flags>
-	   </configuration>
-	
-	   <executions>
-	     <execution>
-	      <phase>package</phase>
-	      <goals>
-	        <goal>really-executable-jar</goal>
-	      </goals>
-	     </execution>
-	   </executions>
- 	 </plugin>
+      <!--  First, shade it all as a big happy bundle -->
       <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-shade-plugin</artifactId>
@@ -93,6 +73,27 @@
         </execution>
       </executions>
     </plugin>
+      <!-- and then make it real actual executable! -->
+      <plugin>
+        <groupId>org.skife.maven</groupId>
+        <artifactId>really-executable-jar-maven-plugin</artifactId>
+        <version>1.0.5</version>
+        <configuration>
+          <!-- value of flags will be interpolated into the java invocation -->
+          <!-- as "java $flags -jar ..." -->
+          <programFile>tstore</programFile>
+          <flags>-Xmx200m</flags>
+        </configuration>
+     
+        <executions>
+          <execution>
+           <phase>package</phase>
+           <goals>
+             <goal>really-executable-jar</goal>
+           </goals>
+          </execution>
+        </executions>
+      </plugin>
    </plugins>
   </build>
 

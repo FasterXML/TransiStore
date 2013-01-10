@@ -24,8 +24,8 @@
     <module>ts-test-cluster</module>
     <!--  and then deployabe package(s)
       -->
-    <module>ts-commands</module>
     <module>ts-server</module>
+    <module>ts-commands</module>
   </modules>
 
   <url>https://github.com/FasterXML/TransiStore</url>
