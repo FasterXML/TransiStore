@@ -6,7 +6,7 @@ import io.airlift.command.Help;
 
 public class TStoreMain
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("tstore")
                 .withDescription("Main tstore command for listing, copying and removing files")
@@ -23,6 +23,23 @@ public class TStoreMain
 
         Cli<Runnable> gitParser = builder.build();
 
-        gitParser.parse(args).run();
+        try {
+            gitParser.parse(args).run();
+        } catch (IllegalArgumentException e) {
+            fail(e);
+        } catch (IllegalStateException e) {
+            fail(e);
+        }
+    }
+    
+    
+    private static void fail(Exception e)
+    {
+        String msg = e.getMessage();
+        if (msg == null || msg.isEmpty()) {
+            msg = "(" + e.getClass().getName() +")";
+        }
+        System.err.println("Failure: "+msg);
+        System.exit(1);
     }
 }

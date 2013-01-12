@@ -11,7 +11,7 @@ import com.fasterxml.storemate.shared.IpAndPort;
  */
 public class SkeletalServiceConfig
 {
-    public Wrapper v = new Wrapper(); // "v" is for Vagabond!
+    public Wrapper ts = new Wrapper();
     
     public static class Wrapper {
         public Cluster cluster = new Cluster();

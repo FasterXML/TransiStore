@@ -25,6 +25,16 @@
     </dependency>
 
     <!--  and then other stuff -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${version.logback}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${version.jackson}</version>
+    </dependency>
 	<dependency>
 	  <groupId>io.airlift</groupId>
 	  <artifactId>airline</artifactId>
