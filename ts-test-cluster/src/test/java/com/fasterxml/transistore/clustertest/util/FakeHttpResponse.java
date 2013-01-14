@@ -6,6 +6,7 @@ import com.fasterxml.clustermate.api.ClusterMateConstants;
 import com.fasterxml.clustermate.service.ServiceResponse;
 import com.fasterxml.clustermate.service.msg.StreamingResponseContentImpl;
 
+@SuppressWarnings("unchecked")
 public class FakeHttpResponse extends ServiceResponse
 {
     protected int statusCode = 200;
