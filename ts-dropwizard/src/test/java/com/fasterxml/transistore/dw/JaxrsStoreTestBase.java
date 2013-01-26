@@ -122,7 +122,8 @@ public abstract class JaxrsStoreTestBase extends TestCase
         // important: configure to reduce log noise:
         stuff.markAsTest();
         stores.initAndOpen(false);
-        ClusterViewByServer cluster = null; // ok just for tests
+        // should be ok to pass null cluster for testing (only needed when accessing lists)
+        ClusterViewByServer cluster = null;
         return new StoreResourceForTests<BasicTSKey, StoredEntry<BasicTSKey>>(clusterViewForTesting(stuff, stores),
                         new BasicTSStoreHandler(stuff, stores, cluster), stuff);
     }

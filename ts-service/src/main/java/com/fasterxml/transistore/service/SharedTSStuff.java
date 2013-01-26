@@ -16,6 +16,7 @@ public abstract class SharedTSStuff extends SharedServiceStuff
         super(timeMaster, fileManager, pathStrategy);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public abstract EntryKeyConverter<BasicTSKey> getKeyConverter();
 }

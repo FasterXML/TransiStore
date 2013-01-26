@@ -24,12 +24,7 @@
       <version>${version.jackson}</version>
     </dependency>
 
-    <!--  also using common stuff from StoreMate/ClusterMate -->
-    <dependency>
-      <groupId>com.fasterxml.storemate</groupId>
-      <artifactId>storemate-shared</artifactId>
-      <version>${version.storemate}</version>
-    </dependency>
+    <!--  also using common stuff from ClusterMate -->
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-api</artifactId>

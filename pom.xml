@@ -54,7 +54,6 @@
 
     <version.storemate>0.8.10-SNAPSHOT</version.storemate>
     <version.clustermate>0.8.4-SNAPSHOT</version.clustermate>
-
     <version.jackson>2.1.2</version.jackson>
     <version.lzf>0.9.6</version.lzf>
     <version.logback>1.0.9</version.logback>

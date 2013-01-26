@@ -52,6 +52,7 @@ public class SharedTSStuffImpl
      return _serviceConfig.storeConfig;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> getEntryConverter() {
         return _entryConverter;
