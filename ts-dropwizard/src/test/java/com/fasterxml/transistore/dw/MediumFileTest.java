@@ -14,7 +14,6 @@ import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.dw.util.*;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 
-
 public class MediumFileTest extends JaxrsStoreTestBase
 {
     @Override

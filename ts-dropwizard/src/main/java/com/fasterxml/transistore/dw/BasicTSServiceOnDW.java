@@ -108,8 +108,9 @@ public class BasicTSServiceOnDW
     
     @Override
     protected StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>> constructStoreHandler(SharedServiceStuff serviceStuff,
-            Stores<BasicTSKey, StoredEntry<BasicTSKey>> stores) {
-        return new BasicTSStoreHandler(serviceStuff, _stores);
+            Stores<BasicTSKey, StoredEntry<BasicTSKey>> stores,
+            ClusterViewByServer cluster) {
+        return new BasicTSStoreHandler(serviceStuff, _stores, cluster);
     }
 
     @Override

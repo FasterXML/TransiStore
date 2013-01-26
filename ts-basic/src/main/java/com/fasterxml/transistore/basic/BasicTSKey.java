@@ -1,6 +1,6 @@
 package com.fasterxml.transistore.basic;
 
-import com.fasterxml.storemate.shared.EntryKey;
+import com.fasterxml.clustermate.api.EntryKey;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.shared.util.WithBytesAsUTF8String;
 import com.fasterxml.storemate.shared.util.WithBytesCallback;

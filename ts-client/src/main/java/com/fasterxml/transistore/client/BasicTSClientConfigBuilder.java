@@ -1,6 +1,6 @@
 package com.fasterxml.transistore.client;
 
-import com.fasterxml.clustermate.client.impl.StoreClientConfigBuilder;
+import com.fasterxml.clustermate.client.StoreClientConfigBuilder;
 import com.fasterxml.clustermate.client.operation.OperationConfig;
 
 import com.fasterxml.transistore.basic.BasicTSKey;

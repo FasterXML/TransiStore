@@ -3,7 +3,7 @@ package com.fasterxml.transistore.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.clustermate.api.EntryKeyConverter;
-import com.fasterxml.clustermate.client.impl.StoreClientConfig;
+import com.fasterxml.clustermate.client.StoreClientConfig;
 import com.fasterxml.clustermate.client.operation.OperationConfig;
 
 import com.fasterxml.transistore.basic.BasicTSKey;

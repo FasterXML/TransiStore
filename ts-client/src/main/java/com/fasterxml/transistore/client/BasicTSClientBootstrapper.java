@@ -2,8 +2,8 @@ package com.fasterxml.transistore.client;
 
 import com.fasterxml.clustermate.api.ClusterStatusAccessor;
 import com.fasterxml.clustermate.client.NetworkClient;
+import com.fasterxml.clustermate.client.StoreClientBootstrapper;
 import com.fasterxml.clustermate.client.cluster.ClusterViewByClientImpl;
-import com.fasterxml.clustermate.client.impl.StoreClientBootstrapper;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 
