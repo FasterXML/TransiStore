@@ -1,7 +1,6 @@
 package com.fasterxml.transistore.client;
 
 import com.fasterxml.clustermate.client.StoreClientConfigBuilder;
-import com.fasterxml.clustermate.client.operation.OperationConfig;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
@@ -30,10 +29,8 @@ public class BasicTSClientConfigBuilder
     }
     
     @Override
-    public BasicTSClientConfig build()
-    {
-        OperationConfig operConfig = buildOperationConfig();
-        return new BasicTSClientConfig(_keyConverter, _basePath,
-                _jsonMapper, operConfig);
+    public BasicTSClientConfig build() {
+        return new BasicTSClientConfig(_keyConverter, _basePath, _jsonMapper,
+                buildOperationConfig());
     }
 }

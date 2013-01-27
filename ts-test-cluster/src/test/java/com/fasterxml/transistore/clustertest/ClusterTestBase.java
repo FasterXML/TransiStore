@@ -29,6 +29,8 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  */
 public abstract class ClusterTestBase extends TestCase
 {
+    protected final static int SINGLE_TEST_PORT = 7777;
+    
     // null -> require client id with key
     protected final BasicTSKeyConverter _keyConverter = BasicTSKeyConverter.defaultInstance();
     
@@ -87,11 +89,15 @@ public abstract class ClusterTestBase extends TestCase
     /* Other factory methods
     /**********************************************************************
      */
-    
+
     protected BasicTSKey contentKey(String fullPath) {
         return _keyConverter.construct(fullPath);
     }
 
+    protected BasicTSKey contentKey(String partition, String fullPath) {
+        return _keyConverter.construct(partition, fullPath);
+    }
+    
     /*
     /**********************************************************************
     /* Service life cycle

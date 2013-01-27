@@ -15,19 +15,16 @@ import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-
 /**
  * Tests to verify that we can use byte ranges to access part of content.
  */
 public class ByteRangesTest extends ClusterTestBase
 {
-    private final static int TEST_PORT = 7777;
-    
     public void testSimpleSingleNode() throws Exception
     {
         initTestLogging(); // reduce noise
         
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1", true, TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ByteRanges", true, SINGLE_TEST_PORT);
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), false);
@@ -39,7 +36,7 @@ public class ByteRangesTest extends ClusterTestBase
 	        .setMaxOks(1)
 	        .build();
         BasicTSClient client = new AHCBasedClientBootstrapper(clientConfig)
-            .addNode(new IpAndPort("http", "localhost", TEST_PORT))
+            .addNode(new IpAndPort("http", "localhost", SINGLE_TEST_PORT))
             .buildAndInitCompletely(5);
 
         // // // Small content: inlined, not-compressed
