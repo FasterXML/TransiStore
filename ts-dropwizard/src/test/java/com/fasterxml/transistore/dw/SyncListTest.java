@@ -55,8 +55,8 @@ public class SyncListTest extends JaxrsStoreTestBase
 
         FakeHttpRequest syncReq = new FakeHttpRequest();
         final KeyRange localRange = resource.getKeyRange();
-        syncReq.addQueryParam(ClusterMateConstants.HTTP_QUERY_PARAM_KEYRANGE_START, ""+localRange.getStart());
-        syncReq.addQueryParam(ClusterMateConstants.HTTP_QUERY_PARAM_KEYRANGE_LENGTH, ""+localRange.getLength());
+        syncReq.addQueryParam(ClusterMateConstants.QUERY_PARAM_KEYRANGE_START, ""+localRange.getStart());
+        syncReq.addQueryParam(ClusterMateConstants.QUERY_PARAM_KEYRANGE_LENGTH, ""+localRange.getLength());
         // JSON or Smile? Either should be fine...
         syncReq.addHeader(ClusterMateConstants.HTTP_HEADER_ACCEPT, ContentType.SMILE.toString());
         
@@ -117,8 +117,8 @@ public class SyncListTest extends JaxrsStoreTestBase
 
         FakeHttpRequest syncReq = new FakeHttpRequest();
         final KeyRange localRange = resource.getKeyRange();
-        syncReq.addQueryParam(ClusterMateConstants.HTTP_QUERY_PARAM_KEYRANGE_START, ""+localRange.getStart());
-        syncReq.addQueryParam(ClusterMateConstants.HTTP_QUERY_PARAM_KEYRANGE_LENGTH, ""+localRange.getLength());
+        syncReq.addQueryParam(ClusterMateConstants.QUERY_PARAM_KEYRANGE_START, ""+localRange.getStart());
+        syncReq.addQueryParam(ClusterMateConstants.QUERY_PARAM_KEYRANGE_LENGTH, ""+localRange.getLength());
         syncReq.addHeader(ClusterMateConstants.HTTP_HEADER_ACCEPT, ContentType.SMILE.toString());
         
         response = new FakeHttpResponse();

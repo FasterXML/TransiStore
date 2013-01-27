@@ -6,7 +6,6 @@ import com.fasterxml.clustermate.api.ListItemType;
 import com.fasterxml.clustermate.client.operation.ListOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.client.operation.StoreEntryLister;
-import com.fasterxml.clustermate.jaxrs.testutil.TestKey;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
 
@@ -42,8 +41,8 @@ public class ListEntriesTest extends ClusterTestBase
         // First, set up test data: 5 things to iterate, 3 others
         addEntry(client, PARTITION2, "foo");
         addEntry(client, PARTITION2, "bar");
-        addEntry(client, PARTITION2, "xyz");
-        addEntry(client, PARTITION2, "aaa");
+        addEntry(client, PARTITION2, "dir/abc");
+        addEntry(client, PARTITION2, "dir/def");
         addEntry(client, PARTITION2, "zzz");
 
         addEntry(client, null, "foo");
@@ -57,23 +56,27 @@ public class ListEntriesTest extends ClusterTestBase
         StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(contentKey(PARTITION2, ""), ListItemType.ids);
 
         ListOperationResult<StorableKey> row = lister.listMore(2);
-        assertTrue(row.succeeded());
+        if (!row.succeeded()) {
+            fail("Failed: "+row.getFirstFail());
+        }
         List<StorableKey> ids = row.getItems();
         assertEquals(2, ids.size());
-        assertEquals(contentKey(PARTITION2, "aaa"), ids.get(0));
-        assertEquals(contentKey(PARTITION2, "bar"), ids.get(1));
+        assertEquals(contentKey(PARTITION2, "bar"), ids.get(0));
+        assertEquals(contentKey(PARTITION2, "foo"), ids.get(1));
         
         row = lister.listMore(4);
         assertTrue(row.succeeded());
         ids = row.getItems();
         assertEquals(4, ids.size());
-        assertEquals(contentKey(PARTITION2, "foo"), ids.get(0));
-        assertEquals(contentKey(PARTITION2, "xyz"), ids.get(1));
+        assertEquals(contentKey(PARTITION2, "dir/abc"), ids.get(0));
+        assertEquals(contentKey(PARTITION2, "dir/def"), ids.get(1));
         assertEquals(contentKey(PARTITION2, "zzz"), ids.get(2));
 
         // and then no more entries
         row = lister.listMore(4);
-        assertTrue(row.succeeded());
+        if (!row.succeeded()) {
+            fail("Failed: "+row.getFirstFail());
+        }
         ids = row.getItems();
         assertEquals(0, ids.size());
         
