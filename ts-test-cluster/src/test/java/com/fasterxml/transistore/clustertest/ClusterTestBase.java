@@ -14,6 +14,7 @@ import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
 import com.fasterxml.clustermate.service.cfg.NodeConfig;
 import com.fasterxml.storemate.backend.bdbje.BDBJEConfig;
+import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.shared.hash.BlockMurmur3Hasher;
 import com.fasterxml.storemate.store.AdminStorableStore;
@@ -96,6 +97,10 @@ public abstract class ClusterTestBase extends TestCase
 
     protected BasicTSKey contentKey(String partition, String fullPath) {
         return _keyConverter.construct(partition, fullPath);
+    }
+
+    protected BasicTSKey contentKey(StorableKey raw) {
+        return _keyConverter.rawToEntryKey(raw);
     }
     
     /*

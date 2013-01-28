@@ -61,16 +61,16 @@ public class ListEntriesTest extends ClusterTestBase
         }
         List<StorableKey> ids = row.getItems();
         assertEquals(2, ids.size());
-        assertEquals(contentKey(PARTITION2, "bar"), ids.get(0));
-        assertEquals(contentKey(PARTITION2, "foo"), ids.get(1));
+        assertEquals(contentKey(PARTITION2, "bar"), contentKey(ids.get(0)));
+        assertEquals(contentKey(PARTITION2, "dir/abc"), contentKey(ids.get(1)));
         
         row = lister.listMore(4);
         assertTrue(row.succeeded());
         ids = row.getItems();
         assertEquals(4, ids.size());
-        assertEquals(contentKey(PARTITION2, "dir/abc"), ids.get(0));
-        assertEquals(contentKey(PARTITION2, "dir/def"), ids.get(1));
-        assertEquals(contentKey(PARTITION2, "zzz"), ids.get(2));
+        assertEquals(contentKey(PARTITION2, "dir/def"), contentKey(ids.get(0)));
+        assertEquals(contentKey(PARTITION2, "foo"), contentKey(ids.get(1)));
+        assertEquals(contentKey(PARTITION2, "zzz"), contentKey(ids.get(2)));
 
         // and then no more entries
         row = lister.listMore(4);
