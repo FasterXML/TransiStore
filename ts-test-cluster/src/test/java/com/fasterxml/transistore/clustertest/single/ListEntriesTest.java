@@ -67,7 +67,7 @@ public class ListEntriesTest extends ClusterTestBase
         row = lister.listMore(4);
         assertTrue(row.succeeded());
         ids = row.getItems();
-        assertEquals(4, ids.size());
+        assertEquals(3, ids.size());
         assertEquals(contentKey(PARTITION2, "dir/def"), contentKey(ids.get(0)));
         assertEquals(contentKey(PARTITION2, "foo"), contentKey(ids.get(1)));
         assertEquals(contentKey(PARTITION2, "zzz"), contentKey(ids.get(2)));
@@ -77,8 +77,27 @@ public class ListEntriesTest extends ClusterTestBase
         if (!row.succeeded()) {
             fail("Failed: "+row.getFirstFail());
         }
-        ids = row.getItems();
-        assertEquals(0, ids.size());
+        assertEquals(0, row.getItems().size());
+        
+        // // Second scan; now with longer prefix...
+
+        lister = client.listContent(contentKey(PARTITION2, "dir/"), ListItemType.ids);
+        row = lister.listMore(1);
+        if (!row.succeeded()) {
+            fail("Failed: "+row.getFirstFail());
+        }
+        assertEquals(1, row.getItems().size());
+        assertEquals(contentKey(PARTITION2, "dir/abc"), contentKey(row.getItems().get(0)));
+
+        row = lister.listMore(1);
+        assertTrue(row.succeeded());
+        assertEquals(1, row.getItems().size());
+        assertEquals(contentKey(PARTITION2, "dir/def"), contentKey(row.getItems().get(0)));
+        row = lister.listMore(1);
+        if (!row.succeeded()) {
+            fail("Failed: "+row.getFirstFail());
+        }
+        assertEquals(0, row.getItems().size());
         
         // and That's All, Folks!
         
