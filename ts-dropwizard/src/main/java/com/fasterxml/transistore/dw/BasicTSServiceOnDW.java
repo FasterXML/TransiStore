@@ -134,4 +134,14 @@ public class BasicTSServiceOnDW
         environment.addHealthCheck(new HealthCheckForBDB(config, _stores));
         environment.addHealthCheck(new HealthCheckForCluster(config, _cluster));
     }
+
+    /*
+    /**********************************************************************
+    /* Extended API
+    /**********************************************************************
+     */
+
+    public StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>> getStoreHandler() {
+        return _storeHandler;
+    }
 }

@@ -1,16 +1,21 @@
 package com.fasterxml.transistore.clustertest.dual;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Random;
 
 import org.skife.config.TimeSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.clustermate.client.operation.PutOperationResult;
-import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.Storable;
+
+import com.yammer.dropwizard.util.Duration;
+
+import com.fasterxml.clustermate.client.operation.PutOperationResult;
+import com.fasterxml.clustermate.service.cfg.ClusterConfig;
+import com.fasterxml.clustermate.std.ChecksumUtil;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
@@ -18,9 +23,10 @@ import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
+import com.fasterxml.transistore.clustertest.util.FakeHttpRequest;
+import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
-import com.yammer.dropwizard.util.Duration;
 
 public class TwoNodesBigSyncTest extends ClusterTestBase
 {
@@ -29,7 +35,7 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
     private final static int TEST_PORT1 = 9020;
     private final static int TEST_PORT2 = 9021;
 
-    private final static int ENTRIES = 250;
+    private final static int ENTRIES = 3000;
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
     
@@ -83,16 +89,31 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
             Random rnd = new Random(1);
         
             // and start sending stuff!
+            long nextCheck = System.currentTimeMillis() + 1000L; // log progress...
             for (int i = 0; i < ENTRIES; ++i) {
                 final BasicTSKey key = generateKey(rnd, i);
                 byte[] data = generateData(rnd);
-                PutOperationResult put = client.putContent(clientConfig, key, data);
-                assertEquals(put.getSuccessCount(), 1);
+                
+                // do occasional PUTs via real client; but mostly direct, latter
+                // to speed up test.
+                if ((i % 31) == 0) {
+                    PutOperationResult put = client.putContent(clientConfig, key, data);
+                    assertEquals(put.getSuccessCount(), 1);
+                } else {
+                    FakeHttpResponse response = new FakeHttpResponse();
+                    final int inputHash = ChecksumUtil.calcChecksum(data);
+                    service1.getStoreHandler().putEntry(new FakeHttpRequest(), response,
+                            key, inputHash, new ByteArrayInputStream(data),
+                            null, null, null);
+                    assertEquals(200, response.getStatus());
+                }
+
                 // advance a bit every now and then
                 if ((i % 3) == 1) {
                     timeMaster.advanceCurrentTimeMillis(1L);
                 }
-                if ((i % 100) == 99) {
+                if (System.currentTimeMillis() > nextCheck) {
+                    nextCheck += 1000L;
                     LOG.warn("Test has sent {}/{} requests", (i+1), ENTRIES);
                 }
             }
@@ -110,14 +131,16 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
             timeMaster.advanceCurrentTimeMillis(5000L);
             Thread.sleep(10L);
 
-            // and loop for a bit, so that syncing occurs
+            // and loop for a bit, so that syncing occurs; looks like our rate is rather low..
+            final int ROUNDS = 5 + (ENTRIES / 20);
+            
             for (int i = 0; true; ++i) {
                 long entries = service2.getEntryStore().getEntryCount();
                 if (entries == ENTRIES) {
                     break;
                 }
-                if (i > 90) {
-                    fail("Failed to sync after "+i+" rounds; entries: "+entries);
+                if (i > ROUNDS) {
+                    fail("Failed to sync after "+ROUNDS+" rounds; entries: "+entries+" (of "+ENTRIES+")");
                 }
                 timeMaster.advanceCurrentTimeMillis(15000L);
                 Thread.sleep(10L);
@@ -164,13 +187,13 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
         if (copy == null) {
             fail("Entry #"+index+"/"+ENTRIES+" missing from destination store");
         }
-        // plus verify contents
+        // plus verify contents...
         byte[] data = generateData(rnd);
-        if (data.length != copy.getOriginalLength()) {
-            fail("Entry #"+index+"/"+ENTRIES+" has wrong length ("+copy.getOriginalLength()+"), expect "+data.length);
+        if (data.length != copy.getActualUncompressedLength()) {
+            fail("Uncompressed entry #"+index+"/"+ENTRIES+" has wrong length ("+copy.getActualUncompressedLength()+"), expect "+data.length);
         }
     }
-    
+
     protected BasicTSKey generateKey(Random rnd, int ix) {
         return contentKey("key"+(rnd.nextInt() & 0xF)+"_"+ix);
     }
