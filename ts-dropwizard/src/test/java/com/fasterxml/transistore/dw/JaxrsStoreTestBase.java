@@ -11,7 +11,6 @@ import com.fasterxml.storemate.backend.bdbje.BDBJEBuilder;
 import com.fasterxml.storemate.backend.bdbje.BDBJEConfig;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.TimeMaster;
-import com.fasterxml.storemate.shared.hash.ChecksumUtil;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.backend.StoreBackend;
@@ -28,6 +27,7 @@ import com.fasterxml.clustermate.service.cluster.ActiveNodeState;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServerImpl;
 import com.fasterxml.clustermate.service.store.StoredEntry;
+import com.fasterxml.clustermate.std.ChecksumUtil;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
@@ -39,7 +39,6 @@ import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 import com.fasterxml.transistore.service.store.BasicTSStoreHandler;
 import com.fasterxml.transistore.service.store.BasicTSStores;
-
 
 import junit.framework.TestCase;
 

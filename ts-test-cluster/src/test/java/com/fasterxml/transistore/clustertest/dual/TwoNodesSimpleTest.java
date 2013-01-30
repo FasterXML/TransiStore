@@ -30,7 +30,6 @@ import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-
 /**
  * Simple CRUD tests for two-node setup (with 100% overlapping key range),
  * using basic two-way replication by client. Both nodes run on same JVM.
