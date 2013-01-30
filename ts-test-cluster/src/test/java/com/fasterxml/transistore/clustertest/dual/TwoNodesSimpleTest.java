@@ -9,17 +9,17 @@ import org.junit.Assert;
 
 import com.yammer.dropwizard.util.Duration;
 
-import com.fasterxml.clustermate.client.NodesForKey;
-import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
-import com.fasterxml.clustermate.client.operation.PutOperationResult;
-import com.fasterxml.clustermate.service.cfg.ClusterConfig;
-import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
-import com.fasterxml.clustermate.service.cfg.NodeConfig;
-import com.fasterxml.clustermate.service.cluster.ClusterPeer;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.store.Storable;
+
+import com.fasterxml.clustermate.client.NodesForKey;
+import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
+import com.fasterxml.clustermate.client.operation.PutOperationResult;
+import com.fasterxml.clustermate.service.cfg.ClusterConfig;
+import com.fasterxml.clustermate.service.cluster.ClusterPeer;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
@@ -49,7 +49,7 @@ public class TwoNodesSimpleTest extends ClusterTestBase
         IpAndPort endpoint2 = new IpAndPort("localhost:"+TEST_PORT2);
 
         // both nodes need same (or at least similar enough) cluster config:
-        ClusterConfig clusterConfig = _twoNodeClusterConfig(endpoint1, endpoint2, 100);
+        ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 100);
 
         BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2_1", true, TEST_PORT1, clusterConfig);
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(200L);
@@ -130,7 +130,7 @@ public class TwoNodesSimpleTest extends ClusterTestBase
         IpAndPort endpoint2 = new IpAndPort("localhost:"+TEST_PORT2);
 
         // use keyspace length of 360 to force specific distribution of entries
-        ClusterConfig clusterConfig = _twoNodeClusterConfig(endpoint1, endpoint2, 360);
+        ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 360);
         
         // reduce shutdown grace period to speed up shutdown...
         final Duration shutdownDelay = Duration.milliseconds(100L);
@@ -310,19 +310,5 @@ public class TwoNodesSimpleTest extends ClusterTestBase
             }
         }
         return true;
-    }
-
-    protected ClusterConfig _twoNodeClusterConfig(IpAndPort endpoint1, IpAndPort endpoint2,
-            int keyspaceLength)
-    {
-        ClusterConfig clusterConfig = new ClusterConfig();
-        // Should be fine to use semi-dynamic allocation
-        
-        clusterConfig.clusterKeyspaceSize = keyspaceLength; // with 2 nodes, anything divisible by 2 is fine
-        clusterConfig.numberOfCopies = 2;
-        clusterConfig.type = KeyRangeAllocationStrategy.SIMPLE_LINEAR;
-        clusterConfig.clusterNodes.add(new NodeConfig(endpoint1));
-        clusterConfig.clusterNodes.add(new NodeConfig(endpoint2));
-        return clusterConfig;
     }
 }

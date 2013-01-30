@@ -14,6 +14,7 @@ import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
 import com.fasterxml.clustermate.service.cfg.NodeConfig;
 import com.fasterxml.storemate.backend.bdbje.BDBJEConfig;
+import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.shared.hash.BlockMurmur3Hasher;
@@ -85,6 +86,20 @@ public abstract class ClusterTestBase extends TestCase
         return createNodeConfig(testSuffix, cleanUp, port, cluster);
     }
 
+    protected ClusterConfig twoNodeClusterConfig(IpAndPort endpoint1, IpAndPort endpoint2,
+            int keyspaceLength)
+    {
+        ClusterConfig clusterConfig = new ClusterConfig();
+        // Should be fine to use semi-dynamic allocation
+        
+        clusterConfig.clusterKeyspaceSize = keyspaceLength; // with 2 nodes, anything divisible by 2 is fine
+        clusterConfig.numberOfCopies = 2;
+        clusterConfig.type = KeyRangeAllocationStrategy.SIMPLE_LINEAR;
+        clusterConfig.clusterNodes.add(new NodeConfig(endpoint1));
+        clusterConfig.clusterNodes.add(new NodeConfig(endpoint2));
+        return clusterConfig;
+    }
+    
     /*
     /**********************************************************************
     /* Other factory methods
