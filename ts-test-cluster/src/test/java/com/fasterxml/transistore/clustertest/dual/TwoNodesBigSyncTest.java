@@ -1,8 +1,11 @@
 package com.fasterxml.transistore.clustertest.dual;
 
+import java.io.IOException;
 import java.util.Random;
 
 import org.skife.config.TimeSpan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
@@ -26,7 +29,9 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
     private final static int TEST_PORT1 = 9020;
     private final static int TEST_PORT2 = 9021;
 
-    private final static int ENTRIES = 400;
+    private final static int ENTRIES = 250;
+
+    private final Logger LOG = LoggerFactory.getLogger(getClass());
     
     /* Let's test a sizable dataset, uploading content into just one node,
      * and then let synchronization happen. And once done (by counts),
@@ -43,18 +48,16 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
         ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 360);
         
         // reduce shutdown grace period to speed up shutdown...
-        final Duration shutdownDelay = Duration.milliseconds(100L);
-        BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2sync_1", true, TEST_PORT1, clusterConfig)
-               .setShutdownGracePeriod(shutdownDelay)
-               .setSyncGracePeriod(new TimeSpan("1s"));
+        BasicTSServiceConfigForDW serviceConfig1 = createTwoNodeConfig("fullStack2sync_1",
+                TEST_PORT1, clusterConfig);
+        
         // all nodes need same (or at least similar enough) cluster config:
         final long START_TIME = 200L;
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(START_TIME);
         // important: last argument 'true' so that background sync thread gets started
         StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, true);
-        BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2sync_2", true, TEST_PORT2, clusterConfig)
-               .setShutdownGracePeriod(shutdownDelay);
-        serviceConfig2.getServiceConfig().cluster = clusterConfig;
+        BasicTSServiceConfigForDW serviceConfig2 = createTwoNodeConfig("fullStack2sync_2",
+                TEST_PORT2, clusterConfig);
         StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, true);
 
         // but only start first one...
@@ -88,6 +91,9 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
                 // advance a bit every now and then
                 if ((i % 3) == 1) {
                     timeMaster.advanceCurrentTimeMillis(1L);
+                }
+                if ((i % 100) == 99) {
+                    LOG.warn("Test has sent {}/{} requests", (i+1), ENTRIES);
                 }
             }
             // and should now have all the entries in the first store
@@ -137,6 +143,16 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
         
     }
 
+    protected BasicTSServiceConfigForDW createTwoNodeConfig(String name, int port, ClusterConfig cluster)
+        throws IOException
+    {
+        final Duration shutdownDelay = Duration.milliseconds(100L);
+        return createNodeConfig(name, true, port, cluster)
+                .setShutdownGracePeriod(shutdownDelay)
+                .setSyncGracePeriod(new TimeSpan("1s"))
+                .disableRequestLog();
+    }
+    
     protected void verifyEntry(int index, Random rnd,
             StoreForTests store1, StoreForTests store2) throws Exception
     {

@@ -9,6 +9,8 @@ import org.skife.config.TimeSpan;
 
 import junit.framework.TestCase;
 
+import ch.qos.logback.classic.Level;
+
 import com.fasterxml.clustermate.client.Loggable;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
@@ -65,6 +67,8 @@ public abstract class ClusterTestBase extends TestCase
         // Use different port than regular runs:
         config.overrideHttpPort(port);
         config.overrideAdminPort(port);
+        // tone down logging
+        config.getLoggingConfiguration().setLevel(Level.WARN);
         // specified cluster defs:
         config.getServiceConfig().cluster = cluster;
         // plus, important: reduce grace period (as we can use TimeMaster) to 1 millisecond:
