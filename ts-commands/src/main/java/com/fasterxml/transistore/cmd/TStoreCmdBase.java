@@ -8,6 +8,9 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.basic.BasicTSKeyConverter;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientBootstrapper;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
@@ -16,7 +19,7 @@ import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
 
 import io.airlift.command.Option;
 
-public abstract class TStoreCmd implements Runnable
+public abstract class TStoreCmdBase implements Runnable
 {
     protected final static ObjectMapper mapper = new ObjectMapper();
     static {
@@ -24,6 +27,8 @@ public abstract class TStoreCmd implements Runnable
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
+    protected final static BasicTSKeyConverter KEY_CONVERTER = BasicTSKeyConverter.defaultInstance();
+    
     @Option(type = GLOBAL, name = { "-v", "--verbose"}, description = "Verbose mode")
     public boolean verbose = false;
 
@@ -88,5 +93,14 @@ public abstract class TStoreCmd implements Runnable
         } catch (IOException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
+    }
+
+    protected BasicTSKey contentKey(String partition, String path)
+    {
+        return null;
+    }
+
+    protected ObjectWriter jsonWriter(Class<?> cls) {
+        return mapper.writerWithType(cls);
     }
 }

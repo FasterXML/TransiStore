@@ -75,9 +75,9 @@ public class BasicTSKeyConverter
         return rawKey.with(new WithBytesCallback<BasicTSKey>() {
             @Override
             public BasicTSKey withBytes(byte[] buffer, int offset, int length) {
-                int groupIdLength = ((buffer[offset] & 0xFF) << 8)
+                int partitionIdLength = ((buffer[offset] & 0xFF) << 8)
                         | (buffer[offset+1] & 0xFF);
-                return new BasicTSKey(rawKey, groupIdLength);
+                return new BasicTSKey(rawKey, partitionIdLength);
             }
         });
     }
@@ -132,14 +132,14 @@ public class BasicTSKeyConverter
      * Method called to construct a {@link BasicTSKey} given a two-part
      * path; partition id as prefix, and additional path contextual path.
      */
-    public BasicTSKey construct(String groupId, String path)
+    public BasicTSKey construct(String partitionId, String path)
     {
         // sanity check for "no group id" case
-        if (groupId == null || groupId.length() == 0) {
+        if (partitionId == null || partitionId.length() == 0) {
             return construct(path);
         }
         
-        byte[] prefixPart = UTF8Encoder.encodeAsUTF8(groupId, DEFAULT_KEY_HEADER_LENGTH, 0, false);
+        byte[] prefixPart = UTF8Encoder.encodeAsUTF8(partitionId, DEFAULT_KEY_HEADER_LENGTH, 0, false);
         final int partitionIdLengthInBytes = prefixPart.length - DEFAULT_KEY_HEADER_LENGTH;
         if (partitionIdLengthInBytes > MAX_PARTITION_ID_BYTE_LENGTH) {
             throw new IllegalArgumentException("Partition id byte length too long ("+partitionIdLengthInBytes

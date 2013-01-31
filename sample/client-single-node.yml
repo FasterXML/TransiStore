@@ -1,0 +1,5 @@
+{ "ts" : {
+   "cluster" : {
+     "clusterNodes" : [ "http://localhost:9090/" ]
+   }
+}
