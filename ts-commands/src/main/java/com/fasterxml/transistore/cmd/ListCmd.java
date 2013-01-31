@@ -19,7 +19,7 @@ import io.airlift.command.Arguments;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 
-@Command(name = "list", description = "Lists files")
+@Command(name = "list", description = "Lists files stored in TStore, under specified partition")
 public class ListCmd extends TStoreCmdBase
 {
     @Option(name = { "-m", "--max" }, description = "Maximum number of entries to list",
@@ -69,18 +69,20 @@ public class ListCmd extends TStoreCmdBase
 
     private ListOperationResult<?> listAsJSON(BasicTSClient client, BasicTSKey prefix) throws InterruptedException
     {
+        int left = Math.max(1, maxEntries);
         StoreEntryLister<BasicTSKey, String> lister = client.listContent(prefix, ListItemType.names);
         while (true) {
-            ListOperationResult<String> result = lister.listMore(50);
+            ListOperationResult<String> result = lister.listMore(Math.min(left, 100));
             if (result.failed()) {
                 return result;
             }
             List<String> names = result.getItems();
-            if (names.isEmpty()) {
-                return result;
-            }
             for (String name : names) {
                 System.out.println(name);
+                --left;
+            }
+            if (left < 1) {
+                return result;
             }
         }
     }
@@ -88,6 +90,7 @@ public class ListCmd extends TStoreCmdBase
     private ListOperationResult<?> listAsText(BasicTSClient client, BasicTSKey prefix)
             throws InterruptedException, IOException
     {
+        int left = Math.max(1, maxEntries);
         StoreEntryLister<BasicTSKey, ListItem> lister = client.listContent(prefix, ListItemType.entries);
         // we'll have to deserialize, serialize back...
         ObjectWriter w = jsonWriter(ListItemType.entries.getValueType());
@@ -96,7 +99,7 @@ public class ListCmd extends TStoreCmdBase
         try {
             jgen.writeStartArray();
             while (true) {
-                ListOperationResult<?>  result = lister.listMore(50);
+                ListOperationResult<?>  result = lister.listMore(Math.min(left, 50));
                 if (result.failed()) { // note: no closing JSON array for failures
                     return result;
                 }
@@ -110,6 +113,10 @@ public class ListCmd extends TStoreCmdBase
                     w.writeValue(jgen, item);
                     // should we force this or not... ?
                     jgen.writeRaw("\n");
+                    --left;
+                }
+                if (left < 1) {
+                    return result;
                 }
             }
         } finally {

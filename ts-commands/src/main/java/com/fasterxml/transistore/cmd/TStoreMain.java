@@ -12,7 +12,8 @@ public class TStoreMain
         CliBuilder<Runnable> builder = Cli.<Runnable>builder("tstore")
                 .withDescription("Main tstore command for listing, copying and removing files")
                 .withDefaultCommand(Help.class)
-                .withCommands(Help.class, ListCmd.class);
+                .withCommands(Help.class,
+                        ListCmd.class, UploadCmd.class);
 
         // If we wanted something like "git [options] remote add [options]", we'd add:
         /*
@@ -29,6 +30,8 @@ public class TStoreMain
         } catch (IllegalArgumentException e) {
             fail(e);
         } catch (IllegalStateException e) {
+            fail(e);
+        } catch (RuntimeException e) {
             fail(e);
         }
     }

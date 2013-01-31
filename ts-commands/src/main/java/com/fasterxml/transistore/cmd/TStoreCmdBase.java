@@ -2,9 +2,9 @@ package com.fasterxml.transistore.cmd;
 
 import static io.airlift.command.OptionType.GLOBAL;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,5 +101,9 @@ public abstract class TStoreCmdBase implements Runnable
 
     protected ObjectWriter jsonWriter(Class<?> cls) {
         return mapper.writerWithType(cls);
+    }
+
+    protected JsonGenerator jsonGenerator(OutputStream out) throws IOException {
+        return mapper.getFactory().createGenerator(out);
     }
 }
