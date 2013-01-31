@@ -35,7 +35,7 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
     private final static int TEST_PORT1 = 9020;
     private final static int TEST_PORT2 = 9021;
 
-    private final static int ENTRIES = 3000;
+    private final static int ENTRIES = 2000;
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
     
@@ -132,9 +132,11 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
             Thread.sleep(10L);
 
             // and loop for a bit, so that syncing occurs; looks like our rate is rather low..
-            final int ROUNDS = 5 + (ENTRIES / 20);
+            final int ROUNDS = 5 + (ENTRIES / 5);
+            int i = 0;
+            final long start = System.currentTimeMillis();
             
-            for (int i = 0; true; ++i) {
+            for (; true; ++i) {
                 long entries = service2.getEntryStore().getEntryCount();
                 if (entries == ENTRIES) {
                     break;
@@ -146,9 +148,12 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
                 Thread.sleep(10L);
             }
 
+            LOG.warn("Synced {} entries in {} rounds (of max {}), {} msecs", ENTRIES, i, ROUNDS,
+                    System.currentTimeMillis()-start);
+            
             // and then, verify that it is all there, in correct shape
             rnd = new Random(1);
-            for (int i = 0; i < ENTRIES; ++i) {
+            for (i = 0; i < ENTRIES; ++i) {
                 verifyEntry(i, rnd, service1, service2);
             }
             
