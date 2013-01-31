@@ -35,7 +35,12 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
     private final static int TEST_PORT1 = 9020;
     private final static int TEST_PORT2 = 9021;
 
-    private final static int ENTRIES = 2000;
+    /**
+     * Would be awesome to run with higher number -- test should work for
+     * about any number -- but builds get progressively slower. Hence a
+     * compromise value seen here.
+     */
+    private final static int ENTRIES = 1700;
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
     
@@ -89,10 +94,12 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
             Random rnd = new Random(1);
         
             // and start sending stuff!
+            long totalBytes = 0L;
             long nextCheck = System.currentTimeMillis() + 1000L; // log progress...
             for (int i = 0; i < ENTRIES; ++i) {
                 final BasicTSKey key = generateKey(rnd, i);
                 byte[] data = generateData(rnd);
+                totalBytes += data.length;
                 
                 // do occasional PUTs via real client; but mostly direct, latter
                 // to speed up test.
@@ -117,6 +124,7 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
                     LOG.warn("Test has sent {}/{} requests", (i+1), ENTRIES);
                 }
             }
+            LOG.warn("Test sent all {} requests, {} kB of data", ENTRIES, totalBytes);
             // and should now have all the entries in the first store
             assertEquals(ENTRIES, service1.getEntryStore().getEntryCount());
 

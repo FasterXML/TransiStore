@@ -14,6 +14,11 @@
   <dependencies>
     <!--  Cross-module deps -->
     <dependency>
+      <groupId>com.fasterxml.clustermate</groupId>
+      <artifactId>clustermate-api</artifactId>
+      <version>${version.clustermate}</version>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.transistore</groupId>
       <artifactId>transistore-basic</artifactId>
       <version>${project.version}</version>

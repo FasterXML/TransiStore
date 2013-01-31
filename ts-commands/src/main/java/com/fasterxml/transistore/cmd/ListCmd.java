@@ -3,11 +3,13 @@ package com.fasterxml.transistore.cmd;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 import com.fasterxml.clustermate.api.ListItemType;
 import com.fasterxml.clustermate.api.msg.ListItem;
 import com.fasterxml.clustermate.client.operation.ListOperationResult;
 import com.fasterxml.clustermate.client.operation.StoreEntryLister;
-import com.fasterxml.jackson.databind.ObjectWriter;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
@@ -52,6 +54,9 @@ public class ListCmd extends TStoreCmdBase
             }
         } catch (Exception e) {
             System.err.println("ERROR: ("+e.getClass().getName()+"): "+e.getMessage());
+            if (e instanceof RuntimeException) {
+                e.printStackTrace(System.err);
+            }
             System.exit(1);
         }
         client.stop();
