@@ -3,6 +3,7 @@ package com.fasterxml.transistore.cmd;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import com.fasterxml.clustermate.api.ListItemType;
@@ -90,18 +91,29 @@ public class ListCmd extends TStoreCmdBase
         StoreEntryLister<BasicTSKey, ListItem> lister = client.listContent(prefix, ListItemType.entries);
         // we'll have to deserialize, serialize back...
         ObjectWriter w = jsonWriter(ListItemType.entries.getValueType());
-        while (true) {
-            ListOperationResult<?> result = lister.listMore(50);
-            if (result.failed()) {
-                return result;
+        // let's wrap output in JSON array (or not?)
+        JsonGenerator jgen = w.getJsonFactory().createGenerator(System.out);
+        try {
+            jgen.writeStartArray();
+            while (true) {
+                ListOperationResult<?>  result = lister.listMore(50);
+                if (result.failed()) { // note: no closing JSON array for failures
+                    return result;
+                }
+                List<?> items = result.getItems();
+                if (items.isEmpty()) {
+                    jgen.writeEndArray();
+                    jgen.writeRaw("\n");
+                    return result;
+                }
+                for (Object item : items) {
+                    w.writeValue(jgen, item);
+                    // should we force this or not... ?
+                    jgen.writeRaw("\n");
+                }
             }
-            List<?> items = result.getItems();
-            if (items.isEmpty()) {
-                return result;
-            }
-            for (Object item : items) {
-                System.out.println(w.writeValueAsString(item));
-            }
+        } finally {
+            jgen.close();
         }
     }
 }

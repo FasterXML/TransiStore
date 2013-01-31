@@ -138,7 +138,6 @@ public class BasicTSKeyConverter
         if (partitionId == null || partitionId.length() == 0) {
             return construct(path);
         }
-        
         byte[] prefixPart = UTF8Encoder.encodeAsUTF8(partitionId, DEFAULT_KEY_HEADER_LENGTH, 0, false);
         final int partitionIdLengthInBytes = prefixPart.length - DEFAULT_KEY_HEADER_LENGTH;
         if (partitionIdLengthInBytes > MAX_PARTITION_ID_BYTE_LENGTH) {
@@ -148,9 +147,12 @@ public class BasicTSKeyConverter
         prefixPart[0] = (byte) (partitionIdLengthInBytes >> 8);
         prefixPart[1] = (byte) partitionIdLengthInBytes;
         
-        // so far so good: and now append actual path
-        byte[] fullKey = UTF8Encoder.encodeAsUTF8(prefixPart, path);
-        return new BasicTSKey(new StorableKey(fullKey), partitionIdLengthInBytes);
+        // so far so good: and now append actual path, if any
+        if (path != null && path.length() > 0) {
+            byte[] fullKey = UTF8Encoder.encodeAsUTF8(prefixPart, path);
+            return new BasicTSKey(new StorableKey(fullKey), partitionIdLengthInBytes);
+        }
+        return new BasicTSKey(new StorableKey(prefixPart), partitionIdLengthInBytes);
     }
 
     public StorableKey storableKey(String fullPath, int partitionIdLengthInBytes)

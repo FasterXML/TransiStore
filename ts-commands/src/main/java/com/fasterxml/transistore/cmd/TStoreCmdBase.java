@@ -95,9 +95,8 @@ public abstract class TStoreCmdBase implements Runnable
         }
     }
 
-    protected BasicTSKey contentKey(String partition, String path)
-    {
-        return null;
+    protected BasicTSKey contentKey(String partition, String path) {
+        return KEY_CONVERTER.construct(partition, path);
     }
 
     protected ObjectWriter jsonWriter(Class<?> cls) {
