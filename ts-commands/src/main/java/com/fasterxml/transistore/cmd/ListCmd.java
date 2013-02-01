@@ -55,7 +55,7 @@ public class ListCmd extends TStoreCmdBase
             }
         } catch (Exception e) {
             System.err.println("ERROR: ("+e.getClass().getName()+"): "+e.getMessage());
-            if (e instanceof RuntimeException) {
+            if (e instanceof RuntimeException || true) {
                 e.printStackTrace(System.err);
             }
             System.exit(1);
@@ -67,10 +67,11 @@ public class ListCmd extends TStoreCmdBase
         }
     }
 
-    private ListOperationResult<?> listAsJSON(BasicTSClient client, BasicTSKey prefix) throws InterruptedException
+    private ListOperationResult<?> listAsText(BasicTSClient client, BasicTSKey prefix) throws InterruptedException
     {
         int left = Math.max(1, maxEntries);
         StoreEntryLister<BasicTSKey, String> lister = client.listContent(prefix, ListItemType.names);
+        
         while (true) {
             ListOperationResult<String> result = lister.listMore(Math.min(left, 100));
             if (result.failed()) {
@@ -81,13 +82,13 @@ public class ListCmd extends TStoreCmdBase
                 System.out.println(name);
                 --left;
             }
-            if (left < 1) {
+            if (left < 1 || names.isEmpty()) {
                 return result;
             }
         }
     }
 
-    private ListOperationResult<?> listAsText(BasicTSClient client, BasicTSKey prefix)
+    private ListOperationResult<?> listAsJSON(BasicTSClient client, BasicTSKey prefix)
             throws InterruptedException, IOException
     {
         int left = Math.max(1, maxEntries);
@@ -98,16 +99,15 @@ public class ListCmd extends TStoreCmdBase
         JsonGenerator jgen = w.getJsonFactory().createGenerator(System.out);
         try {
             jgen.writeStartArray();
+            ListOperationResult<?> result = null;
             while (true) {
-                ListOperationResult<?>  result = lister.listMore(Math.min(left, 50));
+                result = lister.listMore(Math.min(left, 50));
                 if (result.failed()) { // note: no closing JSON array for failures
                     return result;
                 }
                 List<?> items = result.getItems();
                 if (items.isEmpty()) {
-                    jgen.writeEndArray();
-                    jgen.writeRaw("\n");
-                    return result;
+                    break;
                 }
                 for (Object item : items) {
                     w.writeValue(jgen, item);
@@ -116,9 +116,12 @@ public class ListCmd extends TStoreCmdBase
                     --left;
                 }
                 if (left < 1) {
-                    return result;
+                    break;
                 }
             }
+            jgen.writeEndArray();
+            jgen.writeRaw("\n");
+            return result;
         } finally {
             jgen.close();
         }

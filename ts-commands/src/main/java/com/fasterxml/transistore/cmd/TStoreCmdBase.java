@@ -4,6 +4,7 @@ import static io.airlift.command.OptionType.GLOBAL;
 
 import java.io.*;
 
+import com.fasterxml.clustermate.json.ClusterMateObjectMapper;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -21,7 +22,7 @@ import io.airlift.command.Option;
 
 public abstract class TStoreCmdBase implements Runnable
 {
-    protected final static ObjectMapper mapper = new ObjectMapper();
+    protected final static ClusterMateObjectMapper mapper = new ClusterMateObjectMapper();
     static {
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
