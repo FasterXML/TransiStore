@@ -85,10 +85,10 @@ public abstract class VCommand<T extends Configuration> extends ConfiguredComman
                 .with(_mapper.convertValue(v.storeBackendConfig, b.getConfigClass()))
                 .buildCreateAndInit();
         StorableStore store = new StorableStoreImpl(v.storeConfig, backend, tm, files);
-        StoredEntryConverter<?,?> conv0 = v.getEntryConverter();
+        StoredEntryConverter<?,?,?> conv0 = v.getEntryConverter();
         @SuppressWarnings("unchecked")
-        StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> entryConv
-            = (StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>>) conv0;
+        StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> entryConv
+            = (StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?>) conv0;
         return new BasicTSStores(v, tm, new ObjectMapper(), entryConv, store);
     }
 

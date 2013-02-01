@@ -20,7 +20,6 @@ import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 import com.fasterxml.transistore.dw.BasicTSServiceOnDW;
 
-
 /**
  * Specialized sub-class of {@link BasicTSServiceOnDW} used by unit tests.
  */

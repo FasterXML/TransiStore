@@ -26,17 +26,17 @@ public class BasicTSServiceConfig
     
     protected RequestPathStrategy _requestPathStrategy;
 
-    protected StoredEntryConverter<?,?> _entryConverter;
+    protected StoredEntryConverter<?,?,?> _entryConverter;
 
     public BasicTSServiceConfig() {
         this(new BasicTSEntryConverter());
     }
     
-    public BasicTSServiceConfig(StoredEntryConverter<?,?> entryConverter) {
+    public BasicTSServiceConfig(StoredEntryConverter<?,?,?> entryConverter) {
         this(entryConverter, new BasicTSPaths());
     }
 
-    public BasicTSServiceConfig(StoredEntryConverter<?,?> entryConverter,
+    public BasicTSServiceConfig(StoredEntryConverter<?,?,?> entryConverter,
             RequestPathStrategy paths) {
         super(DEFAULT_SERVICE_ROOT);
         _entryConverter = entryConverter;
@@ -55,7 +55,7 @@ public class BasicTSServiceConfig
     }
     
     @Override
-    public StoredEntryConverter<?,?> getEntryConverter() {
+    public StoredEntryConverter<?,?,?> getEntryConverter() {
         return _entryConverter;
     }
     

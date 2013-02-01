@@ -15,7 +15,7 @@ import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
 
 public class BasicTSEntryConverter
-    extends StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>>
+    extends StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>, TSListItem>
 {
     public final static byte V_METADATA_VERSION_1 = 0x11;
     
@@ -118,6 +118,11 @@ public class BasicTSEntryConverter
         return new BasicTSEntry(key, raw, creationTime, minTTLSecs, maxTTLSecs, acc);
     }
 
+    @Override
+    public TSListItem listItemFromStorable(Storable raw) {
+        return new TSListItem(raw);
+    }
+    
     /*
     /**********************************************************************
     /* Other conversions
@@ -212,8 +217,7 @@ public class BasicTSEntryConverter
     /**********************************************************************
      */
     
-    protected void _badData(final BasicTSKey key, String msg)
-    {
+    protected void _badData(final BasicTSKey key, String msg) {
         throw new IllegalArgumentException("Bad BasicTSKey metadata (key "+key+"): "+msg);
     }
     

@@ -34,7 +34,7 @@ public class CommandDumpBDB extends VCommand<BasicTSServiceConfigForDW>
         AdminStorableStore store = (AdminStorableStore) stores.getEntryStore();
         // true/false -> include deleted?
         List<Storable> entries = store.dumpEntries(5000, false);
-        StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> factory = stores.getEntryConverter();
+        StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> factory = stores.getEntryConverter();
         System.out.println("Key,Path,Size,StoredSize,Compressed,Inlined");
         for (Storable raw : entries) {
             StoredEntry<BasicTSKey> entry = factory.entryFromStorable(raw);

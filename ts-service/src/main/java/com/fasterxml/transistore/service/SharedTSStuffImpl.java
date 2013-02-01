@@ -12,13 +12,12 @@ import com.fasterxml.clustermate.service.store.StoredEntryConverter;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 
-
 public class SharedTSStuffImpl
     extends SharedTSStuff
 {
     private final BasicTSServiceConfig _serviceConfig;
 
-    private final StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> _entryConverter;
+    private final StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> _entryConverter;
 
     /*
     /**********************************************************************
@@ -27,7 +26,7 @@ public class SharedTSStuffImpl
      */
 
     public SharedTSStuffImpl(BasicTSServiceConfig config, TimeMaster timeMaster,
-            StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> entryConverter,
+            StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> entryConverter,
             FileManager fileManager)
     {
         super(timeMaster, fileManager, config.getServicePathStrategy());
@@ -54,7 +53,7 @@ public class SharedTSStuffImpl
 
     @SuppressWarnings("unchecked")
     @Override
-    public StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> getEntryConverter() {
+    public StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> getEntryConverter() {
         return _entryConverter;
     }
 

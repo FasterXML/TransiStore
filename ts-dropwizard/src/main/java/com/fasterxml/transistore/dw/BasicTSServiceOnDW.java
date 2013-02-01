@@ -21,6 +21,7 @@ import com.fasterxml.clustermate.service.store.StoresImpl;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.dw.cmd.*;
 import com.fasterxml.transistore.service.SharedTSStuffImpl;
+import com.fasterxml.transistore.service.TSListItem;
 import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 import com.fasterxml.transistore.service.store.BasicTSStoreHandler;
@@ -34,7 +35,7 @@ import com.yammer.dropwizard.config.Environment;
  * and initializing life-cycle components and resources.
  */
 public class BasicTSServiceOnDW
-    extends DWBasedService<BasicTSKey, StoredEntry<BasicTSKey>,
+    extends DWBasedService<BasicTSKey, StoredEntry<BasicTSKey>, TSListItem,
         BasicTSServiceConfig, BasicTSServiceConfigForDW>
 {
     /*
@@ -75,9 +76,9 @@ public class BasicTSServiceOnDW
 
     @SuppressWarnings("unchecked")
     @Override
-    protected StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> constructEntryConverter(BasicTSServiceConfig config,
+    protected StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> constructEntryConverter(BasicTSServiceConfig config,
             Environment environment) {
-        return (StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>>) config.getEntryConverter();
+        return (StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem>) config.getEntryConverter();
     }
 
     @Override
@@ -90,7 +91,7 @@ public class BasicTSServiceOnDW
 
     @Override
     protected SharedServiceStuff constructServiceStuff(BasicTSServiceConfig serviceConfig,
-            TimeMaster timeMaster, StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> entryConverter,
+            TimeMaster timeMaster, StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> entryConverter,
             FileManager files)
     {
         return new SharedTSStuffImpl(serviceConfig, timeMaster,
@@ -101,13 +102,13 @@ public class BasicTSServiceOnDW
     protected StoresImpl<BasicTSKey, StoredEntry<BasicTSKey>> constructStores(SharedServiceStuff stuff,
             BasicTSServiceConfig serviceConfig, StorableStore store)
     {
-        StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>> entryConv = stuff.getEntryConverter();
+        StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> entryConv = stuff.getEntryConverter();
         return new BasicTSStores(serviceConfig,
                 _timeMaster, stuff.jsonMapper(), entryConv, store);
     }
     
     @Override
-    protected StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>> constructStoreHandler(SharedServiceStuff serviceStuff,
+    protected StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> constructStoreHandler(SharedServiceStuff serviceStuff,
             Stores<BasicTSKey, StoredEntry<BasicTSKey>> stores,
             ClusterViewByServer cluster) {
         return new BasicTSStoreHandler(serviceStuff, _stores, cluster);
@@ -115,7 +116,7 @@ public class BasicTSServiceOnDW
 
     @Override
     protected StoreEntryServlet<BasicTSKey, StoredEntry<BasicTSKey>> constructStoreEntryServlet(SharedServiceStuff stuff,
-            ClusterViewByServer cluster, StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>> storeHandler)
+            ClusterViewByServer cluster, StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> storeHandler)
     {
         return new StoreEntryServlet<BasicTSKey, StoredEntry<BasicTSKey>>(stuff, _cluster, storeHandler);
     }
@@ -141,7 +142,7 @@ public class BasicTSServiceOnDW
     /**********************************************************************
      */
 
-    public StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>> getStoreHandler() {
+    public StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> getStoreHandler() {
         return _storeHandler;
     }
 }

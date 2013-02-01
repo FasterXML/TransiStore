@@ -19,7 +19,7 @@ public class BasicTSLastAccessStore
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
     public BasicTSLastAccessStore(Environment env,
-            StoredEntryConverter<BasicTSKey,StoredEntry<BasicTSKey>> conv)
+            StoredEntryConverter<BasicTSKey,StoredEntry<BasicTSKey>,?> conv)
     {
         super(env, conv);
     }

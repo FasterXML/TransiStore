@@ -6,8 +6,10 @@ import com.fasterxml.clustermate.service.store.StoreHandler;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.service.TSListItem;
 
-public class BasicTSStoreHandler extends StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>>
+public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
+    StoredEntry<BasicTSKey>, TSListItem>
 {
     public BasicTSStoreHandler(SharedServiceStuff stuff,
             Stores<BasicTSKey, StoredEntry<BasicTSKey>> stores,

@@ -17,7 +17,7 @@ public class StoreResourceForTests<K extends EntryKey, E extends StoredEntry<K>>
     public SharedServiceStuff _stuff;
     
     public StoreResourceForTests(ClusterViewByServer clusterView,
-            StoreHandler<K, E> storeHandler, SharedServiceStuff stuff)
+            StoreHandler<K,E,?> storeHandler, SharedServiceStuff stuff)
     {
         super(stuff, clusterView, storeHandler);
         _stuff = stuff;

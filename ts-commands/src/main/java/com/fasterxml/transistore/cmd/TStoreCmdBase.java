@@ -1,15 +1,17 @@
 package com.fasterxml.transistore.cmd;
 
+import io.airlift.command.Option;
 import static io.airlift.command.OptionType.GLOBAL;
 
 import java.io.*;
 
-import com.fasterxml.clustermate.json.ClusterMateObjectMapper;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import com.fasterxml.clustermate.json.ClusterMateObjectMapper;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
 import com.fasterxml.transistore.client.BasicTSClient;
@@ -17,8 +19,6 @@ import com.fasterxml.transistore.client.BasicTSClientBootstrapper;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
-
-import io.airlift.command.Option;
 
 public abstract class TStoreCmdBase implements Runnable
 {
