@@ -12,6 +12,7 @@ import com.fasterxml.clustermate.service.bdb.LastAccessStore;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.clustermate.service.store.StoredEntryConverter;
 import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.service.TSLastAccess;
 
 public class BasicTSLastAccessStore
 	extends LastAccessStore<BasicTSKey, StoredEntry<BasicTSKey>>
@@ -25,15 +26,14 @@ public class BasicTSLastAccessStore
     }
 
     @Override
-    protected DatabaseEntry lastAccessKey(BasicTSKey key, LastAccessUpdateMethod acc)
+    protected DatabaseEntry lastAccessKey(BasicTSKey key, LastAccessUpdateMethod acc0)
     {
+        TSLastAccess acc = (TSLastAccess) acc0;
         if (acc != null) {
             switch (acc) {
             case NONE:
                 return null;
-            case GROUPED: // important: not just group id, but also client id
-                return key.withPartitionPrefix(BDBConverters.simpleConverter);
-            case INDIVIDUAL: // whole key, including client id, group id length
+            case SIMPLE: // whole key, for one-to-one match
                 return key.asStorableKey().with(BDBConverters.simpleConverter);
             }
         }

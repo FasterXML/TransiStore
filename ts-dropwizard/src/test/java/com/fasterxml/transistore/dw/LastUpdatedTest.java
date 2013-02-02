@@ -3,13 +3,15 @@ package com.fasterxml.transistore.dw;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import com.fasterxml.storemate.store.StorableStore;
+
 import com.fasterxml.clustermate.jaxrs.StoreResource;
-import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.ServiceResponse;
 import com.fasterxml.clustermate.service.store.StoredEntry;
-import com.fasterxml.storemate.store.StorableStore;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.dw.util.*;
+import com.fasterxml.transistore.service.TSLastAccess;
 
 
 /**
@@ -85,7 +87,7 @@ public class LastUpdatedTest extends JaxrsStoreTestBase
         final long UPDATE_TIME1 = 2000L;
         final long UPDATE_TIME2 = 3000L;
         final long UPDATE_TIME3 = 4000L;
-        
+
         // and then try access in a way that updates the timestamp(s)
         timeMaster.setCurrentTimeMillis(UPDATE_TIME1);        
         ServiceResponse resp = resource.getHandler().getEntry(new FakeHttpRequest(),
@@ -101,16 +103,14 @@ public class LastUpdatedTest extends JaxrsStoreTestBase
         assertEquals(UPDATE_TIME1, resource.getStores().getLastAccessStore().findLastAccessTime(entry2));
         assertEquals(UPDATE_TIME2, resource.getStores().getLastAccessStore().findLastAccessTime(entry1a));
 
-        // note: second entry should see the last-accessed from the first update!
         entry1b = rawToEntry(entries.findEntry(KEY1B.asStorableKey()));
-        assertEquals(LastAccessUpdateMethod.GROUPED, entry1b.getLastAccessUpdateMethod());
-        assertEquals(UPDATE_TIME2, resource.getStores().getLastAccessStore().findLastAccessTime(entry1b));
+        assertEquals(TSLastAccess.SIMPLE, entry1b.getLastAccessUpdateMethod());
 
         // as well as vice-versa
         timeMaster.setCurrentTimeMillis(UPDATE_TIME3);
         resp = resource.getHandler().getEntry(new FakeHttpRequest(), new FakeHttpResponse(), KEY1B);
         assertEquals(UPDATE_TIME3, resource.getStores().getLastAccessStore().findLastAccessTime(entry1b));
-        assertEquals(UPDATE_TIME3, resource.getStores().getLastAccessStore().findLastAccessTime(entry1a));
+
         entries.stop();
     }
 }

@@ -111,7 +111,8 @@ public class BasicTSServiceOnDW
     protected StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,TSListItem> constructStoreHandler(SharedServiceStuff serviceStuff,
             Stores<BasicTSKey, StoredEntry<BasicTSKey>> stores,
             ClusterViewByServer cluster) {
-        return new BasicTSStoreHandler(serviceStuff, _stores, cluster);
+        // false -> no updating of last-accessed timestamps by default
+        return new BasicTSStoreHandler(serviceStuff, _stores, cluster, false);
     }
 
     @Override

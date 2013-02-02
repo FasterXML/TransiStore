@@ -131,7 +131,7 @@ public class BasicTSEntry extends StoredEntry<BasicTSKey>
     public boolean usesLastAccessTime()
     {
         LastAccessUpdateMethod method = lastAccessUpdateMethod;
-        return (method == LastAccessUpdateMethod.GROUPED) || (method == LastAccessUpdateMethod.INDIVIDUAL);
+        return (method != null) && !method.meansNoUpdate();
     }
     
     @Override

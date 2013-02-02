@@ -67,11 +67,11 @@ public class BasicTSEntryConverter
      */
     @Override
     public ByteContainer createMetadata(long creationTime,
-            LastAccessUpdateMethod lastAccessUpdateMethod, int minTTLSecs, int maxTTLSecs)
+            byte lastAccessUpdateMethod, int minTTLSecs, int maxTTLSecs)
     {
         byte[] buffer = new byte[METADATA_LENGTH];
         buffer[OFFSET_VERSION] = V_METADATA_VERSION_1;
-        buffer[OFFSET_LAST_ACCESS] = lastAccessUpdateMethod.asByte();
+        buffer[OFFSET_LAST_ACCESS] = lastAccessUpdateMethod;
         _putLongBE(buffer, OFFSET_CREATE_TIME, creationTime);
         _putIntBE(buffer, OFFSET_MIN_TTL, minTTLSecs);
         _putIntBE(buffer, OFFSET_MAX_TTL, maxTTLSecs);
@@ -173,7 +173,7 @@ public class BasicTSEntryConverter
     protected LastAccessUpdateMethod _extractLastAccessUpdatedMethod(BasicTSKey key, byte[] buffer, int offset, int length)
     {
         int accCode = buffer[offset+OFFSET_LAST_ACCESS];
-        LastAccessUpdateMethod acc = LastAccessUpdateMethod.valueOf(accCode);
+        LastAccessUpdateMethod acc = TSLastAccess.valueOf(accCode);
         if (acc == null) {
             _badData(key, "invalid last-access-update-method 0x"+Integer.toHexString(accCode));
         }

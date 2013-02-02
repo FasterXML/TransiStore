@@ -6,14 +6,14 @@ import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StorableStore;
-import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.dw.util.*;
 
 import com.fasterxml.clustermate.jaxrs.StoreResource;
-import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.msg.PutResponse;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 
+import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.dw.util.*;
+import com.fasterxml.transistore.service.TSLastAccess;
 
 /**
  * Basic testing of creating some data from scratch, accessing it.
@@ -59,7 +59,7 @@ public class SmallFileTest extends JaxrsStoreTestBase
         assertEquals(1, entries.getEntryCount());
         // not accessed yet:
         assertEquals(0L, resource.getStores().getLastAccessStore().findLastAccessTime(INTERNAL_KEY1,
-                LastAccessUpdateMethod.INDIVIDUAL));
+                TSLastAccess.SIMPLE));
 
         // Ok. Then, we should also be able to fetch it, right?
         response = new FakeHttpResponse();
@@ -67,7 +67,7 @@ public class SmallFileTest extends JaxrsStoreTestBase
         assertEquals(200, response.getStatus());
         // and now last-accessed should be set
         assertEquals(1234L, resource.getStores().getLastAccessStore().findLastAccessTime(INTERNAL_KEY1,
-                LastAccessUpdateMethod.INDIVIDUAL));
+                TSLastAccess.SIMPLE));
 
         // let's verify it then; small request...
         assertTrue(response.hasStreamingContent());

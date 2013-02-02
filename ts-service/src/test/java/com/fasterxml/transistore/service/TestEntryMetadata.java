@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 
 import com.fasterxml.storemate.shared.ByteContainer;
 
-import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -22,7 +21,7 @@ public class TestEntryMetadata extends TestCase
 
         BasicTSKey key = keyConverter.construct("silly-key");
         BasicTSEntry entry = new BasicTSEntry(key, null,
-                123L, 10, 100, LastAccessUpdateMethod.INDIVIDUAL);
+                123L, 10, 100, TSLastAccess.SIMPLE);
         assertEquals("0x"+Integer.toHexString(entry.routingHashUsing(keyConverter)),
                 "0x"+Integer.toHexString(keyConverter.routingHashFor(entry.key)));
     }
@@ -30,14 +29,24 @@ public class TestEntryMetadata extends TestCase
     public void testEntryMetadata()
     {
         BasicTSEntryConverter f = new BasicTSEntryConverter(BasicTSKeyConverter.defaultInstance());
-        final long creationTime = 0x1234567887654321L;
+        long creationTime = 0x1234567887654321L;
         ByteContainer bytes = f.createMetadata(creationTime,
-                LastAccessUpdateMethod.GROUPED, Integer.MAX_VALUE, Integer.MAX_VALUE / 3);
+                TSLastAccess.SIMPLE.asByte(), Integer.MAX_VALUE, Integer.MAX_VALUE / 3);
         byte[] raw = bytes.asBytes();
         StoredEntry<?> entry = f.entryFromStorable(null, null, raw, 0, raw.length);
         assertEquals(Long.toHexString(creationTime), Long.toHexString(entry.getCreationTime()));
-        assertEquals(LastAccessUpdateMethod.GROUPED, entry.getLastAccessUpdateMethod());
+        assertEquals(TSLastAccess.SIMPLE, entry.getLastAccessUpdateMethod());
         assertEquals(Integer.MAX_VALUE, entry.getMinTTLSinceAccessSecs());
         assertEquals(Integer.MAX_VALUE/3, entry.getMaxTTLSecs());
+
+        creationTime = 0x1234567887654321L;
+        bytes = f.createMetadata(creationTime,
+                TSLastAccess.NONE.asByte(), Integer.MAX_VALUE/2, Integer.MAX_VALUE / 5);
+        raw = bytes.asBytes();
+        entry = f.entryFromStorable(null, null, raw, 0, raw.length);
+        assertEquals(Long.toHexString(creationTime), Long.toHexString(entry.getCreationTime()));
+        assertEquals(TSLastAccess.NONE, entry.getLastAccessUpdateMethod());
+        assertEquals(Integer.MAX_VALUE/2, entry.getMinTTLSinceAccessSecs());
+        assertEquals(Integer.MAX_VALUE/5, entry.getMaxTTLSecs());
     }
 }
