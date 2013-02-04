@@ -5,7 +5,7 @@
 
   ,"ts" : {
     "metadataDirectory" : "data-tstore-nodes/"
-    ,"cfgSyncGracePeriod" : "5s"
+    ,"cfgSyncGracePeriod" : "8s"
 
     ,"storeConfig" : {
       "dataRootForFiles" : "data-tstore-blobs/"
