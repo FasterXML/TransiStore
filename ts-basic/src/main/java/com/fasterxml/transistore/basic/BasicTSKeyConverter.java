@@ -81,6 +81,33 @@ public class BasicTSKeyConverter
             }
         });
     }
+
+    @Override
+    public BasicTSKey stringToKey(String external)
+    {
+        // first, must have prefix:
+        if (!external.startsWith(BasicTSKey.KEY_PREFIX)) {
+            throw new IllegalArgumentException("Key does not start with '"+BasicTSKey.KEY_PREFIX+"': "+external);
+        }
+        external = external.substring(BasicTSKey.KEY_PREFIX.length());
+        // and then separator
+        int index = external.indexOf(BasicTSKey.KEY_SEPARATOR);
+        if (index < 0) {
+            throw new IllegalArgumentException("Key does not have '"+BasicTSKey.KEY_SEPARATOR+"' to separate partition, path: "+external);
+        }
+        // !!! TODO: unescaping
+        if (index == 0) {
+            return construct(external.substring(1));
+        }
+        return construct(external.substring(0, index), external.substring(index+1));
+    }
+
+    @Override
+    public String keyToString(BasicTSKey key) {
+        // We can actually use 'toString()' here (not always possible)
+        return key.toString();
+    }
+
     /**
      * Method called to figure out raw hash code to use for routing request
      * regarding given content key.
@@ -92,7 +119,7 @@ public class BasicTSKeyConverter
 
     /*
     /**********************************************************************
-    /* VKey construction, conversions
+    /* Key construction, conversions
     /**********************************************************************
      */
 
@@ -167,7 +194,7 @@ public class BasicTSKeyConverter
         b[1] = (byte) partitionIdLengthInBytes;
         return new StorableKey(b);
     }
-
+    
     /*
     /**********************************************************************
     /* Path handling
@@ -178,17 +205,14 @@ public class BasicTSKeyConverter
     @Override
     public <B extends RequestPathBuilder> B appendToPath(B b, BasicTSKey key)
     {
-        String path = key.getExternalPath();
         // Partition id: could be added as path segment; but for now we'll use query param instead
         int partitionIdLen = key.getPartitionIdLength();
         if (partitionIdLen > 0) {
             String partitionId = key.getPartitionId();
             b = (B) b.addParameter(BasicTSConstants.TS_QUERY_PARAM_PARTITION_ID, partitionId);
-            // and then remove partition id to leave path
-            path = path.substring(partitionId.length());
         }
         // also: while not harmful, let's avoid escaping embedded slashes (slightly more compact)
-        b = (B) b.addPathSegmentsRaw(path);
+        b = (B) b.addPathSegmentsRaw(key.getPath());
         return b;
     }
 

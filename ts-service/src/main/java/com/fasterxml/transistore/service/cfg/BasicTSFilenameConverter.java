@@ -27,7 +27,7 @@ public class BasicTSFilenameConverter extends DefaultFilenameConverter
         final char safeChar = _safeChar;
 
         // Start with partition id, if any
-        final String fullPath = key.getExternalPath();
+        final String fullPath = key.getPartitionAndPath();
         final int groupLen = key.getPartitionIdLength();
         if (groupLen > 0) {
             sb.append(groupLen);

@@ -13,6 +13,16 @@ import com.fasterxml.storemate.shared.util.WithBytesCallback;
 public class BasicTSKey
     extends EntryKey
 {
+    /**
+     * Let's model external key presentation as an URI of sort.
+     */
+    public final static String KEY_PREFIX = "tstore://";
+
+    /**
+     * And use meow char for separating optional partition from path
+     */
+    public final static char KEY_SEPARATOR = '@';
+    
     /*
     /**********************************************************************
     /* Main configuration
@@ -69,10 +79,21 @@ public class BasicTSKey
      */
 
     /**
-     * Accessor for getting full path, where partition id is the prefix,
-     * and path follows it right after.
+     * Accessor for getting path part of key, not including partition id.
      */
-    public String getExternalPath()
+    public String getPath()
+    {
+        String full = getPartitionAndPath();
+        if (_partitionIdLength == 0) {
+            return full;
+        }
+        return full.substring(_partitionIdLength);
+    }
+
+    /**
+     * Accessor for getting concatenation of partition id (if any) and path.
+     */
+    public String getPartitionAndPath()
     {
         String str = _externalPath;
         if (str == null) {
@@ -82,13 +103,17 @@ public class BasicTSKey
         }
         return str;
     }
-    
+
+    /**
+     * Accessor for getting partition id part of key, if any; if no partition id,
+     * returns null.
+     */
     public String getPartitionId()
     {
         if (_partitionIdLength == 0) {
             return null;
         }
-        return getExternalPath().substring(0, _partitionIdLength);
+        return getPartitionAndPath().substring(0, _partitionIdLength);
     }
 
     public byte[] getPartitionIdAsBytes()
@@ -141,10 +166,21 @@ public class BasicTSKey
         return _rawKey.hashCode();
     }
 
-    @Override public String toString() {
-        if (_partitionIdLength == 0) {
-            return "0:"+getExternalPath();
+    @Override public String toString()
+    {
+        String path = getPartitionAndPath();
+        final int pathLen = path.length();
+        StringBuilder sb = new StringBuilder(10 + pathLen);
+        sb.append(KEY_PREFIX);
+        int partLen = getPartitionIdLength();
+        // !!! TODO: implement escaping properly
+        if (partLen == 0) {
+            sb.append(KEY_SEPARATOR);
+            sb.append(path);
+        } else {
+            sb.append(path);
+            sb.insert(KEY_PREFIX.length() + partLen, KEY_SEPARATOR);
         }
-        return String.valueOf(_partitionIdLength)+":"+getExternalPath();
+        return sb.toString();
     }
 }
