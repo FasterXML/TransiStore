@@ -1,6 +1,7 @@
 package com.fasterxml.transistore.service;
 
 import com.fasterxml.clustermate.api.EntryKeyConverter;
+import com.fasterxml.clustermate.api.msg.ListItem;
 import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.bdb.BDBConverters;
 import com.fasterxml.clustermate.service.store.EntryLastAccessed;
@@ -119,7 +120,12 @@ public class BasicTSEntryConverter
     }
 
     @Override
-    public TSListItem listItemFromStorable(Storable raw) {
+    public ListItem minimalListItemFromStorable(Storable raw) {
+        return defaultMinimalListItemFromStorable(raw);
+    }
+    
+    @Override
+    public TSListItem fullListItemFromStorable(Storable raw) {
         return new TSListItem(raw);
     }
     

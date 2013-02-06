@@ -117,6 +117,12 @@ public class BasicTSKeyConverter
         return _truncateHash(rawHashForRouting(key, _hasher));
     }
 
+    @Override
+    public String rawToString(StorableKey key) {
+        // !!! TODO: optimize, perhaps? If there's need...
+        return keyToString(rawToEntryKey(key));
+    }
+    
     /*
     /**********************************************************************
     /* Key construction, conversions

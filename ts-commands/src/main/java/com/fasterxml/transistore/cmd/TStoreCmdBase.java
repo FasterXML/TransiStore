@@ -96,6 +96,10 @@ public abstract class TStoreCmdBase implements Runnable
         }
     }
 
+    protected BasicTSKey contentKey(String external) {
+        return KEY_CONVERTER.stringToKey(external);
+    }
+    
     protected BasicTSKey contentKey(String partition, String path) {
         return KEY_CONVERTER.construct(partition, path);
     }

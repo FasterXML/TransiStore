@@ -1,38 +1,31 @@
 package com.fasterxml.transistore.cmd;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.client.*;
+import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.clustermate.client.NodeFailure;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
-import com.fasterxml.jackson.core.JsonGenerator;
 
 import io.airlift.command.Arguments;
 import io.airlift.command.Command;
-import io.airlift.command.Option;
 
-@Command(name = "upload", description = "Upload files from local file system to TStore")
-public class UploadCmd extends TStoreCmdBase
+import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.client.*;
+
+@Command(name = "put", description = "PUT file(s) from local file system to TStore")
+public class PutCmd extends TStoreCmdBase
 {
-    final static long SMALL_FILE = 8000;
-
-    // Let's keep partition required, for now. Empty String is acceptable
-    @Option(name = { "-p", "--partition" },
-            description = "Server-side prefix to use, if any; if defined, uses relative names, if not, absolute",
-            required = true)
-    public String partition;
-
-    @Option(name = { "-s", "--server-prefix" },
-            description = "Server-side prefix to use, if any; if defined, uses relative names, if not, absolute")
-    public String serverPrefix;
+    private final static long SMALL_FILE = 8000;
     
-    @Arguments(description = "Files and/or directories to copy (recursively)",
+    @Arguments(title="arguments",
+            description = "Target (first argument) and File(s) and/or directories to copy (recursively) (remaining)",
+            usage="[server-prefix] [file-or-dir1] ... [file-or-dir-N]",
             required=true)
-    public List<String> source;
+    public List<String> arguments;
+
+    protected BasicTSKey _target;
     
     @Override
     public void run()
@@ -40,16 +33,32 @@ public class UploadCmd extends TStoreCmdBase
         SkeletalServiceConfig serviceConfig = getServiceConfig();
         BasicTSClientConfig clientConfig = getClientConfig();
 
-        if (source == null || source.isEmpty()) { // at least one source thingy
-            throw new IllegalArgumentException("Nothing to upload");
+        if (arguments == null || arguments.size() < 2) {
+            throw new IllegalArgumentException("Nothing to PUT");
         }
         BasicTSClient client = bootstrapClient(clientConfig, serviceConfig);
+        // Ok, first, target, verify it is valid TStore path
+        try {
+            _target = contentKey(arguments.get(0));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid prefix '"+arguments.get(0)+"', problem: "+e.getMessage());
+        }
+        // similarly verify that files/directories actually exist first
+        List<File> input = new ArrayList<File>();
+        for (int i = 1; i < arguments.size(); ++i) {
+            File f = new File(arguments.get(i));
+            if (!f.exists()) {
+                throw new IllegalArgumentException("No file or directory '"+f.getAbsolutePath()+"'");
+            }
+            input.add(f);
+        }
+        
         try {
             JsonGenerator jgen = isJSON ? jsonGenerator(System.out) : null;
             if (jgen != null) {
                 jgen.writeStartArray();
             }
-            int fileCount = _copyStuff(client, source, jgen);
+            int fileCount = _copyStuff(client, input, jgen);
             if (jgen == null) {
                 System.out.printf("COMPLETE: uploaded %s files\n", fileCount);
             } else {
@@ -65,14 +74,12 @@ public class UploadCmd extends TStoreCmdBase
         client.stop();
     }
 
-    private int _copyStuff(BasicTSClient client, List<String> input, JsonGenerator jgen)
+    private int _copyStuff(BasicTSClient client, List<File> input, JsonGenerator jgen)
         throws InterruptedException, IOException
     {
         int count = 0;
         
-        for (String filename : input) {
-            File file = new File(filename);
-            System.err.println(" File -> "+file);
+        for (File file : input) {
             count += _copyFileOrDir(client, file, jgen);
         }
         return count;
@@ -143,9 +150,10 @@ public class UploadCmd extends TStoreCmdBase
     private BasicTSKey keyFor(File src)
     {
         // Use relative name, if we got prefix; absolute if not
+        String serverPrefix = _target.getPath();
         String path = (serverPrefix == null) ? src.getAbsolutePath() :
             (serverPrefix + src.getPath());
-        return contentKey(partition, path); 
+        return contentKey(_target.getPartitionId(), path); 
     }
 
     private static byte[] readFile(File f) throws IOException

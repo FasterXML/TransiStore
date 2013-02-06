@@ -26,7 +26,9 @@ public class ListCmd extends TStoreCmdBase
             arity=1 )
     public int maxEntries = Integer.MAX_VALUE;
 
-    @Arguments(description = "Partition (and optional name prefix) to list",
+    @Arguments(title="prefix",
+            description = "Server-side prefix (partition and optional path prefix) that defines entries to list",
+            usage = "[prefix]",
             required=true)
     public List<String> pathInfo;
 
@@ -37,33 +39,38 @@ public class ListCmd extends TStoreCmdBase
         SkeletalServiceConfig serviceConfig = getServiceConfig();
         BasicTSClientConfig clientConfig = getClientConfig();
 
-        // but also need at least partition
-        if (pathInfo.size() > 2) {
-            throw new IllegalArgumentException("Too many arguments: can only use 2 (partition, optional prefix)");
+        // but also need prefix of some kind
+        if (pathInfo.size() != 1) {
+            throw new IllegalArgumentException("Can only take single argument, path prefix for entries to list");
         }
-        String partition = pathInfo.get(0);
-        String pathPrefix = (pathInfo.size() < 2) ? null : pathInfo.get(1);
+        BasicTSKey prefix = null;
+        try {
+            prefix = contentKey(pathInfo.get(0));
+        } catch (Exception e) {
+            System.err.println("Invalid prefix '"+pathInfo.get(0)+"', problem: "+e.getMessage());
+            System.exit(1);
+        }
         BasicTSClient client = bootstrapClient(clientConfig, serviceConfig);
 
         // as JSON or text?
         ListOperationResult<?> result = null;
         try {
             if (isJSON) {
-                result = listAsJSON(client, contentKey(partition, pathPrefix));
+                result = listAsJSON(client, prefix);
             } else {
-                result = listAsText(client, contentKey(partition, pathPrefix));
+                result = listAsText(client, prefix);
             }
         } catch (Exception e) {
             System.err.println("ERROR: ("+e.getClass().getName()+"): "+e.getMessage());
             if (e instanceof RuntimeException || true) {
                 e.printStackTrace(System.err);
             }
-            System.exit(1);
+            System.exit(2);
         }
         client.stop();
         if (result.failed()) {
             System.err.println("Call failure when listing entries: "+result.getFirstFail().getFirstCallFailure());
-            System.exit(2);
+            System.exit(3);
         }
     }
 
@@ -92,9 +99,9 @@ public class ListCmd extends TStoreCmdBase
             throws InterruptedException, IOException
     {
         int left = Math.max(1, maxEntries);
-        StoreEntryLister<BasicTSKey, ListItem> lister = client.listContent(prefix, ListItemType.entries);
+        StoreEntryLister<BasicTSKey, ListItem> lister = client.listContent(prefix, ListItemType.minimalEntries);
         // we'll have to deserialize, serialize back...
-        ObjectWriter w = jsonWriter(ListItemType.entries.getValueType());
+        ObjectWriter w = jsonWriter(ListItemType.minimalEntries.getValueType());
         // let's wrap output in JSON array (or not?)
         JsonGenerator jgen = w.getJsonFactory().createGenerator(System.out);
         try {
