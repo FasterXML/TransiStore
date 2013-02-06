@@ -111,4 +111,32 @@ public abstract class TStoreCmdBase implements Runnable
     protected JsonGenerator jsonGenerator(OutputStream out) throws IOException {
         return mapper.getFactory().createGenerator(out);
     }
+
+    /**
+     * Helper method used for converting local (usually) relative filenames
+     * into server-side paths.
+     */
+    protected static String pathFromFile(File f)
+    {
+        StringBuilder sb = new StringBuilder();
+        _pathFrom(f, sb);
+        return sb.toString();
+    }
+
+    protected static void _pathFrom(File f, StringBuilder sb)
+    {
+        String name = f.getName();
+        // Not sure what's the best way to do this; but we do need ignore "." and ".." somehow, so..
+        if ("..".equals(name)) {
+            return;
+        }
+        File parent = f.getParentFile();
+        if (parent != null) {
+            _pathFrom(parent, sb);
+        }
+        if (!".".equals(name)) {
+            sb.append('/');
+            sb.append(f.getName());
+        }
+    }
 }

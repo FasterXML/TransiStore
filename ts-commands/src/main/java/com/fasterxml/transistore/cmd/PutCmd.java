@@ -52,19 +52,24 @@ public class PutCmd extends TStoreCmdBase
             }
             input.add(f);
         }
-        
+
+        JsonGenerator jgen = null;        
         try {
-            JsonGenerator jgen = isJSON ? jsonGenerator(System.out) : null;
+            jgen = isJSON ? jsonGenerator(System.out) : null;
             if (jgen != null) {
                 jgen.writeStartArray();
             }
-            int fileCount = _copyStuff(client, input, jgen);
+            int fileCount = _putStuff(client, input, jgen);
             if (jgen == null) {
                 System.out.printf("COMPLETE: uploaded %s files\n", fileCount);
             } else {
                 jgen.writeEndArray();
+                jgen.close();
             }
         } catch (Exception e) {
+            if (jgen != null) {
+                try { jgen.flush(); } catch (Exception e2) { }
+            }
             System.err.println("ERROR: ("+e.getClass().getName()+"): "+e.getMessage());
             if (e instanceof RuntimeException) {
                 e.printStackTrace(System.err);
@@ -74,7 +79,7 @@ public class PutCmd extends TStoreCmdBase
         client.stop();
     }
 
-    private int _copyStuff(BasicTSClient client, List<File> input, JsonGenerator jgen)
+    private int _putStuff(BasicTSClient client, List<File> input, JsonGenerator jgen)
         throws InterruptedException, IOException
     {
         int count = 0;
@@ -151,8 +156,18 @@ public class PutCmd extends TStoreCmdBase
     {
         // Use relative name, if we got prefix; absolute if not
         String serverPrefix = _target.getPath();
-        String path = (serverPrefix == null) ? src.getAbsolutePath() :
-            (serverPrefix + src.getPath());
+        String local = pathFromFile(src);
+        String path;
+        
+        if (serverPrefix == null) {
+            path = local;
+        } else {
+            if (serverPrefix.endsWith("/")) { // local path always starts with slash, trim away
+                path = serverPrefix + local.substring(1);
+            } else {
+                path = serverPrefix + local;
+            }
+        }
         return contentKey(_target.getPartitionId(), path); 
     }
 
