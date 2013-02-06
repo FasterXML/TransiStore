@@ -85,12 +85,12 @@ public class PutCmd extends TStoreCmdBase
         int count = 0;
         
         for (File file : input) {
-            count += _copyFileOrDir(client, file, jgen);
+            count += _copyFileOrDir(client, file, null, jgen);
         }
         return count;
     }
 
-    private int _copyFileOrDir(BasicTSClient client, File src, JsonGenerator jgen)
+    private int _copyFileOrDir(BasicTSClient client, File src, File dstDir, JsonGenerator jgen)
             throws InterruptedException, IOException
     {
         if (src.isDirectory()) {
@@ -99,7 +99,8 @@ public class PutCmd extends TStoreCmdBase
             }
             int count = 0;
             for (File f : src.listFiles()) {
-                count += _copyFileOrDir(client, f, jgen);
+                File dir = new File(dstDir, f.getName());
+                count += _copyFileOrDir(client, f, dir, jgen);
             }
             if (isTextual) {
                 System.out.printf("-> directory '%s' complete with %d files.\n",
@@ -107,16 +108,16 @@ public class PutCmd extends TStoreCmdBase
             }
             return count;
         }
-        return _copyFile(client, src, jgen);
+        return _copyFile(client, src, new File(dstDir, src.getName()), jgen);
     }
     
-    private int _copyFile(BasicTSClient client, File src, JsonGenerator jgen)
+    private int _copyFile(BasicTSClient client, File src, File dst, JsonGenerator jgen)
             throws InterruptedException, IOException
     {
         // use byte-backed for some, just to get better testing...
         boolean isSmall = (src.length() < SMALL_FILE);
         
-        BasicTSKey key = keyFor(src);
+        BasicTSKey key = keyFor(dst);
         
         PutOperationResult putResult = isSmall ? client.putContent(key, readFile(src))
                 : client.putContent(key, src);

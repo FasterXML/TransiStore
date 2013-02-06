@@ -4,6 +4,7 @@ import io.airlift.command.Option;
 import static io.airlift.command.OptionType.GLOBAL;
 
 import java.io.*;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import com.fasterxml.clustermate.json.ClusterMateObjectMapper;
 
+import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
 import com.fasterxml.transistore.client.BasicTSClient;
@@ -28,6 +30,8 @@ public abstract class TStoreCmdBase implements Runnable
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
+    protected final static Pattern SLASH_PATTERN = Pattern.compile("/");
+    
     protected final static BasicTSKeyConverter KEY_CONVERTER = BasicTSKeyConverter.defaultInstance();
     
     @Option(type = GLOBAL, name = { "-v", "--verbose"}, description = "Verbose mode")
@@ -96,6 +100,12 @@ public abstract class TStoreCmdBase implements Runnable
         }
     }
 
+    /*
+    /**********************************************************************
+    /* Key conversions
+    /**********************************************************************
+     */
+    
     protected BasicTSKey contentKey(String external) {
         return KEY_CONVERTER.stringToKey(external);
     }
@@ -104,6 +114,16 @@ public abstract class TStoreCmdBase implements Runnable
         return KEY_CONVERTER.construct(partition, path);
     }
 
+    protected BasicTSKey contentKey(StorableKey rawKey) {
+        return KEY_CONVERTER.rawToEntryKey(rawKey);
+    }
+
+    /*
+    /**********************************************************************
+    /* JSON helpers
+    /**********************************************************************
+     */
+    
     protected ObjectWriter jsonWriter(Class<?> cls) {
         return mapper.writerWithType(cls);
     }
@@ -112,6 +132,12 @@ public abstract class TStoreCmdBase implements Runnable
         return mapper.getFactory().createGenerator(out);
     }
 
+    /*
+    /**********************************************************************
+    /* Path handling
+    /**********************************************************************
+     */
+    
     /**
      * Helper method used for converting local (usually) relative filenames
      * into server-side paths.
@@ -122,7 +148,24 @@ public abstract class TStoreCmdBase implements Runnable
         _pathFrom(f, sb);
         return sb.toString();
     }
-
+    
+    protected File appendPath(File base, String path)
+    {
+        // can either trim leading/trailing slahs, or just skip...
+        for (String segment : SLASH_PATTERN.split(path)) {
+            if (segment.length() > 0) {
+                base = new File(base, segment);
+            }
+        }
+        return base;
+    }
+    
+    /*
+    /**********************************************************************
+    /* Helper methods
+    /**********************************************************************
+     */
+    
     protected static void _pathFrom(File f, StringBuilder sb)
     {
         String name = f.getName();

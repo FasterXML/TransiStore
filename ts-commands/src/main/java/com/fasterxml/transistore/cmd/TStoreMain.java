@@ -13,7 +13,7 @@ public class TStoreMain
                 .withDescription("Main tstore command for listing, copying and removing files")
                 .withDefaultCommand(Help.class)
                 .withCommands(Help.class,
-                        ListCmd.class, PutCmd.class);
+                        GetCmd.class, ListCmd.class, PutCmd.class);
 
         // If we wanted something like "git [options] remote add [options]", we'd add:
         /*
