@@ -85,12 +85,12 @@ public class PutCmd extends TStoreCmdBase
         int count = 0;
         
         for (File file : input) {
-            count += _copyFileOrDir(client, file, null, jgen);
+            count += _copyFileOrDir(client, file, new File(file.getName()), jgen);
         }
         return count;
     }
 
-    private int _copyFileOrDir(BasicTSClient client, File src, File dstDir, JsonGenerator jgen)
+    private int _copyFileOrDir(BasicTSClient client, File src, File dst, JsonGenerator jgen)
             throws InterruptedException, IOException
     {
         if (src.isDirectory()) {
@@ -99,7 +99,7 @@ public class PutCmd extends TStoreCmdBase
             }
             int count = 0;
             for (File f : src.listFiles()) {
-                File dir = new File(dstDir, f.getName());
+                File dir = new File(dst, f.getName());
                 count += _copyFileOrDir(client, f, dir, jgen);
             }
             if (isTextual) {
@@ -108,7 +108,7 @@ public class PutCmd extends TStoreCmdBase
             }
             return count;
         }
-        return _copyFile(client, src, new File(dstDir, src.getName()), jgen);
+        return _copyFile(client, src, dst, jgen);
     }
     
     private int _copyFile(BasicTSClient client, File src, File dst, JsonGenerator jgen)
