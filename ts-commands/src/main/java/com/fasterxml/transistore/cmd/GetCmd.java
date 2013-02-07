@@ -46,7 +46,7 @@ public class GetCmd extends TStoreCmdBase
         // and then verify that all server sources are valid paths as well
         BasicTSKey prefix;
         try {
-            prefix = contentKey(arguments.get(0));;
+            prefix = contentKey(arguments.get(0));
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid server entry reference: "+e.getMessage());
         }
