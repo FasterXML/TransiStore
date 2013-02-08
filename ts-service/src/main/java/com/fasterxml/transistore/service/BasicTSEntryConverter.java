@@ -14,9 +14,10 @@ import com.fasterxml.storemate.store.Storable;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
+import com.fasterxml.transistore.basic.BasicTSListItem;
 
 public class BasicTSEntryConverter
-    extends StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>, TSListItem>
+    extends StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>, BasicTSListItem>
 {
     public final static byte V_METADATA_VERSION_1 = 0x11;
     
@@ -87,23 +88,23 @@ public class BasicTSEntryConverter
      */
     
     @Override
-    public final StoredEntry<BasicTSKey> entryFromStorable(final Storable raw) {
+    public final BasicTSEntry entryFromStorable(final Storable raw) {
         return entryFromStorable(_key(raw.getKey()), raw);
     }
 
     @Override
-    public final StoredEntry<BasicTSKey> entryFromStorable(final BasicTSKey key, final Storable raw)
+    public final BasicTSEntry entryFromStorable(final BasicTSKey key, final Storable raw)
     {
-        return raw.withMetadata(new WithBytesCallback<StoredEntry<BasicTSKey>>() {
-         @Override
-         public StoredEntry<BasicTSKey> withBytes(byte[] buffer, int offset, int length) {
-             return entryFromStorable(key, raw, buffer, offset, length);
-         }
+        return raw.withMetadata(new WithBytesCallback<BasicTSEntry>() {
+            @Override
+            public BasicTSEntry withBytes(byte[] buffer, int offset, int length) {
+                return entryFromStorable(key, raw, buffer, offset, length);
+            }
         });
     }
 
     @Override
-    public StoredEntry<BasicTSKey> entryFromStorable(BasicTSKey key, Storable raw,
+    public BasicTSEntry entryFromStorable(BasicTSKey key, Storable raw,
             byte[] buffer, int offset, int length)
     {
         int version = _extractVersion(key, buffer, offset, length);
@@ -125,8 +126,14 @@ public class BasicTSEntryConverter
     }
     
     @Override
-    public TSListItem fullListItemFromStorable(Storable raw) {
-        return new TSListItem(raw);
+    public BasicTSListItem fullListItemFromStorable(Storable raw) {
+        BasicTSEntry entry = entryFromStorable(raw);
+        /*
+    protected BasicTSListItem(StorableKey rawKey, int hash, long length,
+            long creationTime, int maxTTLSecs)
+         */
+        return new BasicTSListItem(raw.getKey(), raw.getContentHash(), raw.getActualUncompressedLength(),
+                entry.creationTime, entry.maxTTLSecs);
     }
     
     /*
@@ -188,24 +195,23 @@ public class BasicTSEntryConverter
 
     private final static void _putLongBE(byte[] buffer, int offset, long value)
     {
-     _putIntBE(buffer, offset, (int) (value >> 32));
-     _putIntBE(buffer, offset+4, (int) value);
+        _putIntBE(buffer, offset, (int) (value >> 32));
+        _putIntBE(buffer, offset+4, (int) value);
     }
     
     private final static void _putIntBE(byte[] buffer, int offset, int value)
     {
-     buffer[offset] = (byte) (value >> 24);
-     buffer[++offset] = (byte) (value >> 16);
-     buffer[++offset] = (byte) (value >> 8);
-     buffer[++offset] = (byte) value;
+        buffer[offset] = (byte) (value >> 24);
+        buffer[++offset] = (byte) (value >> 16);
+        buffer[++offset] = (byte) (value >> 8);
+        buffer[++offset] = (byte) value;
     }
 
     private final static long _getLongBE(byte[] buffer, int offset)
     {
-     long l1 = _getIntBE(buffer, offset);
-     long l2 = _getIntBE(buffer, offset+4);
-     
-     return (l1 << 32) | ((l2 << 32) >>> 32);
+        long l1 = _getIntBE(buffer, offset);
+        long l2 = _getIntBE(buffer, offset+4);
+        return (l1 << 32) | ((l2 << 32) >>> 32);
     }
     
     private final static int _getIntBE(byte[] buffer, int offset)

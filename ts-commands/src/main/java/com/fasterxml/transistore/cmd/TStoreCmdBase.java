@@ -134,6 +134,30 @@ public abstract class TStoreCmdBase implements Runnable
 
     /*
     /**********************************************************************
+    /* Error reporting
+    /**********************************************************************
+     */
+
+    protected void warn(String template, Object... args)
+    {
+        String str = (args.length == 0) ? template : String.format(template, args);
+        if (!str.endsWith("\n")) {
+            str += "\n";
+        }
+        System.err.println("WARN: "+str);
+    }
+
+    protected void error(String template, Object... args)
+    {
+        String str = (args.length == 0) ? template : String.format(template, args);
+        if (!str.endsWith("\n")) {
+            str += "\n";
+        }
+        System.err.println("ERROR: "+str);
+    }
+    
+    /*
+    /**********************************************************************
     /* Path handling
     /**********************************************************************
      */

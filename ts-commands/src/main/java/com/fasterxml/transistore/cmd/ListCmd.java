@@ -7,11 +7,11 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import com.fasterxml.clustermate.api.ListItemType;
-import com.fasterxml.clustermate.api.msg.ListItem;
 import com.fasterxml.clustermate.client.operation.ListOperationResult;
 import com.fasterxml.clustermate.client.operation.StoreEntryLister;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 
@@ -77,38 +77,97 @@ public class ListCmd extends TStoreCmdBase
     private ListOperationResult<?> listAsText(BasicTSClient client, BasicTSKey prefix) throws InterruptedException
     {
         int left = Math.max(1, maxEntries);
-        StoreEntryLister<BasicTSKey, String> lister = client.listContent(prefix, ListItemType.names);
+        StoreEntryLister<BasicTSKey, BasicTSListItem> lister = client.listContent(prefix, ListItemType.fullEntries);
+        boolean hasWarned = false;
         
         while (true) {
-            ListOperationResult<String> result = lister.listMore(Math.min(left, 100));
+            ListOperationResult<BasicTSListItem> result = lister.listMore(Math.min(left, 100));
             if (result.failed()) {
                 return result;
             }
-            List<String> names = result.getItems();
-            for (String name : names) {
-                System.out.println(name);
+            List<BasicTSListItem> entries = result.getItems();
+            final long now = System.currentTimeMillis();
+            int ix = 0;
+            for (BasicTSListItem entry : entries) {
+                ++ix;
+                System.out.printf("%s %s %s %s\n",
+                        size(entry.getLength()), ageMsecs(now - entry.created), ageSecs(entry.maxTTL),
+                        contentKey(entry.getKey()).toString());
+                if (!hasWarned) {
+                    List<String> unknown = entry.unknownProperties();
+                    if (!unknown.isEmpty()) {
+                        hasWarned = true;
+                        warn("Unknown properties for list item entry #"+ix+": "+unknown);
+                    }
+                }
                 --left;
             }
-            if (left < 1 || names.isEmpty()) {
+            if (left < 1 || entries.isEmpty()) {
                 return result;
             }
         }
     }
 
+    protected String size(long l)
+    {
+        if (l <= 9999L) {
+            return String.format("%5d", l);
+        }
+        int kB = (int) (l >> 10);
+        if (kB < 100) {
+            return String.format("%4.1fk", l / 1024.0); // 99.9k (5 chars)
+        }
+        if (kB < 1024) {
+            return String.format(" %3dk", kB); // 999k
+        }
+        int mB = (kB >> 10);
+        if (mB < 100) {
+            return String.format("%4.1fM", kB / 1024.0); // 99.9M
+        }
+        if (mB < 1024) { // 100 - 999
+            return String.format(" %dM", mB);
+        }
+        return String.format("%5.1fG", mB / 1024.0); // 125.4G
+    }
+
+    protected String ageMsecs(long msecs) {
+        return ageSecs((int) (msecs / 1000.0));
+    }
+
+    protected String ageSecs(int secs)
+    {
+        if (secs < 60) {
+            return String.format("   %3ds", secs);
+        }
+        int mins = (secs / 60);
+        secs -= (mins * 60);
+        if (mins < 60) {
+            return String.format("%2dm%2ds", mins, secs);
+        }
+        int h = (mins / 60);
+        mins -= (h * 60);
+        if (h < 24) {
+            return String.format("%2dh%2dm", h, mins);
+        }
+        int d = (h / 24);
+        h -= (d * 24);
+        return String.format("%2dD%2dh", h, mins);
+    }
+    
     private ListOperationResult<?> listAsJSON(BasicTSClient client, BasicTSKey prefix)
             throws InterruptedException, IOException
     {
         int left = Math.max(1, maxEntries);
-        StoreEntryLister<BasicTSKey, ListItem> lister = client.listContent(prefix, ListItemType.minimalEntries);
+        StoreEntryLister<BasicTSKey, BasicTSListItem> lister = client.listContent(prefix, ListItemType.fullEntries);
         // we'll have to deserialize, serialize back...
-        ObjectWriter w = jsonWriter(ListItemType.minimalEntries.getValueType());
+        ObjectWriter w = jsonWriter(BasicTSListItem.class);
         // let's wrap output in JSON array (or not?)
         JsonGenerator jgen = w.getJsonFactory().createGenerator(System.out);
         try {
             jgen.writeStartArray();
             ListOperationResult<?> result = null;
             while (true) {
-                result = lister.listMore(Math.min(left, 50));
+                result = lister.listMore(Math.min(left, 100));
                 if (result.failed()) { // note: no closing JSON array for failures
                     return result;
                 }

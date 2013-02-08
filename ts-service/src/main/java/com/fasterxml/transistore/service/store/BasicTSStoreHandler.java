@@ -6,11 +6,11 @@ import com.fasterxml.clustermate.service.store.StoreHandler;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.service.TSLastAccess;
-import com.fasterxml.transistore.service.TSListItem;
 
 public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
-    StoredEntry<BasicTSKey>, TSListItem>
+    StoredEntry<BasicTSKey>, BasicTSListItem>
 {
     /**
      * Flag mostly used by tests to force updates of last-accessed time stamps.
