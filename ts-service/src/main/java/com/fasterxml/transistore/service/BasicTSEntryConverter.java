@@ -128,10 +128,6 @@ public class BasicTSEntryConverter
     @Override
     public BasicTSListItem fullListItemFromStorable(Storable raw) {
         BasicTSEntry entry = entryFromStorable(raw);
-        /*
-    protected BasicTSListItem(StorableKey rawKey, int hash, long length,
-            long creationTime, int maxTTLSecs)
-         */
         return new BasicTSListItem(raw.getKey(), raw.getContentHash(), raw.getActualUncompressedLength(),
                 entry.creationTime, entry.maxTTLSecs);
     }

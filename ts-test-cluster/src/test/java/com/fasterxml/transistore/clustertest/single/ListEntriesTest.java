@@ -10,6 +10,7 @@ import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
+import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
@@ -27,7 +28,7 @@ public class ListEntriesTest extends ClusterTestBase
     {
         initTestLogging(); // reduce noise
         
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1Listing", true, SINGLE_TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListId", true, SINGLE_TEST_PORT);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), false); // false -> minimal background tasks
         service.start();
@@ -98,6 +99,53 @@ public class ListEntriesTest extends ClusterTestBase
             fail("Failed: "+row.getFirstFail());
         }
         assertEquals(0, row.getItems().size());
+
+        // and That's All, Folks!
+        
+        service.stop();
+        Thread.yield();
+        service.waitForStopped();
+    }
+
+    public void testFullItemListing() throws Exception
+    {
+        initTestLogging(); // reduce noise
+        
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListFullItem", true, SINGLE_TEST_PORT);
+        StoreForTests service = StoreForTests.createTestService(serviceConfig,
+                new TimeMasterForClusterTesting(100L), false); // false -> minimal background tasks
+        service.start();
+
+        BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+             .setOptimalOks(1).setMaxOks(1).build();
+        BasicTSClient client = new AHCBasedClientBootstrapper(clientConfig)
+            .addNode(new IpAndPort("http", "localhost", SINGLE_TEST_PORT))
+            .buildAndInitCompletely(5);
+
+        // First, set up test data: 5 things to iterate, 3 others
+        addEntry(client, PARTITION2, "foo");
+        addEntry(client, PARTITION2, "bar");
+        addEntry(client, PARTITION2, "dir/abc");
+        addEntry(client, PARTITION2, "dir/def");
+        addEntry(client, PARTITION2, "zzz");
+
+        addEntry(client, null, "foo");
+        addEntry(client, PARTITION3, "foo");
+        addEntry(client, PARTITION1, "bar");
+        // Also, important: need to list with other types as well; esp. full items
+
+        StoreEntryLister<BasicTSKey, BasicTSListItem> listerFull = client.listContent(contentKey(PARTITION2, ""),
+                ListItemType.fullEntries);
+
+        ListOperationResult<BasicTSListItem> rowFull = listerFull.listMore(2);
+        if (!rowFull.succeeded()) {
+            fail("Failed: "+rowFull.getFirstFail());
+        }
+        List<BasicTSListItem> fullItems = rowFull.getItems();
+        assertEquals(2, fullItems.size());
+        assertEquals(BasicTSListItem.class, fullItems.get(0).getClass());
+        assertEquals(BasicTSListItem.class, fullItems.get(1).getClass());
+        // should we verify contents?
         
         // and That's All, Folks!
         
