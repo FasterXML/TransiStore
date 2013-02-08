@@ -151,7 +151,7 @@ public class ListCmd extends TStoreCmdBase
         }
         int d = (h / 24);
         h -= (d * 24);
-        return String.format("%2dD%2dh", h, mins);
+        return String.format("%2dD%2dh", d, h);
     }
     
     private ListOperationResult<?> listAsJSON(BasicTSClient client, BasicTSKey prefix)
