@@ -4,6 +4,6 @@
 # all configs there may be assuming 9090 is one of hosts!
 
 CONFIG="sample/single-node-8080.yml"
-java -cp ts-commands/target/transistore-commands-0.5.0-SNAPSHOT.jar \
+java -cp ts-commands/target/transistore-commands-0.6.0-SNAPSHOT.jar \
  com.fasterxml.transistore.cmd.TStoreMain  \
  --config-file $CONFIG $@
