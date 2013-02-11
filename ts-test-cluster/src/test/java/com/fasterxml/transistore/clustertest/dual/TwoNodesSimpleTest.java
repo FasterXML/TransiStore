@@ -21,10 +21,7 @@ import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cluster.ClusterPeer;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.client.BasicTSClient;
-import com.fasterxml.transistore.client.BasicTSClientConfig;
-import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
-import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
+import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
@@ -152,10 +149,7 @@ public class TwoNodesSimpleTest extends ClusterTestBase
                 .setMaxOks(1)
                 .setAllowRetries(false) // let's not give tests too much slack, shouldn't need it
                 .build();
-            BasicTSClient client = new AHCBasedClientBootstrapper(clientConfig)
-                .addNode(endpoint1)
-                .addNode(endpoint2)
-                .buildAndInitCompletely(5);
+            BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
             /* at this point we can let server complete its initial startup,
              * which may include cleanup (test mode usually adds something like
              * 1 msec virtual sleep)
