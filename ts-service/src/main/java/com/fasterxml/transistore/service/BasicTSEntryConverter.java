@@ -146,13 +146,18 @@ public class BasicTSEntryConverter
     }
 
     @Override
-    public EntryLastAccessed createLastAccessed(byte[] raw)
+    public EntryLastAccessed createLastAccessed(byte[] raw) {
+        return createLastAccessed(raw, 0, raw.length);
+    }
+
+    @Override
+    public EntryLastAccessed createLastAccessed(byte[] raw, int offset, int length)
     {
-        if (raw.length != 17) {
-            throw new IllegalArgumentException("LastAccessed entry length must be 16 bytes, was: "+raw.length);
+        if (length != 17) {
+            throw new IllegalArgumentException("LastAccessed entry length must be 16 bytes, was: "+length);
         }
-        long accessTime = BDBConverters.getLongBE(raw, 0);
-        long creationTime = BDBConverters.getLongBE(raw, 8);
+        long accessTime = BDBConverters.getLongBE(raw, offset);
+        long creationTime = BDBConverters.getLongBE(raw, offset+8);
         byte type = raw[16];
         return new EntryLastAccessed(accessTime, creationTime, type);
     }
