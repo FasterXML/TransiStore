@@ -20,7 +20,9 @@ import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientBootstrapper;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
+
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
+//import com.fasterxml.transistore.client.jdk.JDKBasedClientBootstrapper;
 
 public abstract class TStoreCmdBase implements Runnable
 {
@@ -79,6 +81,7 @@ public abstract class TStoreCmdBase implements Runnable
     protected BasicTSClient bootstrapClient(BasicTSClientConfig clientConfig, SkeletalServiceConfig serviceConfig)
     {
         BasicTSClientBootstrapper bs = new AHCBasedClientBootstrapper(clientConfig);
+//        BasicTSClientBootstrapper bs = new JDKBasedClientBootstrapper(clientConfig);
         for (SkeletalServiceConfig.Node node : serviceConfig.ts.cluster.clusterNodes) {
             bs = bs.addNode(node.ipAndPort);
         }

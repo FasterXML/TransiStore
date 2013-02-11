@@ -127,13 +127,22 @@ public class GetCmd extends TStoreCmdBase
                             +prefix.getPath()+"'): '"+key.getPath()+"'");
                 }
                 File dst = appendPath(target, entryPath);
+                // also: need to ensure path exists, so
+                File parent = dst.getParentFile();
+                if (!parent.exists()) {
+                    if (!parent.mkdirs()) {
+                        warn("failed to created directory '%s'", parent.getAbsolutePath());
+                    }
+                    // probably fails, but let it go...
+                }
+                
                 // And then just download it
                 File resp = client.getContentAsFile(key, dst);
                 if (jgen != null) {
                     writeJsonEntry(key, dst, jgen);
                 } else {
                     if (resp == null) {
-                        System.err.printf("WARN: no content for '%s' (concurrent DELETE?)\n", KEY_CONVERTER.keyToString(key));
+                        warn("no content for '%s' (concurrent DELETE?)\n", KEY_CONVERTER.keyToString(key));
                     } else {
                         System.out.printf("GOT entry '%s' as file '%s'\n", KEY_CONVERTER.keyToString(key),
                                 dst.getAbsolutePath());

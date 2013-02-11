@@ -7,8 +7,8 @@ syntax: glob
 *.old
 .DS_Store
 
-# stupid eclipse:
-bin
+# or Maven
+dependency-reduced-pom.xml
 
 # building
 target
@@ -17,6 +17,7 @@ target
 .classpath
 .project
 .settings
+bin
 
 # IDEA
 .idea
@@ -25,6 +26,5 @@ target
 *.iws
 
 # Project-specific
-data-files
-data-bdb
-test-data
+data-tstore-entries
+data-tstore-nodes

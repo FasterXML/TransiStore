@@ -118,6 +118,7 @@ public class PutCmd extends TStoreCmdBase
         boolean isSmall = (src.length() < SMALL_FILE);
         
         BasicTSKey key = keyFor(dst);
+        final long nanoStart = System.nanoTime();
         
         PutOperationResult putResult = isSmall ? client.putContent(key, readFile(src))
                 : client.putContent(key, src);
@@ -147,7 +148,8 @@ public class PutCmd extends TStoreCmdBase
             jgen.writeRaw('\n');
         } else {
             if (verbose) {
-                System.out.printf("Uploaded file '%s' as '%s'\n", src.getPath(), key);
+                int msecs = (int) ((System.nanoTime() - nanoStart) >> 20);
+                System.out.printf("Uploaded file '%s' as '%s'\n (in %d msecs)", src.getPath(), key, msecs);
             }
         }
         return 1;

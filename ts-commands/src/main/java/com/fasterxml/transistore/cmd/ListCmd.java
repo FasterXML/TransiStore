@@ -28,8 +28,7 @@ public class ListCmd extends TStoreCmdBase
 
     @Arguments(title="prefix",
             description = "Server-side prefix (partition and optional path prefix) that defines entries to list",
-            usage = "[prefix]",
-            required=true)
+            usage = "[prefix]")
     public List<String> pathInfo;
 
     @Override
@@ -40,7 +39,7 @@ public class ListCmd extends TStoreCmdBase
         BasicTSClientConfig clientConfig = getClientConfig();
 
         // but also need prefix of some kind
-        if (pathInfo.size() != 1) {
+        if ((pathInfo == null) || pathInfo.size() != 1) {
             throw new IllegalArgumentException("Can only take single argument, path prefix for entries to list");
         }
         BasicTSKey prefix = null;
