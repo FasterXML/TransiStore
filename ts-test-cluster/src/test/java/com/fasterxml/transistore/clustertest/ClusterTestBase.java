@@ -11,11 +11,6 @@ import junit.framework.TestCase;
 
 import ch.qos.logback.classic.Level;
 
-import com.fasterxml.clustermate.client.Loggable;
-import com.fasterxml.clustermate.client.StoreClientBootstrapper;
-import com.fasterxml.clustermate.service.cfg.ClusterConfig;
-import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
-import com.fasterxml.clustermate.service.cfg.NodeConfig;
 import com.fasterxml.storemate.backend.bdbje.BDBJEConfig;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
@@ -23,14 +18,21 @@ import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.shared.hash.BlockMurmur3Hasher;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.StoreException;
+
+import com.fasterxml.clustermate.client.Loggable;
+import com.fasterxml.clustermate.client.StoreClientBootstrapper;
+import com.fasterxml.clustermate.service.cfg.ClusterConfig;
+import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
+import com.fasterxml.clustermate.service.cfg.NodeConfig;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
+//import com.fasterxml.transistore.client.jdk.JDKBasedClientBootstrapper;
 import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
-
 
 /**
  * Shared base class for unit tests; contains shared utility methods.
@@ -139,6 +141,7 @@ public abstract class ClusterTestBase extends TestCase
     protected StoreClientBootstrapper<?,?,?,?> createClientBootstrapper(BasicTSClientConfig clientConfig)
     {
         return new AHCBasedClientBootstrapper(clientConfig);
+//        return new JDKBasedClientBootstrapper(clientConfig);
     }
     
     /*
