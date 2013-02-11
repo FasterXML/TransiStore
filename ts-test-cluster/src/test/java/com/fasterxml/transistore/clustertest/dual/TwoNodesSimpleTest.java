@@ -71,10 +71,7 @@ public class TwoNodesSimpleTest extends ClusterTestBase
                 .setMaxOks(2)
                 .setAllowRetries(false) // let's not give tests too much slack, shouldn't need it
                 .build();
-        BasicTSClient client = new AHCBasedClientBootstrapper(clientConfig)
-            .addNode(endpoint1)
-            .addNode(endpoint2)
-            .buildAndInitCompletely(5);
+        BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
 
         // just for fun, use a space, slash and ampersand in key (to ensure correct encoding)
         final BasicTSKey KEY = contentKey("testSimple2/this&that/some item");

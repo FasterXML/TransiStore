@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import ch.qos.logback.classic.Level;
 
 import com.fasterxml.clustermate.client.Loggable;
+import com.fasterxml.clustermate.client.StoreClientBootstrapper;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
 import com.fasterxml.clustermate.service.cfg.NodeConfig;
@@ -24,6 +25,9 @@ import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
+import com.fasterxml.transistore.client.BasicTSClient;
+import com.fasterxml.transistore.client.BasicTSClientConfig;
+import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
 import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
@@ -120,6 +124,21 @@ public abstract class ClusterTestBase extends TestCase
 
     protected BasicTSKey contentKey(StorableKey raw) {
         return _keyConverter.rawToEntryKey(raw);
+    }
+
+    protected BasicTSClient createClient(BasicTSClientConfig clientConfig, IpAndPort... nodes)
+        throws IOException
+    {
+        StoreClientBootstrapper<?,?,?,?> bs = createClientBootstrapper(clientConfig);      
+        for (IpAndPort node : nodes) {
+            bs = bs.addNode(node);
+        }
+        return (BasicTSClient) bs.buildAndInitCompletely(5);
+    }
+
+    protected StoreClientBootstrapper<?,?,?,?> createClientBootstrapper(BasicTSClientConfig clientConfig)
+    {
+        return new AHCBasedClientBootstrapper(clientConfig);
     }
     
     /*

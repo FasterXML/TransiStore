@@ -35,9 +35,7 @@ public class ListEntriesTest extends ClusterTestBase
 
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
              .setOptimalOks(1).setMaxOks(1).build();
-        BasicTSClient client = new AHCBasedClientBootstrapper(clientConfig)
-            .addNode(new IpAndPort("http", "localhost", SINGLE_TEST_PORT))
-            .buildAndInitCompletely(5);
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
 
         // First, set up test data: 5 things to iterate, 3 others
         addEntry(client, PARTITION2, "foo");

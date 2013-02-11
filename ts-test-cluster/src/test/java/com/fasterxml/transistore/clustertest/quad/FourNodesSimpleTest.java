@@ -16,15 +16,11 @@ import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.client.BasicTSClient;
-import com.fasterxml.transistore.client.BasicTSClientConfig;
-import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
-import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
+import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
-
 
 /**
  * Simple CRUD tests for four-node setup (with 100% overlapping key range),
@@ -91,12 +87,7 @@ public class FourNodesSimpleTest extends ClusterTestBase
 	            .setMaxOks(1)
 	            .setAllowRetries(false) // let's not give tests too much slack, shouldn't need it
 	            .build();
-            BasicTSClient client = new AHCBasedClientBootstrapper(clientConfig)
-                .addNode(endpoint1)
-                .addNode(endpoint2)
-                .addNode(endpoint3)
-                .addNode(endpoint4)
-                .buildAndInitCompletely(5);
+            BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2, endpoint3, endpoint4);
             
             /* at this point we can let server complete its initial startup,
              * which may include cleanup (test mode usually adds something like

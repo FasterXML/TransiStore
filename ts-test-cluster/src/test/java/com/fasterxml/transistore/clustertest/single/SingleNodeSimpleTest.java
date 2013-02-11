@@ -10,16 +10,11 @@ import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.StoreConfig;
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.client.BasicTSClient;
-import com.fasterxml.transistore.client.BasicTSClientBootstrapper;
-import com.fasterxml.transistore.client.BasicTSClientConfig;
-import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
-import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
+import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
-
 
 /**
  * Set of simple (CRUD) tests for a single-node system, running within
@@ -28,14 +23,12 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 public class SingleNodeSimpleTest extends ClusterTestBase
 {
     final static int MAX_PAYLOAD_IN_MEMORY = StoreConfig.DEFAULT_MIN_PAYLOAD_FOR_STREAMING-1;
-
-    private final static int TEST_PORT = 7777;
     
     public void testSimpleSingleNode() throws Exception
     {
         initTestLogging(); // reduce noise
         
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1", true, TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1", true, SINGLE_TEST_PORT);
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), false);
@@ -48,9 +41,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
                 .setMaxOks(1)
                 .setAllowRetries(false) // no retries!
                 .build();
-        BasicTSClientBootstrapper bs = new AHCBasedClientBootstrapper(clientConfig);
-        bs = bs.addNode(new IpAndPort("http", "localhost", TEST_PORT));
-        BasicTSClient client = bs.buildAndInitCompletely(5);
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
 
         /* 02-Nov-2012, tatu: Minor twist -- use non-ASCII character(s) in
          *   there to trigger possible encoding probs. Ditto for embedded slash.
@@ -99,7 +90,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
     public void testSingleNodeWithFile() throws Exception
     {
         initTestLogging(); // reduce noise
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1F", true, TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1F", true, SINGLE_TEST_PORT);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), false);
         startServices(service);
@@ -108,9 +99,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
                 .setOptimalOks(1).setMaxOks(1)
                 .setAllowRetries(false) // no retries!
                 .build();
-        BasicTSClient client = new AHCBasedClientBootstrapper(clientConfig)
-                .addNode(new IpAndPort("http", "localhost", TEST_PORT))
-                .buildAndInitCompletely(5);
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
         final BasicTSKey KEY = contentKey("testSimple-file");
 
         try {

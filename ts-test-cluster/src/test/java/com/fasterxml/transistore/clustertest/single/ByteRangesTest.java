@@ -9,7 +9,6 @@ import com.fasterxml.storemate.shared.ByteRange;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
-import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
@@ -35,9 +34,7 @@ public class ByteRangesTest extends ClusterTestBase
 	        .setOptimalOks(1)
 	        .setMaxOks(1)
 	        .build();
-        BasicTSClient client = new AHCBasedClientBootstrapper(clientConfig)
-            .addNode(new IpAndPort("http", "localhost", SINGLE_TEST_PORT))
-            .buildAndInitCompletely(5);
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
 
         // // // Small content: inlined, not-compressed
         
