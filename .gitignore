@@ -12,6 +12,7 @@ dependency-reduced-pom.xml
 
 # building
 target
+test-data
 
 # Eclipse
 .classpath
