@@ -158,6 +158,16 @@ public abstract class TStoreCmdBase implements Runnable
         }
         System.err.println("ERROR: "+str);
     }
+
+    protected <T> T terminateWith(Throwable e)
+    {
+        System.err.printf("ERROR: (%s): %s", e.getClass().getName(), e.getMessage());
+        if (e instanceof RuntimeException) {
+            e.printStackTrace(System.err);
+        }
+        System.exit(1);
+        return null;
+    }
     
     /*
     /**********************************************************************
@@ -189,7 +199,7 @@ public abstract class TStoreCmdBase implements Runnable
     
     /*
     /**********************************************************************
-    /* Helper methods
+    /* Internal helper methods
     /**********************************************************************
      */
     
