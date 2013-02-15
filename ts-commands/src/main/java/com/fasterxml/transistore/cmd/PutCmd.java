@@ -18,9 +18,14 @@ import com.fasterxml.transistore.client.*;
 public class PutCmd extends TStoreCmdBase
 {
     private final static long SMALL_FILE = 8000;
+
+    private final static String STDIN_MARKER = "-";
+    
+    private final static File STDIN_MARKER_FILE = new File(STDIN_MARKER);
     
     @Arguments(title="arguments",
-            description = "Target (first argument) and File(s) and/or directories to copy (recursively) (remaining)",
+            description = "Target (first argument) and File(s) and/or directories to copy recursively (remaining arguments)."
+            +" Note that '"+STDIN_MARKER+"' can be used to mean stdin (but only as only source)",
             usage="[server-prefix] [file-or-dir1] ... [file-or-dir-N]",
             required=true)
     public List<String> arguments;
@@ -43,14 +48,20 @@ public class PutCmd extends TStoreCmdBase
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid prefix '"+arguments.get(0)+"', problem: "+e.getMessage());
         }
+        
         // similarly verify that files/directories actually exist first
         List<File> input = new ArrayList<File>();
-        for (int i = 1; i < arguments.size(); ++i) {
-            File f = new File(arguments.get(i));
-            if (!f.exists()) {
-                throw new IllegalArgumentException("No file or directory '"+f.getAbsolutePath()+"'");
+        // Special case: "-" as the only source?
+        if (arguments.size() == 2 && STDIN_MARKER.equals(arguments.get(1))) {
+            input.add(STDIN_MARKER_FILE);
+        } else {
+            for (int i = 1; i < arguments.size(); ++i) {
+                File f = new File(arguments.get(i));
+                if (!f.exists()) {
+                    throw new IllegalArgumentException("No file or directory '"+f.getAbsolutePath()+"'");
+                }
+                input.add(f);
             }
-            input.add(f);
         }
 
         JsonGenerator jgen = null;        
@@ -85,11 +96,34 @@ public class PutCmd extends TStoreCmdBase
         int count = 0;
         
         for (File file : input) {
-            count += _copyFileOrDir(client, file, new File(file.getName()), jgen);
+            if (file == STDIN_MARKER_FILE) {
+                _copyStdIn(client, file, jgen);
+                ++count;
+            } else {
+                count += _copyFileOrDir(client, file, STDIN_MARKER_FILE, jgen);
+            }
         }
         return count;
     }
 
+    private void _copyStdIn(BasicTSClient client, File dst, JsonGenerator jgen)
+            throws InterruptedException, IOException
+    {
+        // Let's actually copy stuff from stdin into a temporary file, upload that
+        File tmpFile = File.createTempFile("tstore", ".tmp");
+        tmpFile.deleteOnExit();
+        byte[] buffer = new byte[4000];
+        InputStream in = System.in;
+        FileOutputStream out = new FileOutputStream(tmpFile);
+
+        int count;
+        while ((count = in.read(buffer)) > 0) {
+            out.write(buffer, 0, count);
+        }
+        out.close();
+        _copyFile(client, tmpFile, dst, jgen);
+    }
+    
     private int _copyFileOrDir(BasicTSClient client, File src, File dst, JsonGenerator jgen)
             throws InterruptedException, IOException
     {
@@ -117,7 +151,8 @@ public class PutCmd extends TStoreCmdBase
         // use byte-backed for some, just to get better testing...
         boolean isSmall = (src.length() < SMALL_FILE);
         
-        BasicTSKey key = keyFor(dst);
+        BasicTSKey key = (dst == STDIN_MARKER_FILE) ? _target : keyFor(dst);
+        
         final long nanoStart = System.nanoTime();
         
         PutOperationResult putResult = isSmall ? client.putContent(key, readFile(src))
