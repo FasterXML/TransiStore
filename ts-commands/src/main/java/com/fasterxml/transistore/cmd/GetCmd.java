@@ -31,6 +31,11 @@ public class GetCmd extends TStoreCmdBase
             ,usage="[server-prefix] [target directory]"
             ,required=true)
     public List<String> arguments;
+
+    public GetCmd() {
+        // true -> Ok to write verbose info on stdout
+        super(true);
+    }
     
     @Override
     public void run()

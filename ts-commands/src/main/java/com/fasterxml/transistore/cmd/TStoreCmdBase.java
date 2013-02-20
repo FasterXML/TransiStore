@@ -35,13 +35,14 @@ public abstract class TStoreCmdBase implements Runnable
     protected final static Pattern SLASH_PATTERN = Pattern.compile("/");
     
     protected final static BasicTSKeyConverter KEY_CONVERTER = BasicTSKeyConverter.defaultInstance();
+
+    protected final boolean _canPrintVerbose;
     
     @Option(type = GLOBAL, name = { "-v", "--verbose"}, description = "Verbose mode")
     public boolean verbose = false;
 
-    @Option(type = GLOBAL, name = { "-c", "--config-file" }, description = "Config file to use",
-            arity=1 )
-    public String configFile;
+    @Option(type = GLOBAL, name = { "-c", "--config-file" }, description = "Config file to use")
+    public String[] configFiles;
 
     @Option(type = GLOBAL, name = { "-t", "--text"}, description = "Textual output mode (vs JSON)")
     public boolean isTextual = true;
@@ -49,14 +50,27 @@ public abstract class TStoreCmdBase implements Runnable
     @Option(type = GLOBAL, name = { "-j", "--json"}, description = "JSON output mode (vs textual)")
     public boolean isJSON = false;
 
+    /**
+     * @param canPrintVerbose Whether this command is allowed to print things to stdout
+     *   in verbose mode
+     */
+    protected TStoreCmdBase(boolean canPrintVerbose) {
+        _canPrintVerbose = canPrintVerbose;
+    }
+    
     protected SkeletalServiceConfig getServiceConfig()
     {
-        if (configFile == null || configFile.isEmpty()) {
+        if (configFiles == null || configFiles.length == 0) {
             throw new IllegalArgumentException("Missing configuration file setting");
         }
+        // Use the one specified last:
+        String configFile = configFiles[configFiles.length-1];
         File f = new File(configFile);
         if (!f.exists() || !f.canRead()) {
             throw new IllegalArgumentException("Can not read config file '"+f.getAbsolutePath()+"'");
+        }
+        if (_canPrintVerbose && verbose) {
+            System.out.printf("INFO: using config file '%s'", f.getAbsolutePath());
         }
         SkeletalServiceConfig config;        
         try {

@@ -2,4 +2,4 @@ Project: TransiStore
 
 0.6.0:
 
-
+- Added basic commands (put, get, list, cat)

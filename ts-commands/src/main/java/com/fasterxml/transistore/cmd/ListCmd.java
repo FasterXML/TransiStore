@@ -31,6 +31,11 @@ public class ListCmd extends TStoreCmdBase
             usage = "[prefix]")
     public List<String> pathInfo;
 
+    public ListCmd() {
+        // false -> Not ok to write verbose info on stdout
+        super(false);
+    }
+    
     @Override
     public void run()
     {

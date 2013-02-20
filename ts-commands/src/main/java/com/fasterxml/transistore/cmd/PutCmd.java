@@ -32,6 +32,11 @@ public class PutCmd extends TStoreCmdBase
 
     protected BasicTSKey _target;
     
+    public PutCmd() {
+        // true -> Ok to write verbose info on stdout
+        super(true);
+    }
+
     @Override
     public void run()
     {

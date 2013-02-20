@@ -23,6 +23,11 @@ public class CatCmd extends TStoreCmdBase
             ,usage="[path1] ... [pathN]")
     public List<String> paths;
     
+    public CatCmd() {
+        // false -> not ok to print stuff to stdout
+        super(false);
+    }
+    
     @Override
     public void run()
     {
