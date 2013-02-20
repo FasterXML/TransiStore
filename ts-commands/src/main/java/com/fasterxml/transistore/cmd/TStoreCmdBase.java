@@ -42,7 +42,7 @@ public abstract class TStoreCmdBase implements Runnable
     public boolean verbose = false;
 
     @Option(type = GLOBAL, name = { "-c", "--config-file" }, description = "Config file to use")
-    public String[] configFiles;
+    public String configFile;
 
     @Option(type = GLOBAL, name = { "-t", "--text"}, description = "Textual output mode (vs JSON)")
     public boolean isTextual = true;
@@ -60,11 +60,10 @@ public abstract class TStoreCmdBase implements Runnable
     
     protected SkeletalServiceConfig getServiceConfig()
     {
-        if (configFiles == null || configFiles.length == 0) {
+        if (configFile == null || configFile.isEmpty()) {
             throw new IllegalArgumentException("Missing configuration file setting");
         }
         // Use the one specified last:
-        String configFile = configFiles[configFiles.length-1];
         File f = new File(configFile);
         if (!f.exists() || !f.canRead()) {
             throw new IllegalArgumentException("Can not read config file '"+f.getAbsolutePath()+"'");
