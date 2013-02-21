@@ -340,14 +340,21 @@ public abstract class ClusterTestBase extends TestCase
      */
 
     /**
-     * Method to be called before tests, to ensure log4j does not whine.
+     * Method to be called before tests, to ensure logging does not whine.
      */
     protected void initTestLogging()
     {
-        // TODO: config slf4j to be quiet...
+        /*
+        final org.slf4j.Logger logger = client.getLogger();
+        if (!(logger instanceof ch.qos.logback.classic.Logger)) {
+            System.err.println("WARN: cannot reconfigure test logging for Logger of type "+logger.getClass());
+            return;
+        }
+        ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
+        logbackLogger.setLevel(ch.qos.logback.classic.Level.WARN);
 //        Log.named(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(Level.WARN);
         // Parts of system use j.u.l:
-        Loggable.setTestLogLevel(java.util.logging.Level.WARNING);
+         */
     }
 
     /**
