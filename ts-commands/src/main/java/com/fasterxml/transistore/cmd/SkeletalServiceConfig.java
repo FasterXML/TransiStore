@@ -24,6 +24,10 @@ public class SkeletalServiceConfig
         // // Static config:
 
         public List<Node> clusterNodes = new ArrayList<Node>();
+        
+        public void addNode(IpAndPort ip) {
+            clusterNodes.add(new Node(ip));
+        }
     }
 
     public static class Node
@@ -36,7 +40,10 @@ public class SkeletalServiceConfig
         
         // Alternate constructor for "simple" end point defs:
         public Node(String str) {
-            ipAndPort = new IpAndPort(str);
+            this(new IpAndPort(str));
+        }
+        public Node(IpAndPort ip) {
+            ipAndPort = ip;
         }
     }
 }

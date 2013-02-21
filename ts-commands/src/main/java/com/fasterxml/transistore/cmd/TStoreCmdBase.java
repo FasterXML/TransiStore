@@ -4,6 +4,7 @@ import io.airlift.command.Option;
 import static io.airlift.command.OptionType.GLOBAL;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import com.fasterxml.clustermate.json.ClusterMateObjectMapper;
 
+import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
@@ -37,13 +39,17 @@ public abstract class TStoreCmdBase implements Runnable
     protected final static BasicTSKeyConverter KEY_CONVERTER = BasicTSKeyConverter.defaultInstance();
 
     protected final boolean _canPrintVerbose;
-    
+
     @Option(type = GLOBAL, name = { "-v", "--verbose"}, description = "Verbose mode")
     public boolean verbose = false;
 
     @Option(type = GLOBAL, name = { "-c", "--config-file" }, description = "Config file to use")
     public String configFile;
 
+    @Option(type = GLOBAL, name = { "-s", "--server" },
+            description = "Server node(s) (comma-separated) to use for boostrap (overrides config file settings)")
+    public String server;
+    
     @Option(type = GLOBAL, name = { "-t", "--text"}, description = "Textual output mode (vs JSON)")
     public boolean isTextual = true;
 
@@ -71,11 +77,22 @@ public abstract class TStoreCmdBase implements Runnable
         if (_canPrintVerbose && verbose) {
             System.out.printf("INFO: using config file '%s'", f.getAbsolutePath());
         }
-        SkeletalServiceConfig config;        
-        try {
-            config = mapper.readValue(f, SkeletalServiceConfig.class);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Fail to read config file '"+f.getAbsolutePath()+"': "+e.getMessage());
+
+        SkeletalServiceConfig config;
+
+        // If we have server definition(s), can avoid reading config file
+        if (server != null && !server.isEmpty()) {
+            config = new SkeletalServiceConfig();
+            for (String str : server.split(",")) {
+                config.ts.cluster.addNode(new IpAndPort(str));
+            }
+            
+        } else {
+            try {
+                config = mapper.readValue(f, SkeletalServiceConfig.class);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Fail to read config file '"+f.getAbsolutePath()+"': "+e.getMessage());
+            }
         }
         if (config.ts.cluster.clusterNodes == null || config.ts.cluster.clusterNodes.isEmpty()) {
             throw new IllegalArgumentException("Missing cluster nodes definition");
