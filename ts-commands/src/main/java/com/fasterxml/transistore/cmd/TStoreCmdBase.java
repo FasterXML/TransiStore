@@ -4,7 +4,6 @@ import io.airlift.command.Option;
 import static io.airlift.command.OptionType.GLOBAL;
 
 import java.io.*;
-import java.util.*;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -66,18 +65,6 @@ public abstract class TStoreCmdBase implements Runnable
     
     protected SkeletalServiceConfig getServiceConfig()
     {
-        if (configFile == null || configFile.isEmpty()) {
-            throw new IllegalArgumentException("Missing configuration file setting");
-        }
-        // Use the one specified last:
-        File f = new File(configFile);
-        if (!f.exists() || !f.canRead()) {
-            throw new IllegalArgumentException("Can not read config file '"+f.getAbsolutePath()+"'");
-        }
-        if (_canPrintVerbose && verbose) {
-            System.out.printf("INFO: using config file '%s'", f.getAbsolutePath());
-        }
-
         SkeletalServiceConfig config;
 
         // If we have server definition(s), can avoid reading config file
@@ -86,16 +73,30 @@ public abstract class TStoreCmdBase implements Runnable
             for (String str : server.split(",")) {
                 config.ts.cluster.addNode(new IpAndPort(str));
             }
-            
-        } else {
+            if (_canPrintVerbose && verbose) {
+                System.out.printf("INFO: using %d server nodes: %s\n", config.ts.cluster.clusterNodes.size(),
+                        config.ts.cluster.clusterNodes.toString());
+            }
+        } else if (configFile != null && !configFile.isEmpty()) {
+            // Use the one specified last:
+            File f = new File(configFile);
+            if (!f.exists() || !f.canRead()) {
+                throw new IllegalArgumentException("Can not read config file '"+f.getAbsolutePath()+"'");
+            }
+            if (_canPrintVerbose && verbose) {
+                System.out.printf("INFO: using config file '%s'\n", f.getAbsolutePath());
+            }
+
             try {
                 config = mapper.readValue(f, SkeletalServiceConfig.class);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Fail to read config file '"+f.getAbsolutePath()+"': "+e.getMessage());
             }
-        }
-        if (config.ts.cluster.clusterNodes == null || config.ts.cluster.clusterNodes.isEmpty()) {
-            throw new IllegalArgumentException("Missing cluster nodes definition");
+            if (config.ts.cluster.clusterNodes == null || config.ts.cluster.clusterNodes.isEmpty()) {
+                throw new IllegalArgumentException("Missing cluster nodes definition in config file '"+f.getAbsolutePath()+"'");
+            }
+        } else {
+            throw new IllegalArgumentException("Missing settings for configuration file, or server(s) to contact; can not initialize client");
         }
         return config;
     }
