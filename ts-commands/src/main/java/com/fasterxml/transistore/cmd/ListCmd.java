@@ -138,24 +138,31 @@ public class ListCmd extends TStoreCmdBase
         return ageSecs((int) (msecs / 1000.0));
     }
 
-    protected String ageSecs(int secs)
+    protected String ageSecs(long secs0)
     {
+        int secs = (secs0 < Integer.MAX_VALUE) ? ((int) secs0) : Integer.MAX_VALUE;
         if (secs < 60) {
-            return String.format("   %3ds", secs);
+            return String.format("%2ds   ", secs);
         }
         int mins = (secs / 60);
         secs -= (mins * 60);
         if (mins < 60) {
-            return String.format("%2dm%2ds", mins, secs);
+            return String.format("%2dm%02d", mins, secs);
         }
         int h = (mins / 60);
         mins -= (h * 60);
-        if (h < 24) {
-            return String.format("%2dh%2dm", h, mins);
+        if (h < 24) { // even hours quite common, optimize
+            if (mins == 0) {
+                return String.format("%2dh   ", h);
+            }
+            return String.format("%2dh%02d", h, mins);
         }
         int d = (h / 24);
         h -= (d * 24);
-        return String.format("%2dd%2dh", d, h);
+        if (h == 0) { // even days common as well
+            return String.format("%2dd   ", d);
+        }
+        return String.format("%2dd%02d", d, h);
     }
     
     private ListOperationResult<?> listAsJSON(BasicTSClient client, BasicTSKey prefix)
