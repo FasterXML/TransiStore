@@ -19,7 +19,7 @@ import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 
-@Command(name = "get", description = "GET file(s) from TStore into local file system")
+@Command(name = "get", description = "GET entries from TStore into local file system")
 public class GetCmd extends TStoreCmdBase
 {
     @Option(name = { "-m", "--max" }, description = "Maximum number of entries to get",
@@ -107,7 +107,7 @@ public class GetCmd extends TStoreCmdBase
             pathPrefix2 = pathPrefix.substring(0, ix+1);
             pathPrefix = pathPrefix + "/";
         }
-        
+
         int left = Math.max(1, maxEntries);
         StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(prefix, ListItemType.ids);
         int gotten = 0;

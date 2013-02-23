@@ -4,6 +4,7 @@ import io.airlift.command.Option;
 import static io.airlift.command.OptionType.GLOBAL;
 
 import java.io.*;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -42,12 +43,16 @@ public abstract class TStoreCmdBase implements Runnable
     @Option(type = GLOBAL, name = { "-v", "--verbose"}, description = "Verbose mode")
     public boolean verbose = false;
 
+    /**
+     * Multiple instances are allowed, but we only use the last one specified if so; hence
+     * type of <code>String</code>
+     */
     @Option(type = GLOBAL, name = { "-c", "--config-file" }, description = "Config file to use")
     public String configFile;
 
     @Option(type = GLOBAL, name = { "-s", "--server" },
-            description = "Server node(s) (comma-separated) to use for boostrap (overrides config file settings)")
-    public String server;
+            description = "Server node(s) (comma-separated, if multiple) to use for boostrap (overrides config file settings)")
+    public List<String> servers;
     
     @Option(type = GLOBAL, name = { "-t", "--text"}, description = "Textual output mode (vs JSON)")
     public boolean isTextual = true;
@@ -68,10 +73,13 @@ public abstract class TStoreCmdBase implements Runnable
         SkeletalServiceConfig config;
 
         // If we have server definition(s), can avoid reading config file
-        if (server != null && !server.isEmpty()) {
+        if (servers != null && !servers.isEmpty()) {
             config = new SkeletalServiceConfig();
-            for (String str : server.split(",")) {
-                config.ts.cluster.addNode(new IpAndPort(str));
+            // allow both multiple entries, and comma-separated lists
+            for (String server : servers) {
+                for (String str : server.split(",")) {
+                    config.ts.cluster.addNode(new IpAndPort(str));
+                }
             }
             if (_canPrintVerbose && verbose) {
                 System.out.printf("INFO: using %d server nodes: %s\n", config.ts.cluster.clusterNodes.size(),

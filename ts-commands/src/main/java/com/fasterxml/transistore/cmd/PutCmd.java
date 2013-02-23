@@ -105,7 +105,7 @@ public class PutCmd extends TStoreCmdBase
                 _copyStdIn(client, file, jgen);
                 ++count;
             } else {
-                count += _copyFileOrDir(client, file, STDIN_MARKER_FILE, jgen);
+                count += _copyFileOrDir(client, file, new File(file.getName()), jgen);
             }
         }
         return count;
@@ -162,12 +162,11 @@ public class PutCmd extends TStoreCmdBase
         
         PutOperationResult putResult = isSmall ? client.putContent(key, readFile(src))
                 : client.putContent(key, src);
-        
         if (!putResult.succeededMinimally()) {
             NodeFailure fail = putResult.getFirstFail();
             int status = fail.getFirstCallFailure().getStatusCode();
             if (status == 409) {
-                System.err.printf("WARN: Conflict (409) for server entry '%s'; skipping\n", key);
+                warn("Conflict (409) for server entry '%s'; skipping\n", key);
                 return 0;
             }
             throw new IOException("Failed to PUT copy of '"+key+"': "+putResult.getFailCount()
@@ -177,9 +176,9 @@ public class PutCmd extends TStoreCmdBase
         if (!putResult.succeededOptimally()) {
             NodeFailure fail = putResult.getFirstFail();
             if (fail == null) {
-                System.err.printf("(WARN: sub-optimal PUT, %d copies -- no FAIL info?)\n", copies);
+                warn("(sub-optimal PUT, %d copies -- no FAIL info?)\n", copies);
             } else {
-                System.err.printf("(WARN: sub-optimal PUT, %d copies; %s failed, first fail status: %d)\n",
+                warn("(sub-optimal PUT, %d copies; %s failed, first fail status: %d)\n",
                         copies, fail.getServer().getAddress(), fail.getFirstCallFailure().getStatusCode());
             }
         }
@@ -197,7 +196,6 @@ public class PutCmd extends TStoreCmdBase
 
     private BasicTSKey keyFor(File src)
     {
-        // Use relative name, if we got prefix; absolute if not
         String serverPrefix = _target.getPath();
         String local = pathFromFile(src);
         String path;

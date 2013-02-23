@@ -83,7 +83,7 @@ public class ListCmd extends TStoreCmdBase
         int left = Math.max(1, maxEntries);
         StoreEntryLister<BasicTSKey, BasicTSListItem> lister = client.listContent(prefix, ListItemType.fullEntries);
         boolean hasWarned = false;
-        
+
         while (true) {
             ListOperationResult<BasicTSListItem> result = lister.listMore(Math.min(left, 100));
             if (result.failed()) {

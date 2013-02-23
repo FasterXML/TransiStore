@@ -13,6 +13,8 @@ public class TestCommandUtils extends TestCase
         f = new File(new File("foo"), "bar.txt");
         assertEquals("/foo/bar.txt", TStoreCmdBase.pathFromFile(f));
 
+        assertEquals("/pom.xml", TStoreCmdBase.pathFromFile(new File("pom.xml")));
+        
         // Unix parent/current dir refs should be ignored from such paths:
         assertEquals("/Foobar.txt", TStoreCmdBase.pathFromFile(new File("../../Foobar.txt")));
         assertEquals("/bar/foo.txt", TStoreCmdBase.pathFromFile(new File("../bar/foo.txt")));
