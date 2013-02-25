@@ -22,11 +22,8 @@ Here are some highlights (for more refer to `StoreMate` project):
 
 ## Documentation
 
+First things you are likely to read are these:
+
 * [Installing](../../wiki/Install)
 * [Tools](../../wiki/Tools)
 * [Configuration](../../wiki/Configuration)
-
-
-
-
-
