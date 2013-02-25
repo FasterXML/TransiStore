@@ -22,9 +22,9 @@ Here are some highlights (for more refer to `StoreMate` project):
 
 ## Documentation
 
-* [Installing](TransiStore/wiki/Install)
-* [Tools](TransiStore/wiki/Tools)
-* [Configuration](TransiStore/wiki/Configuration)
+* [Installing](/FasterXML/TransiStore/wiki/Install)
+* [Tools](/FasterXML/TransiStore/wiki/Tools)
+* [Configuration](/FasterXML/TransiStore/wiki/Configuration)
 
 
 
