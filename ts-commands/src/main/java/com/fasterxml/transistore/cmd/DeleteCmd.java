@@ -61,7 +61,7 @@ public class DeleteCmd extends TStoreCmdBase
             for (BasicTSKey path : paths) {
                 // One check: no recursive deletion without partition id, since it won't work
                 // reliably
-                if (!recursive && !path.hasPartitionId()) {
+                if (recursive && !path.hasPartitionId()) {
                     System.err.printf("Can not delete recursively without partition id, skipping: %s\n", path);
                     continue;
                 }
