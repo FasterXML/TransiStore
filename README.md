@@ -23,8 +23,8 @@ Here are some highlights (for more refer to `StoreMate` project):
 
 ## Documentation
 
-First things you are likely to read are these:
+Here are things you will probably want to read first:
 
-* [Installing](../../wiki/Install)
-* [Tools](../../wiki/Tools)
-* [Configuration](../../wiki/Configuration)
+* [Installing](../../wiki/Install): (TL;DNR) Build or download jar, find a config, start up
+* [Configuration](../../wiki/Configuration): (TL;DNR) Minimum amount of config is needed
+* [Tools](../../wiki/Tools): (TL;DNR) Yes, we have small set of command-line tools too
