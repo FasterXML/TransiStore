@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.fasterxml.transistore</groupId>
     <artifactId>transistore-parent</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.1-SNAPSHOT</version>
   </parent>
   <artifactId>transistore-test-cluster</artifactId>
   <name>TransiStore Cluster Tests</name>
