@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.fasterxml.transistore</groupId>
     <artifactId>transistore-parent</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.7.0</version>
   </parent>
   <artifactId>transistore-basic</artifactId>
   <name>TransiStore Basic</name>
