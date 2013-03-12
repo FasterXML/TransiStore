@@ -55,8 +55,8 @@
 
     <version.plugin.shade>1.7.1</version.plugin.shade>
 
-    <version.storemate>0.9.4</version.storemate>
-    <version.clustermate>0.8.10</version.clustermate>
+    <version.storemate>0.9.5</version.storemate>
+    <version.clustermate>0.9.0</version.clustermate>
     <version.jackson.core>2.1.4</version.jackson.core>
     <version.lzf>0.9.7</version.lzf>
     <version.logback>1.0.9</version.logback>
