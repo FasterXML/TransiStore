@@ -38,6 +38,9 @@ public class BasicTSPaths extends RequestPathStrategy
 
     protected final static String SECOND_SEGMENT_STORE_ENTRY = "entry";
     protected final static String SECOND_SEGMENT_STORE_LIST = "list";
+    protected final static String SECOND_SEGMENT_STORE_STATUS = "status";
+    protected final static String SECOND_SEGMENT_STORE_FIND_ENTRY = "findEntry";
+    protected final static String SECOND_SEGMENT_STORE_FIND_LIST = "findList";
 
     protected final static String SECOND_SEGMENT_NODE_STATUS = "status";
 
@@ -60,6 +63,21 @@ public class BasicTSPaths extends RequestPathStrategy
         return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_LIST);
     }
 
+    @Override
+    public <K extends RequestPathBuilder> K appendStoreFindEntryPath(K nodeRoot) {
+        return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_FIND_ENTRY);
+    }
+
+    @Override
+    public <K extends RequestPathBuilder> K appendStoreFindListPath(K nodeRoot) {
+        return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_FIND_LIST);
+    }
+
+    @Override
+    public <K extends RequestPathBuilder> K appendStoreStatusPath(K nodeRoot) {
+        return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_STATUS);
+    }
+    
     @Override
     public <K extends RequestPathBuilder> K appendNodeStatusPath(K nodeRoot) {
         return (K) _nodePath(nodeRoot).addPathSegment(SECOND_SEGMENT_NODE_STATUS);
