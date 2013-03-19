@@ -16,19 +16,16 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${version.jackson.core}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson.core}</version>
     </dependency>
 
     <!--  also using common stuff from ClusterMate -->
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-api</artifactId>
-      <version>${version.clustermate}</version>
     </dependency>
   </dependencies>
 </project>

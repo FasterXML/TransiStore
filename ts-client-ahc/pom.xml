@@ -20,7 +20,6 @@
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-client-ahc</artifactId>
-      <version>${version.clustermate}</version>
     </dependency>
   </dependencies>
 </project>

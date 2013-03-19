@@ -23,24 +23,20 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${version.slf4j}</version>
     </dependency>
 
     <!--  also using common stuff from StoreMate/ClusterMate -->
     <dependency>
       <groupId>com.fasterxml.storemate</groupId>
       <artifactId>storemate-backend-bdb-je</artifactId>
-      <version>${version.storemate}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-service</artifactId>
-      <version>${version.clustermate}</version>
     </dependency>
     <dependency>
         <groupId>com.fasterxml.clustermate</groupId>
         <artifactId>clustermate-dropwizard</artifactId>
-        <version>${version.clustermate}</version>
     </dependency>
   </dependencies>
 </project>

@@ -45,18 +45,16 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>${version.logback}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson.core}</version>
     </dependency>
-	<dependency>
+    <dependency>
 	  <groupId>io.airlift</groupId>
 	  <artifactId>airline</artifactId>
 	  <version>0.5</version>
-	</dependency>
+    </dependency>
   </dependencies>
 
   <!-- To create a stand-alone jar, we also need to package it
