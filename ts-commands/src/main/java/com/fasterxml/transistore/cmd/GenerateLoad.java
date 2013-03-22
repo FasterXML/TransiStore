@@ -108,7 +108,7 @@ public class GenerateLoad extends TStoreCmdBase
             while (!exec.awaitTermination(10, TimeUnit.SECONDS)) {
                 int left = threadsStarted.get() - threadsFinished.get();
                 if (left == 0) {   
-                    System.err.println("Odd: no threads left; ExecutorService not done. Bailing out...")''
+                    System.err.println("Odd: no threads left; ExecutorService not done. Bailing out...");
                     break;
                 }
                 System.out.printf("... waiting for termination, %d threads running\n", left);
@@ -146,14 +146,16 @@ public class GenerateLoad extends TStoreCmdBase
         
         if (!result.succeededMinimally()) {
             String error = result.getFirstFail().getFirstCallFailure().getErrorMessage();
-            msg = String.format("%4.1f %s PUT`%s`F`%03d`%s`ERROR: %s\n",
+            msg = String.format("%4.1f %s PUT`F`%03d`%s`ERROR: %s\n",
                     secOffset, threadId, msecs, key, error);
         } else if (!result.succeededOptimally()) {
             String status = String.valueOf(result.getSuccessCount());
-            msg = String.format("%4.1f %s PUT`%s`%03d`%s`WARN\n", secOffset, threadId, status, msecs, key);
+            msg = String.format("%4.1f %s PUT`%s`%03d`%s`WARN\n",
+                    secOffset, threadId, status, msecs, key);
         } else {
             String status = String.valueOf(result.getSuccessCount());
-            msg = String.format("%4.1f %s PUT`%s`%03d`%s`OK\n", secOffset, threadId, status, msecs, key);
+            msg = String.format("%4.1f %s PUT`%s`%03d`%s`OK\n",
+                    secOffset, threadId, status, msecs, key);
         }
         synchronized (this) {
             System.out.print(msg);
