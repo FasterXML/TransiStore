@@ -5,5 +5,5 @@
 # Also note that jar SHOULD be real executable (on unix anyway)
 
 CONFIG="sample/single-node-8080.yml"
-./ts-commands/target/transistore-commands-0.7.0-SNAPSHOT.jar \
+./ts-commands/target/transistore-commands-0.9.3-SNAPSHOT.jar \
  --config-file $CONFIG $@
