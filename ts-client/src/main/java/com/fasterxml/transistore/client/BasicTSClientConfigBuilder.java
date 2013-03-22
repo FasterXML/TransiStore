@@ -18,6 +18,14 @@ public class BasicTSClientConfigBuilder
     protected final static String[] DEFAULT_BASE_PATH = new String[] { "ts" };
 
     protected final static BasicTSPaths DEFAULT_PATH_STRATEGY = new BasicTSPaths();
+
+    protected final static int DEFAULT_MAX_HTTP_CONNECTIONS = 50;
+    
+    /**
+     * Default settings for some HttpClients (like AHC) are quite modest; so
+     * let's allow overrides
+     */
+    protected int _maxHttpConnections = DEFAULT_MAX_HTTP_CONNECTIONS;
     
     public BasicTSClientConfigBuilder() {
         super(DEFAULT_KEY_CONVERTER, DEFAULT_BASE_PATH,
@@ -26,11 +34,18 @@ public class BasicTSClientConfigBuilder
 
     public BasicTSClientConfigBuilder(BasicTSClientConfig config) {
         super(config);
+        _maxHttpConnections = config.getMaxHttpConnections();
     }
     
     @Override
     public BasicTSClientConfig build() {
         return new BasicTSClientConfig(_keyConverter, _basePath, _jsonMapper,
-                buildOperationConfig());
+                buildOperationConfig(),
+                _maxHttpConnections);
+    }
+
+    public BasicTSClientConfigBuilder setMaxHttpConnections(int max) {
+        _maxHttpConnections = max;
+        return this;
     }
 }

@@ -49,6 +49,14 @@ public class GenerateLoad extends TStoreCmdBase
         super(true);
     }
 
+    // Need to add bit more room for HTTP activity...
+    @Override
+    protected BasicTSClientConfig getClientConfig() {
+        return super.getClientConfig().builder()
+                .setMaxHttpConnections(100)
+                .build();
+    }
+    
     @Override
     public void run()
     {
@@ -105,17 +113,25 @@ public class GenerateLoad extends TStoreCmdBase
             }
         }
         try {
-            while (!exec.awaitTermination(10, TimeUnit.SECONDS)) {
+            while (!exec.awaitTermination(5, TimeUnit.SECONDS)) {
                 int left = threadsStarted.get() - threadsFinished.get();
                 if (left == 0) {   
                     System.err.println("Odd: no threads left; ExecutorService not done. Bailing out...");
                     exec.shutdownNow();
                     break;
                 }
-                System.out.printf("... waiting for termination, %d threads running\n", left);
+                if (left > 60000L) {
+                    System.out.printf("... waiting for termination, %d threads running\n", left);
+                }
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                _client.stop();
+            } catch (Exception e) {
+                System.err.printf("WARN: failed to close HttpClient: %s\n", e.getMessage());
+            }
         }
         double taken =  (System.currentTimeMillis() - _startTime) / 1000.0;
         System.out.printf("DONE: sent %d requests in %.1f seconds\n", requestCount, taken);
