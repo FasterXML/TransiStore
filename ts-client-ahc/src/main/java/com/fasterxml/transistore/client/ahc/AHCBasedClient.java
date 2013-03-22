@@ -20,6 +20,7 @@ public class AHCBasedClient
     {
         return ahcConfigBuilder
                 .setMaximumConnectionsTotal(config.getMaxHttpConnections())
+                .setMaximumConnectionsPerHost(config.getMaxHttpConnectionsPerHost())
                 .build();
     }
 }

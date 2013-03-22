@@ -13,13 +13,16 @@ public class BasicTSClientConfig
     extends StoreClientConfig<BasicTSKey, BasicTSClientConfig>
 {
     protected final int _maxHttpConnections;
-    
+    protected final int _maxHttpConnectionsPerHost;
+
     protected BasicTSClientConfig(EntryKeyConverter<BasicTSKey> keyConverter,
             String[] basePath, ObjectMapper jsonMapper,
-            OperationConfig operConfig, int maxHttpConnections) {
+            OperationConfig operConfig,
+            int maxHttpConnections, int maxHttpConnectionsPerHost) {
         super(keyConverter, basePath, new BasicTSPaths(),
                 jsonMapper, operConfig);
         _maxHttpConnections = maxHttpConnections;
+        _maxHttpConnectionsPerHost = maxHttpConnectionsPerHost;
     }
 
     @SuppressWarnings("unchecked")
@@ -38,5 +41,9 @@ public class BasicTSClientConfig
 
     public int getMaxHttpConnections() {
         return _maxHttpConnections;
+    }
+
+    public int getMaxHttpConnectionsPerHost() {
+        return _maxHttpConnectionsPerHost;
     }
 }

@@ -23,13 +23,15 @@ public class GenerateLoad extends TStoreCmdBase
      */
     protected final static long THREAD_STARTUP_DELAY_MSECS = 500L;
 
-    @Option(name = { "-t", "--threads" }, description = "Number of threads to use (per operation type)")
-    public int threadCount = 30;
+    // NOTE: due to HTTP restrictions, more threads will often not help throughput
+    // too much. We could create multiple clients maybe?
+    @Option(name = { "--threadCount" }, description = "Number of threads to use (per operation type)")
+    public int threadCount = 10;
 
-    @Option(name = { "-c", "--count" }, description = "Number of requests to send (per operation type)")
+    @Option(name = { "--requestCount" }, description = "Number of requests to send (per operation type)")
     public int requestCount = 10000;
     
-    @Option(name = { "-s", "--entrySize" }, description = "Size of entries to PUT")
+    @Option(name = { "--entrySize" }, description = "Size of entries to PUT")
     public long requestSize = 30000;
     
     @Arguments(title="server-path",

@@ -20,12 +20,16 @@ public class BasicTSClientConfigBuilder
     protected final static BasicTSPaths DEFAULT_PATH_STRATEGY = new BasicTSPaths();
 
     protected final static int DEFAULT_MAX_HTTP_CONNECTIONS = 50;
+
+    protected final static int DEFAULT_MAX_HTTP_CONNECTIONS_PER_HOST = 10;
     
     /**
      * Default settings for some HttpClients (like AHC) are quite modest; so
      * let's allow overrides
      */
     protected int _maxHttpConnections = DEFAULT_MAX_HTTP_CONNECTIONS;
+
+    protected int _maxHttpConnectionsPerHost = DEFAULT_MAX_HTTP_CONNECTIONS_PER_HOST;
     
     public BasicTSClientConfigBuilder() {
         super(DEFAULT_KEY_CONVERTER, DEFAULT_BASE_PATH,
@@ -35,17 +39,23 @@ public class BasicTSClientConfigBuilder
     public BasicTSClientConfigBuilder(BasicTSClientConfig config) {
         super(config);
         _maxHttpConnections = config.getMaxHttpConnections();
+        _maxHttpConnectionsPerHost = config.getMaxHttpConnectionsPerHost();
     }
     
     @Override
     public BasicTSClientConfig build() {
         return new BasicTSClientConfig(_keyConverter, _basePath, _jsonMapper,
                 buildOperationConfig(),
-                _maxHttpConnections);
+                _maxHttpConnections, _maxHttpConnectionsPerHost);
     }
 
     public BasicTSClientConfigBuilder setMaxHttpConnections(int max) {
         _maxHttpConnections = max;
+        return this;
+    }
+
+    public BasicTSClientConfigBuilder setMaxHttpConnectionsPerHost(int max) {
+        _maxHttpConnectionsPerHost = max;
         return this;
     }
 }
