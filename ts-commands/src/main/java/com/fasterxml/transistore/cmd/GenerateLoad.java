@@ -13,7 +13,7 @@ import io.airlift.command.Arguments;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 
-@Command(name = "get", description = "GET file(s) from TStore into local file system")
+@Command(name = "generate", description = "Generate and upload test data in TStore")
 public class GenerateLoad extends TStoreCmdBase
 {
     /**
@@ -30,7 +30,7 @@ public class GenerateLoad extends TStoreCmdBase
     @Option(name = { "-s", "--entrySize" }, description = "Size of entries to PUT")
     public long requestSize = 30000;
     
-    @Arguments(title="arguments",
+    @Arguments(title="server-path",
            description = "Path prefix to use for generated entries"
            ,usage="[server-prefix]"
            ,required=true)

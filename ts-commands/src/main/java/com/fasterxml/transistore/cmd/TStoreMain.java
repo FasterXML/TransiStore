@@ -14,7 +14,9 @@ public class TStoreMain
                 .withDefaultCommand(Help.class)
                 .withCommands(Help.class,
                         GetCmd.class, CatCmd.class, ListCmd.class,
-                        PutCmd.class, DeleteCmd.class);
+                        PutCmd.class, DeleteCmd.class,
+                        // and some debug tools as well
+                        GenerateLoad.class);
 
         // If we wanted something like "git [options] remote add [options]", we'd add:
         /*
