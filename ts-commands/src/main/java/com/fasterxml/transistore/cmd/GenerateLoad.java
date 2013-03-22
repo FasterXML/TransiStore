@@ -21,10 +21,10 @@ public class GenerateLoad extends TStoreCmdBase
     /**
      * Number of milliseconds between creating new threads during startup
      */
-    protected final static long THREAD_STARTUP_DELAY_MSECS = 1000L;
+    protected final static long THREAD_STARTUP_DELAY_MSECS = 500L;
 
     @Option(name = { "-t", "--threads" }, description = "Number of threads to use (per operation type)")
-    public int threadCount = 50;
+    public int threadCount = 30;
 
     @Option(name = { "-c", "--count" }, description = "Number of requests to send (per operation type)")
     public int requestCount = 10000;
@@ -72,14 +72,15 @@ public class GenerateLoad extends TStoreCmdBase
 
         _startTime = System.currentTimeMillis();
 
-        final AtomicInteger threadsRunning = new AtomicInteger(0);
+        final AtomicInteger threadsStarted = new AtomicInteger(0);
+        final AtomicInteger threadsFinished = new AtomicInteger(0);
         
         for (int i = 0; i < threadCount; ++i) {
             final String threadId = String.format("T%02d", i);
             exec.submit(new Runnable() {
                 @Override
                 public void run() {
-                    threadsRunning.addAndGet(1);
+                    threadsStarted.addAndGet(1);
                     try {
                         while (true) {
                             try {
@@ -93,7 +94,7 @@ public class GenerateLoad extends TStoreCmdBase
                             }
                         }
                     } finally {
-                        threadsRunning.addAndGet(-1);
+                        threadsFinished.addAndGet(1);
                     }
                 }
             });
@@ -105,8 +106,12 @@ public class GenerateLoad extends TStoreCmdBase
         }
         try {
             while (!exec.awaitTermination(10, TimeUnit.SECONDS)) {
-                System.out.printf("... waiting for termination, %d threads running\n", 
-                        threadsRunning.get());
+                int left = threadsStarted.get() - threadsFinished.get();
+                if (left == 0) {   
+                    System.err.println("Odd: no threads left; ExecutorService not done. Bailing out...")''
+                    break;
+                }
+                System.out.printf("... waiting for termination, %d threads running\n", left);
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -136,16 +141,19 @@ public class GenerateLoad extends TStoreCmdBase
     protected void _logPut(PutOperationResult result, String threadId, int msecs, String key)
     {
         String msg;
+        long msecOffset = System.currentTimeMillis() - _startTime;
+        double secOffset = msecOffset / 1000.0;
         
         if (!result.succeededMinimally()) {
             String error = result.getFirstFail().getFirstCallFailure().getErrorMessage();
-            msg = String.format("PUT`%s`F`%03d`%s`ERROR: %s\n", threadId, msecs, key, error);
+            msg = String.format("%4.1f %s PUT`%s`F`%03d`%s`ERROR: %s\n",
+                    secOffset, threadId, msecs, key, error);
         } else if (!result.succeededOptimally()) {
             String status = String.valueOf(result.getSuccessCount());
-            msg = String.format("PUT`%s`%s`%03d`%s`WARN\n", threadId, status, msecs, key);
+            msg = String.format("%4.1f %s PUT`%s`%03d`%s`WARN\n", secOffset, threadId, status, msecs, key);
         } else {
             String status = String.valueOf(result.getSuccessCount());
-            msg = String.format("PUT`%s`%s`%03d`%s`OK\n", threadId, status, msecs, key);
+            msg = String.format("%4.1f %s PUT`%s`%03d`%s`OK\n", secOffset, threadId, status, msecs, key);
         }
         synchronized (this) {
             System.out.print(msg);
