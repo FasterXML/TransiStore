@@ -109,6 +109,7 @@ public class GenerateLoad extends TStoreCmdBase
                 int left = threadsStarted.get() - threadsFinished.get();
                 if (left == 0) {   
                     System.err.println("Odd: no threads left; ExecutorService not done. Bailing out...");
+                    exec.shutdownNow();
                     break;
                 }
                 System.out.printf("... waiting for termination, %d threads running\n", left);
