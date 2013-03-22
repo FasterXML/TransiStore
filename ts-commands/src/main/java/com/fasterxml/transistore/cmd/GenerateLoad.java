@@ -3,6 +3,8 @@ package com.fasterxml.transistore.cmd;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -39,6 +41,8 @@ public class GenerateLoad extends TStoreCmdBase
     protected BasicTSClient _client;
 
     protected BasicTSKey _prefix;
+
+    protected long _startTime;
     
     public GenerateLoad() {
        // true -> Ok to write verbose info on stdout
@@ -50,7 +54,6 @@ public class GenerateLoad extends TStoreCmdBase
     {
         SkeletalServiceConfig serviceConfig = getServiceConfig();
         BasicTSClientConfig clientConfig = getClientConfig();
-        final long startTime = System.currentTimeMillis();
 
         if (arguments == null || arguments.size() != 1) {
             throw new IllegalArgumentException("Wrong number of arguments; expect one (server-prefix)");
@@ -66,25 +69,53 @@ public class GenerateLoad extends TStoreCmdBase
 
         final ExecutorService exec = Executors.newFixedThreadPool(threadCount);
         final ContentGenerator gen = new ContentGenerator(requestCount, requestSize);
+
+        _startTime = System.currentTimeMillis();
+
+        final AtomicInteger threadsRunning = new AtomicInteger(0);
+        
         for (int i = 0; i < threadCount; ++i) {
+            final String threadId = String.format("T%02d", i);
             exec.submit(new Runnable() {
                 @Override
                 public void run() {
+                    threadsRunning.addAndGet(1);
                     try {
-                        if (!_performOperation(gen)) {
-                            
+                        while (true) {
+                            try {
+                                if (!_performOperation(threadId, gen)) {
+                                    return;
+                                }
+                            } catch (Exception e) {
+                                System.err.println("ERROR: "+e.getMessage());
+                                // Let's hold up a bit should this happen...
+                                try { Thread.sleep(50L); } catch (InterruptedException e2) { }
+                            }
                         }
-                    } catch (Exception e) {
-                        System.err.println("ERROR: "+e.getMessage());
+                    } finally {
+                        threadsRunning.addAndGet(-1);
                     }
                 }
             });
+            try {
+                Thread.sleep(THREAD_STARTUP_DELAY_MSECS);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-        double taken =  (System.currentTimeMillis() - startTime) / 1000.0;
+        try {
+            while (!exec.awaitTermination(10, TimeUnit.SECONDS)) {
+                System.out.printf("... waiting for termination, %d threads running\n", 
+                        threadsRunning.get());
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        double taken =  (System.currentTimeMillis() - _startTime) / 1000.0;
         System.out.printf("DONE: sent %d requests in %.1f seconds\n", requestCount, taken);
     }
 
-    protected boolean _performOperation(ContentGenerator gen)
+    protected boolean _performOperation(String threadId, ContentGenerator gen)
             throws Exception
     {
         int index = gen.nextIndex();
@@ -98,20 +129,24 @@ public class GenerateLoad extends TStoreCmdBase
                 _prefix.getPath() + "/entry_"+Integer.toHexString(index));
         PutOperationResult result = _client.putContent(entryKey, stuff);
         int msecs = (int) ((System.nanoTime() - startTime) >> 20); // about right
-        _logPut(result, msecs, entryKey.toString());
+        _logPut(result, threadId, msecs, entryKey.toString());
         return true;
     }
 
-    protected void _logPut(PutOperationResult result, int msecs, String key)
+    protected void _logPut(PutOperationResult result, String threadId, int msecs, String key)
     {
-        String status;
+        String msg;
         
         if (!result.succeededMinimally()) {
-            status = "F";
+            String error = result.getFirstFail().getFirstCallFailure().getErrorMessage();
+            msg = String.format("PUT`%s`F`%03d`%s`ERROR: %s\n", threadId, msecs, key, error);
+        } else if (!result.succeededOptimally()) {
+            String status = String.valueOf(result.getSuccessCount());
+            msg = String.format("PUT`%s`%s`%03d`%s`WARN\n", threadId, status, msecs, key);
         } else {
-            status = String.valueOf(result.getSuccessCount());
+            String status = String.valueOf(result.getSuccessCount());
+            msg = String.format("PUT`%s`%s`%03d`%s`OK\n", threadId, status, msecs, key);
         }
-        String msg = String.format("PUT/%s/%03d/%s\n", status, msecs, key);
         synchronized (this) {
             System.out.print(msg);
         }
