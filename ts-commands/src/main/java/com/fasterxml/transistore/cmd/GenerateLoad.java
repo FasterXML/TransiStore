@@ -56,6 +56,7 @@ public class GenerateLoad extends TStoreCmdBase
     protected BasicTSClientConfig getClientConfig() {
         return super.getClientConfig().builder()
                 .setMaxHttpConnections(100)
+                .setMaxHttpConnectionsPerHost(10) // default of 5 not so hot for load test
                 .build();
     }
     
@@ -213,8 +214,10 @@ public class GenerateLoad extends TStoreCmdBase
                 // make mildly more compressible; ctrls -> spaces
                 if (c < 32) {
                     c = ' ';
-                } else if (c >= 127) { // and non-ASCII as upper-case ascii letters
-                    c = 64 + (c & 0x1F);
+                } else if (c >= 127) { // and non-ASCII as digits
+                    c = 48 + (c % 10);
+                } else if (c >= 96) {
+                    c -= 32; // and lowercase letters
                 }
                 result[i] = (byte) c;
             }
