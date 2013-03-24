@@ -25,6 +25,15 @@
         <artifactId>transistore-dropwizard</artifactId>
         <version>${project.version}</version>
     </dependency>
+
+    <!-- Also: let's embed LevelDB backend in too, for now; may need
+         to separate in future
+      -->
+    <dependency>
+      <groupId>com.fasterxml.storemate</groupId>
+      <artifactId>storemate-backend-leveldb</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
