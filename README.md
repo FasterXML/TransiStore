@@ -16,14 +16,13 @@ The main limitation -- as of now, at least -- is that content is Write-Once; tha
 Storage layer comes from `ClusterMate` (which in turn builds on [StoreMate](https://github.com/cowtowncoder/StoreMate).
 Here are some highlights (for more refer to `StoreMate` project):
 
-* Pluggable backends: default implementations uses `BDB-JE` for local storage
-* Automatic on-the-fly (de)compression; negotiated using standard HTTP; supports multiple compression methods
+* Pluggable backends: default implementation uses `BDB-JE` for local storage, but there is also experimental `LevelDB` backend.
+* Automatic on-the-fly (de)compression; negotiated using standard HTTP; supports multiple compression methods (client can pre-compress instead of server, or defer uncompression)
 * Partial content queries (HTTP Range supported)
-
 
 ## Documentation
 
-Here are things you will probably want to read first:
+Here are things you will probably want to read first (NOTE: to be written)
 
 * [Installing](../../wiki/Install): (TL;DNR) Build or download jar, find a config, start up
 * [Configuration](../../wiki/Configuration): (TL;DNR) Minimum amount of config is needed
