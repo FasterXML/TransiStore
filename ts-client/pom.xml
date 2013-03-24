@@ -23,7 +23,6 @@
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-client</artifactId>
-      <version>${version.clustermate}</version>
     </dependency>
   </dependencies>
 </project>

@@ -38,12 +38,10 @@
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-service</artifactId>
-      <version>${version.clustermate}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-client</artifactId>
-      <version>${version.clustermate}</version>
     </dependency>
   </dependencies>
 </project>

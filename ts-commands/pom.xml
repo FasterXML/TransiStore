@@ -33,13 +33,11 @@
       <artifactId>transistore-client-jdk</artifactId>
       <version>${project.version}</version>
     </dependency>
-<!-- 
     <dependency>
       <groupId>com.fasterxml.transistore</groupId>
       <artifactId>transistore-client-ahc</artifactId>
       <version>${project.version}</version>
     </dependency>
--->
 
     <!--  and then other stuff -->
     <dependency>
