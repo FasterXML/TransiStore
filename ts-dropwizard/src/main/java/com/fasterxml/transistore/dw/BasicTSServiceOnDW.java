@@ -6,8 +6,8 @@ import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
 
 import com.fasterxml.clustermate.dw.DWBasedService;
-import com.fasterxml.clustermate.dw.HealthCheckForBDB;
 import com.fasterxml.clustermate.dw.HealthCheckForCluster;
+import com.fasterxml.clustermate.dw.HealthCheckForStore;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cfg.ServiceConfig;
@@ -133,7 +133,7 @@ public class BasicTSServiceOnDW
             Environment environment)
     {
         ServiceConfig config = stuff.getServiceConfig();
-        environment.addHealthCheck(new HealthCheckForBDB(config, _stores));
+        environment.addHealthCheck(new HealthCheckForStore(config, _stores));
         environment.addHealthCheck(new HealthCheckForCluster(config, _cluster));
     }
 
