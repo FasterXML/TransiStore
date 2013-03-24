@@ -16,7 +16,8 @@
     ,"storeBackendType" : "com.fasterxml.storemate.backend.leveldb.LevelDBBuilder"
     ,"storeBackendConfig" : {
       "dataRoot" : "data-leveldb-entries/"
-      ,"cacheSize" : "32MB"
+      ,"dataCacheSize" : "40MB"
+      ,"indexCacheSize" : "20MB"
     }
 
     ,"cluster" : {
