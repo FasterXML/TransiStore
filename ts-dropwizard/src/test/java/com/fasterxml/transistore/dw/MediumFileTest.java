@@ -1,7 +1,6 @@
 package com.fasterxml.transistore.dw;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 import org.junit.Assert;
 
@@ -22,7 +21,7 @@ public class MediumFileTest extends JaxrsStoreTestBase
     }
 
     // Test to use GZIP
-    public void testMediumFile() throws IOException
+    public void testMediumFile() throws Exception
     {
         final long startTime = 1234L;
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(startTime);

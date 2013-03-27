@@ -1,7 +1,6 @@
 package com.fasterxml.transistore.dw;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 import com.fasterxml.storemate.store.StorableStore;
 
@@ -12,7 +11,6 @@ import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.dw.util.*;
 import com.fasterxml.transistore.service.TSLastAccess;
-
 
 /**
  * Tests to verify correct handling of 'last updated' timestamps
@@ -27,7 +25,7 @@ public class LastUpdatedTest extends JaxrsStoreTestBase
 
     // Simple test that creates 3 entries: two under same group, third
     // one as it's "own group"
-    public void testLargerFile() throws IOException
+    public void testLargerFile() throws Exception
     {
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(1000L);
         

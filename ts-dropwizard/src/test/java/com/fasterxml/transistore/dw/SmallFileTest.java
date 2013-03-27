@@ -27,7 +27,7 @@ public class SmallFileTest extends JaxrsStoreTestBase
         initTestLogging();
     }
 	
-    public void testSmallFile() throws IOException
+    public void testSmallFile() throws Exception
     {
         final long creationTime = 1234L;
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(creationTime);
@@ -183,7 +183,7 @@ public class SmallFileTest extends JaxrsStoreTestBase
     /**
      * Test to verify handling of duplicate PUTs
      */
-    public void testDuplicates() throws IOException
+    public void testDuplicates() throws Exception
     {
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(1234L);
 		
@@ -236,7 +236,7 @@ public class SmallFileTest extends JaxrsStoreTestBase
     /**
      * Test to check that if we already have LZF, we don't even try to re-compress it
      */
-    public void testSmallTextAlreadyLZF() throws IOException
+    public void testSmallTextAlreadyLZF() throws Exception
     {
         final long startTime = 1234L;
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(startTime);
@@ -283,7 +283,7 @@ public class SmallFileTest extends JaxrsStoreTestBase
      * Test to verify that trying to send non-LZF content, claiming to be LZF,
      * fails.
      */
-    public void testSmallTextAllegedLZF() throws IOException
+    public void testSmallTextAllegedLZF() throws Exception
     {
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(1234L);
 

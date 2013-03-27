@@ -13,7 +13,6 @@ import com.fasterxml.storemate.store.StoreConfig;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.dw.util.*;
 
-
 public class LargeFileTest extends JaxrsStoreTestBase
 {
     final static int MAX_PAYLOAD_IN_MEMORY = StoreConfig.DEFAULT_MIN_PAYLOAD_FOR_STREAMING-1;
@@ -25,9 +24,9 @@ public class LargeFileTest extends JaxrsStoreTestBase
     
     // Test larger content that should end up as file, with LZF encoding
     // if client sends it uncompressed.
-    public void testLargerEntry() throws IOException
+    public void testLargerEntry() throws Exception
     {
-    	final long startTime = 1234L;
+        final long startTime = 1234L;
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(startTime);
 	
         // Need to make big enough to use streaming, too...
@@ -102,7 +101,7 @@ public class LargeFileTest extends JaxrsStoreTestBase
         entries.stop();
     }
     
-    public void testLargerGZIPEntry() throws IOException
+    public void testLargerGZIPEntry() throws Exception
     {
         final long startTime = 1234L;
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(startTime);
@@ -177,7 +176,7 @@ public class LargeFileTest extends JaxrsStoreTestBase
      * Test to verify that trying to send non-GZIP content, claiming to be GZIP,
      * fails.
      */
-    public void testLargerGZIPEntryFailing() throws IOException
+    public void testLargerGZIPEntryFailing() throws Exception
     {
         final TimeMasterForSimpleTesting timeMaster = new TimeMasterForSimpleTesting(1234L);
         
