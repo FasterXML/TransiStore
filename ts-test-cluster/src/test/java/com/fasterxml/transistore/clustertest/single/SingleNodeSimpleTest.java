@@ -78,7 +78,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
             assertNotNull("Should not have the data after DELETE", data);
         } finally {
             // and That's All, Folks!
-            service.stop();
+            service._stop();
             service.waitForStopped();
         }
     }
@@ -138,7 +138,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
             assertNotNull("Should not have the data after DELETE", data);
             // and That's All, Folks!
         } finally {
-            service.stop();
+            service._stop();
             service.waitForStopped();
         }        
     }

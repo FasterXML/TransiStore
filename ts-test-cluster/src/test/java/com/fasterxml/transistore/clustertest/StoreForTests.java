@@ -80,16 +80,16 @@ public class StoreForTests extends BasicTSServiceOnDW
      */
     
     @Override
-    public void start() throws Exception
+    public void _start() throws Exception
     {
         _jettyServer.start();
         if (_fullInit) {
-            super.start();
+            super._start();
         }
     }
 
     @Override
-    public void stop() throws Exception {
+    public void _stop() throws Exception {
         // Let's ensure there are no threads blocked on virtual timer
         long wait = _testTimer.advanceTimeToWakeAll();
         // and apply tiny bit of delay iff time was advanced:
@@ -111,7 +111,7 @@ public class StoreForTests extends BasicTSServiceOnDW
             if (!_preStopped.get()) {
                 _preStopped.set(true);
                 try {
-                    super.stop();
+                    super._stop();
                 } catch (Exception e) {
                     System.err.printf("prepareForStop fail (%s): %s\n", e.getClass().getName(), e.getMessage());
                 }

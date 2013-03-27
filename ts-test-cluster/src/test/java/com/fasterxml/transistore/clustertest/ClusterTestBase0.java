@@ -150,7 +150,7 @@ public abstract class ClusterTestBase0 extends TestCase
     {
         for (StoreForTests service : services) {
             try {
-                service.start();
+                service._start();
             } catch (java.net.BindException e) {
                 fail("Failed to start test server due to bind exception: "+e.getMessage());
             } catch (Exception e) {

@@ -30,7 +30,7 @@ public class ListEntriesTest extends ClusterTestBase
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListId", true, SINGLE_TEST_PORT);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), false); // false -> minimal background tasks
-        service.start();
+        service._start();
 
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
              .setOptimalOks(1).setMaxOks(1).build();
@@ -99,7 +99,7 @@ public class ListEntriesTest extends ClusterTestBase
 
         // and That's All, Folks!
         
-        service.stop();
+        service._stop();
         Thread.yield();
         service.waitForStopped();
     }
@@ -111,7 +111,7 @@ public class ListEntriesTest extends ClusterTestBase
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListFullItem", true, SINGLE_TEST_PORT);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), false); // false -> minimal background tasks
-        service.start();
+        service._start();
 
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
              .setOptimalOks(1).setMaxOks(1).build();
@@ -144,7 +144,7 @@ public class ListEntriesTest extends ClusterTestBase
         
         // and That's All, Folks!
         
-        service.stop();
+        service._stop();
         Thread.yield();
         service.waitForStopped();
     }

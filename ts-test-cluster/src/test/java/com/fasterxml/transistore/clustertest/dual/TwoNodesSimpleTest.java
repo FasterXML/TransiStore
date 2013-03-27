@@ -106,8 +106,8 @@ public class TwoNodesSimpleTest extends ClusterTestBase
 
         // and That's All, Folks!
         
-        service1.stop();
-        service2.stop();
+        service1._stop();
+        service2._stop();
         service1.waitForStopped();
         service2.waitForStopped();
     }
@@ -275,8 +275,8 @@ public class TwoNodesSimpleTest extends ClusterTestBase
             // and That's All, Folks!
             service1.prepareForStop();
             service2.prepareForStop();
-            service1.stop();
-            service2.stop();
+            service1._stop();
+            service2._stop();
         }
         try { Thread.sleep(20L); } catch (InterruptedException e) { }
         service1.waitForStopped();

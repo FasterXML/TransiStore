@@ -75,10 +75,10 @@ public class FourNodesSimpleTest extends ClusterTestBase
         try {
         
             // then start them all
-            service1.start();
-            service2.start();
-            service3.start();
-            service4.start();
+            service1._start();
+            service2._start();
+            service3._start();
+            service4._start();
     
             // require just a single ok, so we can test replication nicely
             BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
@@ -218,10 +218,10 @@ public class FourNodesSimpleTest extends ClusterTestBase
                 service4.prepareForStop();
  
                 // and only then force stopping of the Servlet container (Jetty):
-                service1.stop();
-                service2.stop();
-                service3.stop();
-                service4.stop();
+                service1._stop();
+                service2._stop();
+                service3._stop();
+                service4._stop();
 
                 if (passed) { // takes a bit for threads to stop it seems...
                     try { Thread.sleep(20L); } catch (InterruptedException e) { }

@@ -164,8 +164,8 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
             service1.prepareForStop();
             service2.prepareForStop();
             Thread.sleep(10L);
-            service1.stop();
-            service2.stop();
+            service1._stop();
+            service2._stop();
         }
         try { Thread.sleep(20L); } catch (InterruptedException e) { }
         service1.waitForStopped();

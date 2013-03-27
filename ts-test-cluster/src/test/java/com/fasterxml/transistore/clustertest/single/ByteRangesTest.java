@@ -27,7 +27,7 @@ public class ByteRangesTest extends ClusterTestBase
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), false);
-        service.start();
+        service._start();
 
         // Ok: now, let's try doing some basic stuff
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
@@ -86,8 +86,8 @@ public class ByteRangesTest extends ClusterTestBase
         assertArrayEquals(exp, data);
         
         // and That's All, Folks!
-        
-        service.stop();
+
+        service._stop();
         Thread.yield();
         service.waitForStopped();
     }
