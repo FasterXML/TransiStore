@@ -24,7 +24,7 @@
     ,"storeBackendType" : "com.fasterxml.storemate.backend.bdbje.BDBJEBuilder"
     ,"storeBackendConfig" : {
       "dataRoot" : "data-tstore-entries/"
-      ,"cacheSize" : "32MB"
+      ,"cacheSize" : "64MB"
     }
 
     ,"cluster" : {
