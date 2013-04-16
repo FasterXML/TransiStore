@@ -55,7 +55,7 @@
 
     <version.plugin.shade>1.7.1</version.plugin.shade>
 
-    <version.clustermate>0.9.4-SNAPSHOT</version.clustermate>
+    <version.clustermate>0.9.4</version.clustermate>
   </properties>
 
   <!-- Licensing -->
