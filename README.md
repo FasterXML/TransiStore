@@ -45,5 +45,5 @@ files can be found from under `sample/`.
 Here are things you will probably want to read first (NOTE: to be written)
 
 * [Installing](../../wiki/Install) (my first TransiStore cluster): Build or download jar, find a config, start up!
-* [Configuration](../../wiki/Configuration): (TL;DNR) Minimum amount of config that is needed
-* [Tools](../../wiki/Tools): (TL;DNR) Yes, we have small set of command-line tools too
+* [Configuration](../../wiki/Configuration): what do those sample configs contain?
+* [Tools](../../wiki/Tools): Yes, we have small set of command-line tools too; accessed with `tstore.sh` wrapper (invoking `ts-client` jar)
