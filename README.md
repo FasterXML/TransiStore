@@ -13,7 +13,9 @@ Note that implementing storage system with different behavior, using `ClusterMat
 
 ### Functionality
 
-`TransiStore` can be viewed as a distributed key/value ("BLOB") store which explicitly supports Key Range queries for primary keys. It is horizontally scalable and allows addition/removal of storage nodes, without node restarts.
+`TransiStore` can be viewed as a distributed key/value ("BLOB") store which explicitly supports Key Range queries for primary keys.
+Stored entries have explicit time-to-live setting and service removes expired entries if they have not been explicitly deleted earlier.
+Clusters are horizontally scalable and allow addition/removal of storage nodes, without restarting other nodes.
 
 The main limitation -- as of now, at least -- is that content is Write-Once; that is, entries are immutable after being added: they may however. be explicitly deleted (and if not, will expire as per time-to-live settings). While this is a limit that use cases must conform to, it greatly simplifies implementation and improves handling performance, as conflict resolution is simple to handle (due to minimal number of cases to resolve).
 
@@ -39,6 +41,21 @@ and additional features that `ClusterMate` provides are:
 
 Configuration is simple: it consists of a single JSON configuration file. Sample configuration
 files can be found from under `sample/`.
+
+## Why not X?
+
+(where X may be "HBase", "Cassandra", "Voldemort", "Riak" or any of dozens of distributed key/value stores)
+
+Features that separate TransiStore for most other "noSQL" key/value stores are ones listed earlier:
+
+1. Can store LARGE entries (similar to S3): authors use it for storing 10 megabyte sized entries. It is designed for such usage -- you can even do partial GETs (with HTTP Range header)
+2. Key-range queries: some noSQL systems (like HBase) support them, but most don't (Cassandra, Voldemort), at least with recommended set ups. TransiStore is designed to  fully support them.
+3. Automatic expiration of data: useful for intermediate results (Hadoop processing? Log aggregation?), weekly reports, or even some types of caching. You just specify maximum life-time for entries and system purges them as necessary
+4. Simple configuration: single configuration file, used for all nodes; and even clients if you want.
+5. Automatic node recovery: once a node has its configuration file, it is ready to start up and synchronize entries it needs -- no manual process or delicate coordination needed (NOTE: there will be need to build dashboards, tools to help track progress -- but foundational functionality works for actual syncing)
+
+There are many more advanced features; but most of them are common within this class of servers
+(recovery, configurable number of copies required, statistics/metrics).
 
 ## Documentation
 
