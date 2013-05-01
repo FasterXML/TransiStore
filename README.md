@@ -50,4 +50,4 @@ Here are things you will probably want to read first:
 
 and here's some more stuff:
 
-* [Dependencies](Dependencies) -- what is TransiStore built of?
+* [Dependencies](../../wiki/Dependencies) -- what is TransiStore built of?
