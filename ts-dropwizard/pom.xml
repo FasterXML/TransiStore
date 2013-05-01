@@ -10,7 +10,6 @@
   <packaging>jar</packaging>
   <description>Version of TransiStore service to deploy on DropWizard
   </description>
-
   <dependencies>
     <!--  Cross-module deps -->
     <dependency>
