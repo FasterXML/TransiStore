@@ -7,11 +7,17 @@ Note that implementing storage system with different behavior, using `ClusterMat
 
 ## Basics
 
+### License
+
 'TransiStore` (and all its dependencies) are licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+
+### Functionality
 
 `TransiStore` can be viewed as a distributed key/value ("BLOB") store which explicitly supports Key Range queries for primary keys. It is horizontally scalable and allows addition/removal of storage nodes, without node restarts.
 
 The main limitation -- as of now, at least -- is that content is Write-Once; that is, entries are immutable after being added: they may however. be explicitly deleted (and if not, will expire as per time-to-live settings). While this is a limit that use cases must conform to, it greatly simplifies implementation and improves handling performance, as conflict resolution is simple to handle (due to minimal number of cases to resolve).
+
+### Underlying (per-node) storage
 
 Storage layer comes from `ClusterMate` (which in turn builds on [StoreMate](https://github.com/cowtowncoder/StoreMate).
 Here are some highlights (for more refer to `StoreMate` project):
@@ -19,6 +25,11 @@ Here are some highlights (for more refer to `StoreMate` project):
 * Pluggable backends: default implementation uses `BDB-JE` for local storage, but there is also experimental `LevelDB` backend.
 * Automatic on-the-fly (de)compression; negotiated using standard HTTP; supports multiple compression methods (client can pre-compress instead of server, or defer uncompression)
 * Partial content queries (HTTP Range supported)
+
+### Configuration
+
+Configuration is simple: it consists of a single JSON configuration file. Sample configuration
+files can be found from under `sample/`.
 
 ## Documentation
 
