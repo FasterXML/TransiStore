@@ -19,12 +19,21 @@ The main limitation -- as of now, at least -- is that content is Write-Once; tha
 
 ### Underlying (per-node) storage
 
-Storage layer comes from `ClusterMate` (which in turn builds on [StoreMate](https://github.com/cowtowncoder/StoreMate).
-Here are some highlights (for more refer to `StoreMate` project):
+Storage layer comes from [ClusterMate](https://github.com/cowtowncoder/ClusterMate) (which in turn builds on [StoreMate](https://github.com/cowtowncoder/StoreMate) project.
+
+Here are some highlights (for more refer to `StoreMate` project) of storage system:
 
 * Pluggable backends: default implementation uses `BDB-JE` for local storage, but there is also experimental `LevelDB` backend.
 * Automatic on-the-fly (de)compression; negotiated using standard HTTP; supports multiple compression methods (client can pre-compress instead of server, or defer uncompression)
 * Partial content queries (HTTP Range supported)
+* Key-range queries.
+
+and additional features that `ClusterMate` provides are:
+
+* Peer-to-peer content synchronization used for on-going content synchronization, recovery, and bootstrapping of newly added nodes
+* Configurable redundance (number of copies to store), with different client-controlled minimal required writes.
+* Client-configurable data expiration rates (per-entry time-to-live) to ensure that content will not live forever even if no explicit deletions are performed
+* Key partitioning to support cluster-wide key-range queries (routing by partition; queries within single partition) -- note: key structure fully configurable at `ClusterMate` level; TransiStore uses a simple `partition + path` key structure.
 
 ### Configuration
 
