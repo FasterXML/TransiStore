@@ -30,7 +30,7 @@ public class DeleteCmd extends TStoreCmdBase
     
     @Arguments(title="arguments",
             description = "Path(s) to entry(ies) to delete (if non-recursive); or prefix (if recursive)"
-            ,usage="[server-prefix] [target directory]"
+            ,usage="[entry1] ... [entryN]"
             ,required=true)
     public List<String> arguments;
 
