@@ -1,13 +1,12 @@
 Project: TransiStore
 
-0.9.3 (xx-xxx-2013)
+0.9.5 (30-Apr-2013)
 
 #6: Change order of 'tstore put' so that target is the last argument
  (suggested by Paul B)
+- version synced to that of ClusterMate
 
-0.9.2 (18-Mar-2013)
-
-- Synced version to that of ClusterMate, for maintainability
+...
 
 0.6.0 (25-Feb-2013)
 
