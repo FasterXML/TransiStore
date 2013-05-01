@@ -47,11 +47,12 @@ public class PutCmd extends TStoreCmdBase
             throw new IllegalArgumentException("Nothing to PUT");
         }
         BasicTSClient client = bootstrapClient(clientConfig, serviceConfig);
-        // Ok, first, target, verify it is valid TStore path
+        // Ok, first, target; verify it is valid TStore path
+        final int lastArgIndex = arguments.size()-1;
         try {
-            _target = contentKey(arguments.get(0));
+            _target = contentKey(arguments.get(lastArgIndex));
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid prefix '"+arguments.get(0)+"', problem: "+e.getMessage());
+            throw new IllegalArgumentException("Invalid prefix '"+arguments.get(lastArgIndex)+"', problem: "+e.getMessage());
         }
         
         // similarly verify that files/directories actually exist first
@@ -60,7 +61,7 @@ public class PutCmd extends TStoreCmdBase
         if (arguments.size() == 2 && STDIN_MARKER.equals(arguments.get(1))) {
             input.add(STDIN_MARKER_FILE);
         } else {
-            for (int i = 1; i < arguments.size(); ++i) {
+            for (int i = 0; i < lastArgIndex; ++i) {
                 File f = new File(arguments.get(i));
                 if (!f.exists()) {
                     throw new IllegalArgumentException("No file or directory '"+f.getAbsolutePath()+"'");
