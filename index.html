@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Transistore by FasterXML</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Transistore</h1>
+        <p>Distributed data store for transient (temporary, time-bound) data. Based on ClusterMate/StoreMate</p>
+
+        <p class="view"><a href="https://github.com/FasterXML/TransiStore">View the Project on GitHub <small>FasterXML/TransiStore</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/FasterXML/TransiStore/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/FasterXML/TransiStore/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/FasterXML/TransiStore">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>TransiStore</h1>
+
+<p>TransiStore is a distributed data store for temporary (time-bound, possibly but not necessarily transient) data, such as intermediate processing results (for Map/Reduce, Hadoop), staging area between high-volume procuders and consumers (log processing and aggregation), or just as general-purpose store for data exchange.</p>
+
+<p>TransiStore is built on <a href="https://github.com/cowtowncoder/ClusterMate">ClusterMate</a> platform, and serves as a sample system.
+Note that implementing storage system with different behavior, using <code>ClusterMate</code> (possibly using <code>TransiStore</code> as sample code) is highly encouraged: it is not meant as "The" storage system; although if it works as-is for your use case, all the better.</p>
+
+<h2>Basics</h2>
+
+<h3>License</h3>
+
+<p>'TransiStore` (and all its dependencies) are licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2.0</a>.</p>
+
+<h3>Functionality</h3>
+
+<p><code>TransiStore</code> can be viewed as a distributed key/value ("BLOB") store which explicitly supports Key Range queries for primary keys.
+Stored entries have explicit time-to-live setting and service removes expired entries if they have not been explicitly deleted earlier.
+Clusters are horizontally scalable and allow addition/removal of storage nodes, without restarting other nodes.</p>
+
+<p>The main limitation -- as of now, at least -- is that content is Write-Once; that is, entries are immutable after being added: they may however. be explicitly deleted (and if not, will expire as per time-to-live settings). While this is a limit that use cases must conform to, it greatly simplifies implementation and improves handling performance, as conflict resolution is simple to handle (due to minimal number of cases to resolve).</p>
+
+<h3>Underlying (per-node) storage</h3>
+
+<p>Storage layer comes from <a href="https://github.com/cowtowncoder/ClusterMate">ClusterMate</a> (which in turn builds on <a href="https://github.com/cowtowncoder/StoreMate">StoreMate</a> project.</p>
+
+<p>Here are some highlights (for more refer to <code>StoreMate</code> project) of storage system:</p>
+
+<ul>
+<li>Pluggable backends: default implementation uses <code>BDB-JE</code> for local storage, but there is also experimental <code>LevelDB</code> backend.</li>
+<li>Automatic on-the-fly (de)compression; negotiated using standard HTTP; supports multiple compression methods (client can pre-compress instead of server, or defer uncompression)</li>
+<li>Partial content queries (HTTP Range supported)</li>
+<li>Key-range queries.</li>
+</ul><p>and additional features that <code>ClusterMate</code> provides are:</p>
+
+<ul>
+<li>Peer-to-peer content synchronization used for on-going content synchronization, recovery, and bootstrapping of newly added nodes</li>
+<li>Configurable redundance (number of copies to store), with different client-controlled minimal required writes.</li>
+<li>Client-configurable data expiration rates (per-entry time-to-live) to ensure that content will not live forever even if no explicit deletions are performed</li>
+<li>Key partitioning to support cluster-wide key-range queries (routing by partition; queries within single partition) -- note: key structure fully configurable at <code>ClusterMate</code> level; TransiStore uses a simple <code>partition + path</code> key structure.</li>
+</ul><h3>Configuration</h3>
+
+<p>Configuration is simple: it consists of a single JSON configuration file. Sample configuration
+files can be found from under <code>sample/</code>.</p>
+
+<h2>Why not X?</h2>
+
+<p>(where X may be "HBase", "Cassandra", "Voldemort", "Riak" or any of dozens of distributed key/value stores)</p>
+
+<p>Features that separate TransiStore for most other "noSQL" key/value stores are ones listed earlier:</p>
+
+<ol>
+<li>Can store LARGE entries (similar to S3): authors use it for storing 10 megabyte sized entries. It is designed for such usage -- you can even do partial GETs (with HTTP Range header)</li>
+<li>Key-range queries: some noSQL systems (like HBase) support them, but most don't (Cassandra, Voldemort), at least with recommended set ups. TransiStore is designed to  fully support them.</li>
+<li>Automatic expiration of data: useful for intermediate results (Hadoop processing? Log aggregation?), weekly reports, or even some types of caching. You just specify maximum life-time for entries and system purges them as necessary</li>
+<li>Simple configuration: single configuration file, used for all nodes; and even clients if you want.</li>
+<li>Automatic node recovery: once a node has its configuration file, it is ready to start up and synchronize entries it needs -- no manual process or delicate coordination needed (NOTE: there will be need to build dashboards, tools to help track progress -- but foundational functionality works for actual syncing)</li>
+</ol><p>There are many more advanced features; but most of them are common within this class of servers
+(recovery, configurable number of copies required, statistics/metrics).</p>
+
+<h2>Documentation</h2>
+
+<p>Here are things you will probably want to read first:</p>
+
+<ul>
+<li>
+<a href="../../wiki/Install">Installing</a> (my first TransiStore cluster): Build or download jar, find a config, start up!</li>
+<li>
+<a href="../../wiki/Configuration">Configuration</a>: what do those sample configs contain?</li>
+<li>
+<a href="../../wiki/Tools">Tools</a>: Yes, we have small set of command-line tools too; accessed with <code>tstore.sh</code> wrapper (invoking <code>ts-client</code> jar)</li>
+</ul><p>and here's some more stuff:</p>
+
+<ul>
+<li>
+<a href="../../wiki/Dependencies">Dependencies</a> -- what is TransiStore built of?</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/FasterXML">FasterXML</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
