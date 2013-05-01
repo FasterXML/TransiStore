@@ -5,6 +5,7 @@
     <artifactId>transistore-parent</artifactId>
     <version>0.9.3-SNAPSHOT</version>
   </parent>
+
   <artifactId>transistore-client-ahc</artifactId>
   <name>TransiStore Client AHC</name>
   <packaging>jar</packaging>
