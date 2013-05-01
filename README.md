@@ -47,3 +47,7 @@ Here are things you will probably want to read first:
 * [Installing](../../wiki/Install) (my first TransiStore cluster): Build or download jar, find a config, start up!
 * [Configuration](../../wiki/Configuration): what do those sample configs contain?
 * [Tools](../../wiki/Tools): Yes, we have small set of command-line tools too; accessed with `tstore.sh` wrapper (invoking `ts-client` jar)
+
+and here's some more stuff:
+
+* [Dependencies](Dependencies) -- what is TransiStore built of?
