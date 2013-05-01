@@ -5,6 +5,7 @@
     <artifactId>transistore-parent</artifactId>
     <version>0.9.3-SNAPSHOT</version>
   </parent>
+
   <artifactId>transistore-test-cluster</artifactId>
   <name>TransiStore Cluster Tests</name>
   <packaging>jar</packaging>
