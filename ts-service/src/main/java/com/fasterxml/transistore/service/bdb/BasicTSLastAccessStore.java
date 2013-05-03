@@ -9,6 +9,7 @@ import com.sleepycat.je.Environment;
 import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.bdb.BDBConverters;
 import com.fasterxml.clustermate.service.bdb.LastAccessStore;
+import com.fasterxml.clustermate.service.cfg.LastAccessConfig;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.clustermate.service.store.StoredEntryConverter;
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -20,9 +21,10 @@ public class BasicTSLastAccessStore
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
     public BasicTSLastAccessStore(Environment env,
-            StoredEntryConverter<BasicTSKey,StoredEntry<BasicTSKey>,?> conv)
+            StoredEntryConverter<BasicTSKey,StoredEntry<BasicTSKey>,?> conv,
+            LastAccessConfig config)
     {
-        super(env, conv);
+        super(env, conv, config);
     }
 
     @Override

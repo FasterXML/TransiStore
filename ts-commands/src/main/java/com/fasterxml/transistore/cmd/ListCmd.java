@@ -173,7 +173,7 @@ public class ListCmd extends TStoreCmdBase
         // we'll have to deserialize, serialize back...
         ObjectWriter w = jsonWriter(BasicTSListItem.class);
         // let's wrap output in JSON array (or not?)
-        JsonGenerator jgen = w.getJsonFactory().createGenerator(System.out);
+        JsonGenerator jgen = w.getFactory().createGenerator(System.out);
         try {
             jgen.writeStartArray();
             ListOperationResult<?> result = null;

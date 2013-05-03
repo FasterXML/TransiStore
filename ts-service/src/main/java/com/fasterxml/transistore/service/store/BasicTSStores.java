@@ -5,6 +5,7 @@ import java.io.File;
 import com.sleepycat.je.Environment;
 
 import com.fasterxml.clustermate.service.bdb.LastAccessStore;
+import com.fasterxml.clustermate.service.cfg.LastAccessConfig;
 import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.clustermate.service.store.StoredEntryConverter;
@@ -31,7 +32,8 @@ public class BasicTSStores extends StoresImpl<BasicTSKey, StoredEntry<BasicTSKey
     }
 
     @Override
-    protected LastAccessStore<BasicTSKey, StoredEntry<BasicTSKey>> buildAccessStore(Environment env) {
-        return new BasicTSLastAccessStore(env, _entryConverter);
+    protected LastAccessStore<BasicTSKey, StoredEntry<BasicTSKey>> buildAccessStore(Environment env,
+            LastAccessConfig config) {
+        return new BasicTSLastAccessStore(env, _entryConverter, config);
     }
 }
