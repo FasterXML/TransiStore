@@ -4,7 +4,7 @@ import java.io.File;
 
 import com.sleepycat.je.Environment;
 
-import com.fasterxml.clustermate.service.bdb.LastAccessStore;
+import com.fasterxml.clustermate.service.LastAccessStore;
 import com.fasterxml.clustermate.service.cfg.LastAccessConfig;
 import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.clustermate.service.store.StoredEntry;

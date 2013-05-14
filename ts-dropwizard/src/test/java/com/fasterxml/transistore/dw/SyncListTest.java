@@ -34,7 +34,7 @@ public class SyncListTest extends JaxrsStoreTestBase
         StoreResourceForTests<BasicTSKey, StoredEntry<BasicTSKey>> resource = createResource("syncSimple", timeMaster, true);
 
         SyncHandler<BasicTSKey, StoredEntry<BasicTSKey>> syncH = new SyncHandler<BasicTSKey, StoredEntry<BasicTSKey>>
-            (resource._stuff, resource.getStores(), resource.getCluster());
+            (resource.getStuff(), resource.getStores(), resource.getCluster());
         
         // First, add an entry:
         StorableStore entries = resource.getStores().getEntryStore();
@@ -66,7 +66,7 @@ public class SyncListTest extends JaxrsStoreTestBase
         assertEquals(ContentType.SMILE.toString(), response.getContentType());
         byte[] data = response.getStreamingContentAsBytes();
 
-        SyncListResponse<?> syncList = resource._stuff.smileReader(SyncListResponse.class).readValue(data);
+        SyncListResponse<?> syncList = resource.getStuff().smileReader(SyncListResponse.class).readValue(data);
         assertNotNull(syncList);
         assertNull(syncList.message);
         assertNotNull(syncList.entries);
@@ -87,7 +87,7 @@ public class SyncListTest extends JaxrsStoreTestBase
 
         // set handler's "max-to-list" to 1, less than what we need later on
         SyncHandler<BasicTSKey, StoredEntry<BasicTSKey>> syncH =
-                new SyncHandler<BasicTSKey, StoredEntry<BasicTSKey>>(resource._stuff,
+                new SyncHandler<BasicTSKey, StoredEntry<BasicTSKey>>(resource.getStuff(),
                 resource.getStores(), resource.getCluster(), 1);
         
         // First, add an entry:
@@ -127,7 +127,7 @@ public class SyncListTest extends JaxrsStoreTestBase
         assertEquals(ContentType.SMILE.toString(), response.getContentType());
         byte[] data = response.getStreamingContentAsBytes();
 
-        SyncListResponse<StoredEntry<?>> syncList = resource._stuff.smileReader(SyncListResponse.class).readValue(data);
+        SyncListResponse<StoredEntry<?>> syncList = resource.getStuff().smileReader(SyncListResponse.class).readValue(data);
         assertNotNull(syncList);
         assertNull(syncList.message);
         assertNotNull(syncList.entries);
