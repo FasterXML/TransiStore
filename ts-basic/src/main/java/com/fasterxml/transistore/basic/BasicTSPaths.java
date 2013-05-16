@@ -20,6 +20,9 @@ import com.fasterxml.clustermate.api.RequestPathStrategy;
  *  <ul>
  *    <li>".../node/status" for basic status</li>
  *  </ul>
+ *  <ul>
+ *    <li>".../node/metrics" for various metrics</li>
+ *  </ul>
  *</ul>
  * <li>Sync entries under ".../sync/":
  *  <ul>
@@ -31,7 +34,6 @@ import com.fasterxml.clustermate.api.RequestPathStrategy;
 @SuppressWarnings("unchecked")
 public class BasicTSPaths extends RequestPathStrategy
 {
-    
     protected final static String FIRST_SEGMENT_STORE = "store";
     protected final static String FIRST_SEGMENT_NODE = "node";
     protected final static String FIRST_SEGMENT_SYNC = "sync";
@@ -43,6 +45,7 @@ public class BasicTSPaths extends RequestPathStrategy
     protected final static String SECOND_SEGMENT_STORE_FIND_LIST = "findList";
 
     protected final static String SECOND_SEGMENT_NODE_STATUS = "status";
+    protected final static String SECOND_SEGMENT_NODE_METRICS = "metrics";
 
     protected final static String SECOND_SEGMENT_SYNC_LIST = "list";
     protected final static String SECOND_SEGMENT_SYNC_PULL = "pull";
@@ -84,6 +87,11 @@ public class BasicTSPaths extends RequestPathStrategy
     }
 
     @Override
+    public <K extends RequestPathBuilder> K appendNodeMetricsPath(K nodeRoot) {
+        return (K) _nodePath(nodeRoot).addPathSegment(SECOND_SEGMENT_NODE_METRICS);
+    }
+
+    @Override
     public <K extends RequestPathBuilder> K appendSyncListPath(K nodeRoot) {
         return (K) _syncPath(nodeRoot).addPathSegment(SECOND_SEGMENT_SYNC_LIST);
     }
@@ -113,6 +121,9 @@ public class BasicTSPaths extends RequestPathStrategy
         } else if (pathDecoder.matchPathSegment(FIRST_SEGMENT_NODE)) {
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_NODE_STATUS)) {
                 return PathType.NODE_STATUS;
+            }
+            if (pathDecoder.matchPathSegment(SECOND_SEGMENT_NODE_METRICS)) {
+                return PathType.NODE_METRICS;
             }
         } else if (pathDecoder.matchPathSegment(FIRST_SEGMENT_SYNC)) {
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_SYNC_LIST)) {
