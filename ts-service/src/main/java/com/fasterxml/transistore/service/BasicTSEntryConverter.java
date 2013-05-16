@@ -1,16 +1,17 @@
 package com.fasterxml.transistore.service;
 
-import com.fasterxml.clustermate.api.EntryKeyConverter;
-import com.fasterxml.clustermate.api.msg.ListItem;
-import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
-import com.fasterxml.clustermate.service.bdb.BDBConverters;
-import com.fasterxml.clustermate.service.store.EntryLastAccessed;
-import com.fasterxml.clustermate.service.store.StoredEntry;
-import com.fasterxml.clustermate.service.store.StoredEntryConverter;
 import com.fasterxml.storemate.shared.ByteContainer;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.shared.util.WithBytesCallback;
 import com.fasterxml.storemate.store.Storable;
+
+import com.fasterxml.clustermate.api.EntryKeyConverter;
+import com.fasterxml.clustermate.api.msg.ListItem;
+import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
+import com.fasterxml.clustermate.service.store.EntryLastAccessed;
+import com.fasterxml.clustermate.service.store.StoredEntry;
+import com.fasterxml.clustermate.service.store.StoredEntryConverter;
+import com.fasterxml.clustermate.service.util.ByteUtil;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
@@ -141,7 +142,9 @@ public class BasicTSEntryConverter
     @Override
     public EntryLastAccessed createLastAccessed(StoredEntry<BasicTSKey> entry, long accessTime)
     {
-        return new EntryLastAccessed(accessTime, entry.getCreationTime(), 
+        long expireTime = entry.getCreationTime();
+        expireTime += 1000 * entry.getMaxTTLSecs();
+        return new EntryLastAccessed(accessTime, expireTime,
                  entry.getLastAccessUpdateMethod().asByte());
     }
 
@@ -154,12 +157,12 @@ public class BasicTSEntryConverter
     public EntryLastAccessed createLastAccessed(byte[] raw, int offset, int length)
     {
         if (length != 17) {
-            throw new IllegalArgumentException("LastAccessed entry length must be 16 bytes, was: "+length);
+            throw new IllegalArgumentException("LastAccessed entry length must be 17 bytes, was: "+length);
         }
-        long accessTime = BDBConverters.getLongBE(raw, offset);
-        long creationTime = BDBConverters.getLongBE(raw, offset+8);
+        long accessTime = ByteUtil.getLongBE(raw, offset);
+        long expirationTime = ByteUtil.getLongBE(raw, offset+8);
         byte type = raw[16];
-        return new EntryLastAccessed(accessTime, creationTime, type);
+        return new EntryLastAccessed(accessTime, expirationTime, type);
     }
     
     /*
