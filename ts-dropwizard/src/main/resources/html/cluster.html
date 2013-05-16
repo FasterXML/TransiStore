@@ -166,7 +166,7 @@ function buildOpMetrics(now, allMetrics)
   ;
   table.append(header);
   // iterate over operations (GET, PUT, DELETE)
-  for (oper in allMetrics.operation) {
+  for (oper in allMetrics.operations) {
      var tr = $("<tr class='dataRow' class='nowrap'></tr>");
      tr.append($("<td class='logCell'></td>").text(""+oper));
      table.append(tr);
