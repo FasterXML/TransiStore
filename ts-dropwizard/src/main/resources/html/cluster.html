@@ -130,6 +130,7 @@ function setTimeAndStatus(status) {
 
 function startRefresh() {
 	sendRequest("/ts/node/status", handleStatusResults);
+     sendRequest("/ts/node/metrics", handleMetricsResults);
 }
 
 function handleStatusResults(response)
@@ -144,6 +145,54 @@ function handleStatusResults(response)
 	$("#localTable").html(buildTable(now, loco));
 	$("#remoteTable").html(buildTable(now, peers));
 	$("#clusterUpdated").text(timestamp(now, response.clusterLastUpdated));
+}
+
+function handleMetricsResults(response)
+{
+     var now = new Date().getTime()
+
+     $("#metricsUpdated").text(timestamp(now, response.lastUpdated));
+
+     $("#opMetricsTable").html(buildOpMetrics(now, response));
+     $("#storeMetricsTable").html(buildStoreMetrics(now, response));
+}
+
+function buildOpMetrics(now, allMetrics)
+{
+  var table = $("<table class='outputTable'></table>");
+  var header = $("<tr class='dataRow' style='background-color: #C0C0DC;'></tr>");
+  header
+     .append($("<th class='dataHeader'></th>").text("Operation"))
+  ;
+  table.append(header);
+  // iterate over operations (GET, PUT, DELETE)
+  for (oper in allMetrics.operation) {
+     var tr = $("<tr class='dataRow' class='nowrap'></tr>");
+     tr.append($("<td class='logCell'></td>").text(""+oper));
+     table.append(tr);
+  }
+  return table;
+}
+
+function buildStoreMetrics(now, allMetrics)
+{
+  var table = $("<table class='outputTable'></table>");
+  var header = $("<tr class='dataRow' style='background-color: #C0C0DC;'></tr>");
+  header
+     .append($("<th class='dataHeader'></th>").text("Store"))
+     .append($("<th class='dataHeader'></th>").text("Size (entries)"))
+  ;
+  table.append(header);
+
+  // iterate over various stores (entries/index, last-access)
+  for (storeId in allMetrics.stores) {
+     var store = allMetrics.stores[storeId];
+     var tr = $("<tr class='dataRow' class='nowrap'></tr>");
+     tr.append($("<td class='logCell'></td>").text(""+storeId));
+     tr.append($("<td class='logCell'></td>").text(store.count));
+     table.append(tr);
+  }
+  return table;
 }
 
 function buildTable(now, nodes)
@@ -498,6 +547,9 @@ tr.dataRow > td {
  <tr><td>
 Last cluster update: <span id="clusterUpdated">-</span> ago.
 </td></tr>
+ <tr><td>
+Last metrics update: <span id="metricsUpdated">-</span> ago.
+</td></tr>
 
 <tr><td><hr class='edgeBottom'></hr></td></tr>
 </table></td></tr>
@@ -563,6 +615,54 @@ status: <span id="requestStatus">---</span>;
 time taken: <span id="requestTime">---</span> secs.
 </form>
 </div>
+
+<!-- Third: Local metrics; operational, store -->
+<table>
+ <tr>
+<td class="tableHeaderPadding">&nbsp;</td>
+<td class="tableHeader" rowspan="2">Local Call Metrics</td>
+<td class="tableHeaderPadding" colspan="1">&nbsp;</td>
+<td class="tableHeaderPadding" colspan="1">&nbsp;</td>
+</td>
+ </tr>
+ <tr>
+<td class="edgeTopLeft">&nbsp;</td>
+<td class="edgeTop" colspan='2'>&nbsp;</td>
+<td class="edgeTopRight">&nbsp;</td>
+ </tr>
+ <tr>
+<td class="edgeLeft" width="10">&nbsp;</td>
+<td colspan="3"><div id="opMetricsTable"></div></td>
+<td class="edgeRight" width="10">&nbsp;</td>
+ </tr>
+ <tr><td class="edgeBottomLeft">&nbsp;</td>
+<td colspan="3" class="edgeBottom">&nbsp;</td>
+<td class="edgeBottomRight">&nbsp;</td></tr>
+</table>
+
+<table>
+ <tr>
+<td class="tableHeaderPadding">&nbsp;</td>
+<td class="tableHeader" rowspan="2">Local Store Metrics</td>
+<td class="tableHeaderPadding" colspan="1">&nbsp;</td>
+<td class="tableHeaderPadding" colspan="1">&nbsp;</td>
+</td>
+ </tr>
+ <tr>
+<td class="edgeTopLeft">&nbsp;</td>
+<td class="edgeTop" colspan='2'>&nbsp;</td>
+<td class="edgeTopRight">&nbsp;</td>
+ </tr>
+ <tr>
+<td class="edgeLeft" width="10">&nbsp;</td>
+<td colspan="3"><div id="storeMetricsTable"></div></td>
+<td class="edgeRight" width="10">&nbsp;</td>
+ </tr>
+ <tr><td class="edgeBottomLeft">&nbsp;</td>
+<td colspan="3" class="edgeBottom">&nbsp;</td>
+<td class="edgeBottomRight">&nbsp;</td></tr>
+</table>
+
 
 </body>
 </html>
