@@ -1,5 +1,10 @@
 package com.fasterxml.transistore.dw;
 
+import java.util.List;
+
+import com.yammer.dropwizard.config.Bootstrap;
+import com.yammer.dropwizard.config.Environment;
+
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.file.FileManager;
@@ -11,6 +16,7 @@ import com.fasterxml.clustermate.dw.HealthCheckForStore;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cfg.ServiceConfig;
+import com.fasterxml.clustermate.service.cleanup.CleanupTask;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.clustermate.service.servlet.StoreEntryServlet;
 import com.fasterxml.clustermate.service.store.StoreHandler;
@@ -24,11 +30,9 @@ import com.fasterxml.transistore.dw.cmd.*;
 import com.fasterxml.transistore.service.SharedTSStuffImpl;
 import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
+import com.fasterxml.transistore.service.cleanup.LastAccessCleaner;
 import com.fasterxml.transistore.service.store.BasicTSStoreHandler;
 import com.fasterxml.transistore.service.store.BasicTSStores;
-
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Environment;
 
 /**
  * Main service class that sets up service configuration, bootstrapping things
@@ -137,6 +141,18 @@ public class BasicTSServiceOnDW
         environment.addHealthCheck(new HealthCheckForCluster(config, _cluster));
     }
 
+    @Override
+    protected List<CleanupTask<?>> constructCleanupTasks()
+    {
+        /* Default tasks (local file cleaner, local entry cleaner)
+         * work as-is, but we also need to clean up last-accessed
+         * entries:
+         */
+        List<CleanupTask<?>> tasks = super.constructCleanupTasks();
+        tasks.add(new LastAccessCleaner());
+        return tasks;
+    }
+    
     /*
     /**********************************************************************
     /* Extended API

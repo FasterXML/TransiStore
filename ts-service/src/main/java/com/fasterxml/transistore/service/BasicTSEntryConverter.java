@@ -142,9 +142,7 @@ public class BasicTSEntryConverter
     @Override
     public EntryLastAccessed createLastAccessed(StoredEntry<BasicTSKey> entry, long accessTime)
     {
-        long expireTime = entry.getCreationTime();
-        expireTime += 1000 * entry.getMaxTTLSecs();
-        return new EntryLastAccessed(accessTime, expireTime,
+        return new EntryLastAccessed(accessTime, entry.calculateMaxExpirationTime(),
                  entry.getLastAccessUpdateMethod().asByte());
     }
 
