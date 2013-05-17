@@ -19,7 +19,8 @@ import io.airlift.command.Arguments;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 
-@Command(name = "list", description = "Lists files stored in TStore, under specified partition")
+@Command(name = "list", description = "Lists files stored in TStore, under specified partition."
++"\nOutput format (in text): size/age/max-ttl/entry-key")
 public class ListCmd extends TStoreCmdBase
 {
     @Option(name = { "-m", "--max" }, description = "Maximum number of entries to list",

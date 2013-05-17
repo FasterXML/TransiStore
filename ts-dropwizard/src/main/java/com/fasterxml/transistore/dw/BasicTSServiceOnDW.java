@@ -1,6 +1,6 @@
 package com.fasterxml.transistore.dw;
 
-import java.util.List;
+import java.util.*;
 
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
@@ -17,6 +17,7 @@ import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
+import com.fasterxml.clustermate.service.cleanup.FileCleaner;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.clustermate.service.servlet.StoreEntryServlet;
 import com.fasterxml.clustermate.service.store.StoreHandler;
@@ -31,6 +32,7 @@ import com.fasterxml.transistore.service.SharedTSStuffImpl;
 import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 import com.fasterxml.transistore.service.cleanup.LastAccessCleaner;
+import com.fasterxml.transistore.service.cleanup.LocalEntryCleaner;
 import com.fasterxml.transistore.service.store.BasicTSStoreHandler;
 import com.fasterxml.transistore.service.store.BasicTSStores;
 
@@ -144,12 +146,14 @@ public class BasicTSServiceOnDW
     @Override
     protected List<CleanupTask<?>> constructCleanupTasks()
     {
-        /* Default tasks (local file cleaner, local entry cleaner)
-         * work as-is, but we also need to clean up last-accessed
-         * entries:
-         */
-        List<CleanupTask<?>> tasks = super.constructCleanupTasks();
+        ArrayList<CleanupTask<?>> tasks = new ArrayList<CleanupTask<?>>();
+        // start with main entries
+        tasks.add(new LocalEntryCleaner());
+        // then remove orphan dirs
+        tasks.add(new FileCleaner());
+        // and finally last-accessed entries
         tasks.add(new LastAccessCleaner());
+
         return tasks;
     }
     
