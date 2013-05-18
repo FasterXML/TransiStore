@@ -142,8 +142,8 @@ function handleStatusResults(response)
 	var loco = [ response.local ];
 	var peers = response.remote;
 
-	$("#localTable").html(buildTable(now, loco));
-	$("#remoteTable").html(buildTable(now, peers));
+	$("#localTable").html(buildNodeTable(now, loco));
+	$("#remoteTable").html(buildNodeTable(now, peers));
 	$("#clusterUpdated").text(timestamp(now, response.clusterLastUpdated));
 }
 
@@ -157,45 +157,7 @@ function handleMetricsResults(response)
      $("#storeMetricsTable").html(buildStoreMetrics(now, response));
 }
 
-function buildOpMetrics(now, allMetrics)
-{
-  var table = $("<table class='outputTable'></table>");
-  var header = $("<tr class='dataRow' style='background-color: #C0C0DC;'></tr>");
-  header
-     .append($("<th class='dataHeader'></th>").text("Operation"))
-  ;
-  table.append(header);
-  // iterate over operations (GET, PUT, DELETE)
-  for (oper in allMetrics.operations) {
-     var tr = $("<tr class='dataRow' class='nowrap'></tr>");
-     tr.append($("<td class='logCell'></td>").text(""+oper));
-     table.append(tr);
-  }
-  return table;
-}
-
-function buildStoreMetrics(now, allMetrics)
-{
-  var table = $("<table class='outputTable'></table>");
-  var header = $("<tr class='dataRow' style='background-color: #C0C0DC;'></tr>");
-  header
-     .append($("<th class='dataHeader'></th>").text("Store"))
-     .append($("<th class='dataHeader'></th>").text("Size (entries)"))
-  ;
-  table.append(header);
-
-  // iterate over various stores (entries/index, last-access)
-  for (storeId in allMetrics.stores) {
-     var store = allMetrics.stores[storeId];
-     var tr = $("<tr class='dataRow' class='nowrap'></tr>");
-     tr.append($("<td class='logCell'></td>").text(""+storeId));
-     tr.append($("<td class='logCell'></td>").text(store.count));
-     table.append(tr);
-  }
-  return table;
-}
-
-function buildTable(now, nodes)
+function buildNodeTable(now, nodes)
 {
   var table = $("<table class='outputTable'></table>");
   // add Headers
@@ -228,41 +190,144 @@ function buildTable(now, nodes)
   return table;
 }
 
+function buildOpMetrics(now, allMetrics)
+{
+  var table = $("<table class='outputTable'></table>");
+  var header = $("<tr class='dataRow' style='background-color: #C0C0DC;'></tr>");
+  header
+     .append($("<th class='dataHeader' rowspan='2'></th>").text("Operation"))
+     .append($("<th class='dataHeader' rowspan='2'></th>").text("count"))
+     .append($("<th class='dataHeader' rowspan='2'></th>").text("in-flight"))
+     .append($("<th class='dataHeader' colspan='3'></th>").text("request rates (tps)"))
+     .append($("<th class='dataHeader' colspan='5'></th>").text("request times (msec)"))
+  ;
+  table.append(header);
+  header = $("<tr class='dataRow' style='background-color: #C0C0DC;'></tr>")
+     .append($("<th class='dataHeader'></th>").text("1 min"))
+     .append($("<th class='dataHeader'></th>").text("5 min"))
+     .append($("<th class='dataHeader'></th>").text("15min"))
+     .append($("<th class='dataHeader'></th>").text("median"))
+     .append($("<th class='dataHeader'></th>").text("tp75"))
+     .append($("<th class='dataHeader'></th>").text("tp95"))
+     .append($("<th class='dataHeader'></th>").text("tp99"))
+     .append($("<th class='dataHeader'></th>").text("tp99.9"))
+  ;
+  table.append(header);
+
+  // iterate over operations for data
+  var operations = allMetrics.operations;
+  for (operId in operations) {
+     var oper = operations[operId];
+
+     var tr = $("<tr class='dataRow' class='nowrap'></tr>");
+     tr.append($("<td class='logCell'></td>").text(operId));
+     tr.append($("<td class='logCell'></td>").text(oper.count));
+     tr.append($("<td class='logCell'></td>").text(oper.inFlight));
+
+     tr.append($("<td class='logCell'></td>").text(oper.rate1Min));
+     tr.append($("<td class='logCell'></td>").text(oper.rate5Min));
+     tr.append($("<td class='logCell'></td>").text(oper.rate15Min));
+
+     var reqTimes = oper.requestTimes;
+     if (reqTimes)  {
+       tr.append($("<td class='logCell'></td>").text(reqTimes.pct50));
+       tr.append($("<td class='logCell'></td>").text(reqTimes.pct75));
+       tr.append($("<td class='logCell'></td>").text(reqTimes.pct95));
+       tr.append($("<td class='logCell'></td>").text(reqTimes.pct99));
+       tr.append($("<td class='logCell'></td>").text(reqTimes.pct999));
+     } else {
+       tr.append($("<td class='logCell'></td>").text("-"));
+       tr.append($("<td class='logCell'></td>").text("-"));
+       tr.append($("<td class='logCell'></td>").text("-"));
+     }
+     
+     // no use for request sizes quite yet
+     table.append(tr);
+  }
+  return table;
+}
+
+function buildStoreMetrics(now, allMetrics)
+{
+  var table = $("<table class='outputTable'></table>");
+  var header = $("<tr class='dataRow' style='background-color: #C0C0DC;'></tr>");
+  header
+     .append($("<th class='dataHeader'></th>").text("Store"))
+     .append($("<th class='dataHeader'></th>").text("type"))
+     .append($("<th class='dataHeader'></th>").text("size (entries)"))
+     .append($("<th class='dataHeader'></th>").text("cached (data/total)"))
+  ;
+  table.append(header);
+
+  // iterate over various stores (entries/index, last-access)
+  for (storeId in allMetrics.stores) {
+     var store = allMetrics.stores[storeId];
+     var tr = $("<tr class='dataRow' class='nowrap'></tr>");
+     tr.append($("<td class='logCell'></td>").text(""+storeId));
+     var cacheStr = "n/a";
+     var stats = store.stats;
+     if (stats && stats.env) {
+       var total = stats.env.cacheTotalBytes;
+       if (total) {
+         cacheStr = size(stats.env.cacheDataBytes) + "/" + size(total);
+       }
+     }
+     var type = stats ? stats.type : "n/a";
+     tr.append($("<td class='logCell'></td>").text(type));
+     tr.append($("<td class='logCell'></td>").text(store.count));
+     tr.append($("<td class='logCell'></td>").text(cacheStr));
+     table.append(tr);
+  }
+  return table;
+}
+
 function bool(value) {
-	if (value) return "yes";
-	return "no";
+  if (value) return "yes";
+  return "no";
 }
 
 function ip(address) {
-	if (!address) return "N/A";
-    // we actually now get String serialized value, not ip/port properties, so:
-	return address;
+  if (!address) return "N/A";
+  // we actually now get String serialized value, not ip/port properties, so:
+  return address;
 }
 
 function range(range) {
-	if (!range || !range.length) return "empty";
-	return "["+range.start+",+"+range.length+"]";
+  if (!range || !range.length) return "empty";
+  return "["+range.start+",+"+range.length+"]";
+}
+
+function size(s) {
+  if (!s) {
+    return "-";
+  }
+  var kb = Math.round(s / 1024);
+  if (kb < 1024) {
+    return ""+kb+"k";
+  }
+  var k100 = Math.floor(kb / 102.4);
+  return ""+(k100/10.0)+"M";
 }
 
 function timestamp(currTime, ts)
 {
-	if (!ts) return "N/A";
-	var diff = currTime - ts;
-	if (diff < 0) return "In Future";
-	var secs = Math.round(diff / 1000);
-	if (secs < 120) {
-		return ""+secs+" seconds ago";
-	}
-	var mins = Math.round(secs / 60);
-	if (mins < 120) {
-		return ""+mins+" minutes ago";
-	}
-	var hours = Math.round(mins / 60);
-	if (hours < 48) {
-		return ""+hours+" hours ago";
-	}
-	var days = Math.round(hours / 24);
-	return ""+days+" days ago";
+  if (!ts) return "N/A";
+  var diff = currTime - ts;
+  if (diff < 0) return "In Future";
+  var secs = Math.round(diff / 1000);
+  if (secs < 120) {
+    return ""+secs+" seconds ago";
+  }
+  var mins = Math.round(secs / 60);
+  if (mins < 120) {
+    return ""+mins+" minutes ago";
+  }
+  var hours = Math.round(mins / 60);
+  if (hours < 48) {
+    return ""+hours+" hours ago";
+  }
+  var days = Math.round(hours / 24);
+  return ""+days+" days ago";
 }
 
 </script>
@@ -607,15 +672,6 @@ Last metrics update: <span id="metricsUpdated">-</span> ago.
 <td class="edgeBottomRight">&nbsp;</td></tr>
  </table>
 
-<!--  Can disable status view in prod... but for now it's useful -->
-<div style="visibility: visible;">
-<form>
-Last url: <span id="requestUrl">---</span>;
-status: <span id="requestStatus">---</span>;
-time taken: <span id="requestTime">---</span> secs.
-</form>
-</div>
-
 <!-- Third: Local metrics; operational, store -->
 <table>
  <tr>
@@ -663,6 +719,14 @@ time taken: <span id="requestTime">---</span> secs.
 <td class="edgeBottomRight">&nbsp;</td></tr>
 </table>
 
+<!--  Can disable status view in prod... but for now it's useful -->
+<div style="visibility: visible;">
+<form>
+Last url: <span id="requestUrl">---</span>;
+status: <span id="requestStatus">---</span>;
+time taken: <span id="requestTime">---</span> secs.
+</form>
+</div>
 
 </body>
 </html>
