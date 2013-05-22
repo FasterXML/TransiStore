@@ -53,7 +53,7 @@ public class TwoNodesSimpleTest extends ClusterTestBase
         
         // false -> don't bother with full init of background tasks:
         StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, false);
-        
+
         BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2_2", true, TEST_PORT2, clusterConfig);
         serviceConfig2.getServiceConfig().cluster = clusterConfig;
         StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, false);
