@@ -28,7 +28,7 @@ function sendRequest(url, okFunction)
           setTimeAndStatus(status);
           var json = parseJSON(results); 
           if (!json) {
-              setFailure(status, "Invalid JSON, could not parse: "+results);
+              handleError(status, "Invalid JSON, could not parse: "+results);
               return;
             }
             okFunction(json);
@@ -69,7 +69,7 @@ function verifyJSON(msg)
     setTime();
     var json = parseJSON(msg); 
     if (!json) {
-        setFailure(-1, "Invalid JSON, could not parse: "+msg);
+        handleError(-1, "Invalid JSON, could not parse: "+msg);
      }
      return json;
 }
