@@ -15,6 +15,9 @@ import com.fasterxml.clustermate.api.RequestPathStrategy;
  *  <ul>
  *    <li>".../store/entry" for single-entry</li>
  *    <li>".../store/list" for range access</li>
+ *    <li>".../store/status" for store status (admin interface)</li>
+ *    <li>".../store/findEntry" for redirecting single-entry</li>
+ *    <li>".../store/findList" for redirecting range access</li>
  *  </ul>
  * <li>Node status entries under ".../node/":
  *  <ul>
@@ -55,50 +58,34 @@ public class BasicTSPaths extends RequestPathStrategy
     /* Path building
     /**********************************************************************
      */
-    
-    @Override
-    public <K extends RequestPathBuilder> K appendStoreEntryPath(K nodeRoot) {
-        return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_ENTRY);
-    }
 
     @Override
-    public <K extends RequestPathBuilder> K appendStoreListPath(K nodeRoot) {
-        return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_LIST);
-    }
+    public <B extends RequestPathBuilder> B appendPath(B basePath,
+            PathType type)
+    {
+        switch (type) {
+        case NODE_METRICS:
+            return (B) _nodePath(basePath).addPathSegment(SECOND_SEGMENT_NODE_METRICS);
+        case NODE_STATUS:
+            return (B) _nodePath(basePath).addPathSegment(SECOND_SEGMENT_NODE_STATUS);
 
-    @Override
-    public <K extends RequestPathBuilder> K appendStoreFindEntryPath(K nodeRoot) {
-        return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_FIND_ENTRY);
-    }
+        case STORE_ENTRY:
+            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRY);
+        case STORE_FIND_ENTRY:
+            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_FIND_ENTRY);
+        case STORE_FIND_LIST:
+            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_FIND_LIST);
+        case STORE_LIST:
+            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_LIST);
+        case STORE_STATUS:
+            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_STATUS);
 
-    @Override
-    public <K extends RequestPathBuilder> K appendStoreFindListPath(K nodeRoot) {
-        return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_FIND_LIST);
-    }
-
-    @Override
-    public <K extends RequestPathBuilder> K appendStoreStatusPath(K nodeRoot) {
-        return (K) _storePath(nodeRoot).addPathSegment(SECOND_SEGMENT_STORE_STATUS);
-    }
-    
-    @Override
-    public <K extends RequestPathBuilder> K appendNodeStatusPath(K nodeRoot) {
-        return (K) _nodePath(nodeRoot).addPathSegment(SECOND_SEGMENT_NODE_STATUS);
-    }
-
-    @Override
-    public <K extends RequestPathBuilder> K appendNodeMetricsPath(K nodeRoot) {
-        return (K) _nodePath(nodeRoot).addPathSegment(SECOND_SEGMENT_NODE_METRICS);
-    }
-
-    @Override
-    public <K extends RequestPathBuilder> K appendSyncListPath(K nodeRoot) {
-        return (K) _syncPath(nodeRoot).addPathSegment(SECOND_SEGMENT_SYNC_LIST);
-    }
-
-    @Override
-    public <K extends RequestPathBuilder> K appendSyncPullPath(K nodeRoot) {
-        return (K) _syncPath(nodeRoot).addPathSegment(SECOND_SEGMENT_SYNC_PULL);
+        case SYNC_LIST:
+            return (B) _syncPath(basePath).addPathSegment(SECOND_SEGMENT_SYNC_LIST);
+        case SYNC_PULL:
+            return (B) _syncPath(basePath).addPathSegment(SECOND_SEGMENT_SYNC_PULL);
+        }
+        throw new IllegalStateException();
     }
 
     /*
