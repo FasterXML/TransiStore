@@ -33,7 +33,8 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
      */
 
     @Override
-    protected LastAccessUpdateMethod _findLastAccessUpdateMethod(ServiceRequest request, BasicTSKey key)
+    protected TSLastAccess _findLastAccessUpdateMethod(ServiceRequest request,
+            BasicTSKey key)
     {
         /* 31-Jan-2012, tatu: For now let's only enable last-access time tracking
          *   for tests, since there's no good way to pass that with request, and it simply adds
@@ -55,14 +56,25 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
     protected void updateLastAccessedForGet(ServiceRequest request, ServiceResponse response,
             StoredEntry<BasicTSKey> entry, long accessTime)
     {
-        _updateLastAccessed(entry.getKey(), entry, accessTime);
+        _updateLastAccessed(request, entry, accessTime);
     }
 
     @Override
     protected void updateLastAccessedForHead(ServiceRequest request, ServiceResponse response,
             StoredEntry<BasicTSKey> entry, long accessTime)
     {
-        _updateLastAccessed(entry.getKey(), entry, accessTime);
+        _updateLastAccessed(request, entry, accessTime);
+    }
+
+    @Override
+    protected void updateLastAccessedForDelete(ServiceRequest request, ServiceResponse response,
+            BasicTSKey key, long deletionTime)
+    {
+        TSLastAccess acc = _findLastAccessUpdateMethod(request, key);
+        // can only do straight delete with one-to-one mappings
+        if (acc == TSLastAccess.SIMPLE) {
+            _stores.getLastAccessStore().removeLastAccess(key, acc, deletionTime);
+        }
     }
     
     /*
@@ -71,8 +83,13 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
     /**********************************************************************
      */
     
-    private void _updateLastAccessed(BasicTSKey key, StoredEntry<BasicTSKey> entry, long accessTime)
+    private void _updateLastAccessed(ServiceRequest request, 
+            StoredEntry<BasicTSKey> entry, long accessTime)
     {
-        _stores.getLastAccessStore().updateLastAccess(entry, accessTime);
+        BasicTSKey key = entry.getKey();
+        TSLastAccess acc = _findLastAccessUpdateMethod(request, key);
+        if (acc != null && !acc.meansNoUpdate()) {
+            _stores.getLastAccessStore().updateLastAccess(entry, accessTime);
+        }
     }
 }
