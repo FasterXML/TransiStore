@@ -23,9 +23,14 @@ import io.airlift.command.Option;
 +"\nOutput format (in text): size/age/max-ttl/entry-key")
 public class ListCmd extends TStoreCmdBase
 {
-    @Option(name = { "-m", "--max" }, description = "Maximum number of entries to list",
+    /**
+     * By default, let's limit to 1000 entries
+     */
+    public static final int DEFAULT_MAX_TO_LIST = 1000;
+    
+    @Option(name = { "-m", "--max" }, description = "Maximum number of entries to list (default: 1000)",
             arity=1 )
-    public int maxEntries = Integer.MAX_VALUE;
+    public int maxEntries = DEFAULT_MAX_TO_LIST;
 
     @Arguments(title="prefix",
             description = "Server-side prefix (partition and optional path prefix) that defines entries to list",
