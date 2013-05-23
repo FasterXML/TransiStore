@@ -1,0 +1,12 @@
+com.fasterxml.transistore.basic
+com.fasterxml.transistore.client
+com.fasterxml.transistore.client.ahc
+com.fasterxml.transistore.client.jdk
+com.fasterxml.transistore.cmd
+com.fasterxml.transistore.dw
+com.fasterxml.transistore.dw.cmd
+com.fasterxml.transistore.service
+com.fasterxml.transistore.service.bdb
+com.fasterxml.transistore.service.cfg
+com.fasterxml.transistore.service.cleanup
+com.fasterxml.transistore.service.store
