@@ -13,6 +13,9 @@
       "dataRoot" : "data-tstore-entries/"
       ,"cacheSize" : "200MB"
     }
+    ,"deletes" : {
+      "allowDeferred" : true
+    }
     ,"cluster" : {
       "type" : "SIMPLE_LINEAR"
       ,"clusterKeyspaceSize" : 1024
