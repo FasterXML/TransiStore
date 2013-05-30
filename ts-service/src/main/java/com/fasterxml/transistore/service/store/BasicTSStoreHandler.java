@@ -3,7 +3,7 @@ package com.fasterxml.transistore.service.store;
 import com.fasterxml.clustermate.service.*;
 import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
-import com.fasterxml.clustermate.service.store.DeferredOperationQueue;
+import com.fasterxml.clustermate.service.store.DeferredDeletionQueue;
 import com.fasterxml.clustermate.service.store.StoreHandler;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 
@@ -29,7 +29,7 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
     }
 
     @Override
-    protected DeferredOperationQueue<BasicTSKey> constructDeletionQueue(SharedServiceStuff stuff)
+    protected DeferredDeletionQueue constructDeletionQueue(SharedServiceStuff stuff)
     {
         // 28-May-2013, tatu: For now, better keep DELETEs synchronous for tests.
         if (stuff.isRunningTests()) {
@@ -38,7 +38,7 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
         
         ServiceConfig config = stuff.getServiceConfig();
         // Yes; assume for now that deferred deletions are enabled by default...
-        DeferredOperationQueue<BasicTSKey> deleteQ =  DeferredOperationQueue.<BasicTSKey>forConfig(
+        DeferredDeletionQueue deleteQ =  DeferredDeletionQueue.forConfig(
                 config.deletes, true);
         return deleteQ;
     }
