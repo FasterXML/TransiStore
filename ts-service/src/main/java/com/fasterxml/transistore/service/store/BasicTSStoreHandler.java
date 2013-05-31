@@ -1,9 +1,8 @@
 package com.fasterxml.transistore.service.store;
 
 import com.fasterxml.clustermate.service.*;
-import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
-import com.fasterxml.clustermate.service.store.DeferredDeletionQueue;
+import com.fasterxml.clustermate.service.store.DeferredDeleter;
 import com.fasterxml.clustermate.service.store.StoreHandler;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 
@@ -29,18 +28,16 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
     }
 
     @Override
-    protected DeferredDeletionQueue constructDeletionQueue(SharedServiceStuff stuff)
+    protected DeferredDeleter constructDeleter(SharedServiceStuff stuff,
+            Stores<BasicTSKey,?> stores)
     {
         // 28-May-2013, tatu: For now, better keep DELETEs synchronous for tests.
         if (stuff.isRunningTests()) {
-            return null;
+            return DeferredDeleter.nonDeferring(stores.getEntryStore());
         }
-        
-        ServiceConfig config = stuff.getServiceConfig();
-        // Yes; assume for now that deferred deletions are enabled by default...
-        DeferredDeletionQueue deleteQ =  DeferredDeletionQueue.forConfig(
-                config.deletes, true);
-        return deleteQ;
+        // Let's aim for target delay of no more than 50 msecs?
+        // TODO: 
+        return new DeferredDeleter(stores.getEntryStore(), stuff.getServiceConfig().deletes);
     }
 
     /*

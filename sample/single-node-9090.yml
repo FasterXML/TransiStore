@@ -14,7 +14,6 @@
       ,"cacheSize" : "200MB"
     }
     ,"deletes" : {
-      "allowDeferred" : true
     }
     ,"cluster" : {
       "type" : "SIMPLE_LINEAR"
