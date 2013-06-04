@@ -26,11 +26,11 @@ import com.yammer.dropwizard.config.Configuration;
 
 
 // NOTE: can NOT parametrize at this level, due to DropWizard issue #89
-public abstract class VCommand<T extends Configuration> extends ConfiguredCommand<T>
+public abstract class CommandBase<T extends Configuration> extends ConfiguredCommand<T>
 {
     protected final static ObjectMapper _mapper = new ObjectMapper();
     
-    public VCommand(String name, String desc)
+    public CommandBase(String name, String desc)
     {
         super(name, desc);
 //        Log.named(org.slf4j.Logger.ROOT_LOGGER_NAME).setLevel(Level.INFO);
@@ -84,7 +84,8 @@ public abstract class VCommand<T extends Configuration> extends ConfiguredComman
         StoreBackend backend = b.with(v.storeConfig)
                 .with(_mapper.convertValue(v.storeBackendConfig, b.getConfigClass()))
                 .buildCreateAndInit();
-        StorableStore store = new StorableStoreImpl(v.storeConfig, backend, tm, files);
+        // null -> simple throttler
+        StorableStore store = new StorableStoreImpl(v.storeConfig, backend, tm, files, null);
         StoredEntryConverter<?,?,?> conv0 = v.getEntryConverter();
         @SuppressWarnings("unchecked")
         StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> entryConv

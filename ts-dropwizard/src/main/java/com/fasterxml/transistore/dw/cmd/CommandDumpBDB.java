@@ -19,7 +19,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  * Command that can be used to dump first parts of BDB contents
  * for debugging; by default first 100 entries will be output.
  */
-public class CommandDumpBDB extends VCommand<BasicTSServiceConfigForDW>
+public class CommandDumpBDB extends CommandBase<BasicTSServiceConfigForDW>
 {
     public CommandDumpBDB() {
         super("dump", "Command to dump contents of Entity BDB store");

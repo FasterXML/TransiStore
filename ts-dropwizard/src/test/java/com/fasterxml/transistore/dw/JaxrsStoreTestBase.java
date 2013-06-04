@@ -113,7 +113,9 @@ public abstract class JaxrsStoreTestBase extends TestCase
         bdbConfig.dataRoot = new File(fileDir.getParent(), "bdb-storemate");
         BDBJEBuilder b = new BDBJEBuilder(config.storeConfig, bdbConfig);
         StoreBackend backend = b.buildCreateAndInit();
-        StorableStore store = new StorableStoreImpl(config.storeConfig, backend, timeMaster, files);
+        // null -> default throttler
+        StorableStore store = new StorableStoreImpl(config.storeConfig,
+                backend, timeMaster, files, null);
         SharedTSStuffImpl stuff = new SharedTSStuffImpl(config, timeMaster,
                 _entryConverter, files);
         BasicTSStores stores = new BasicTSStores(config, timeMaster, stuff.jsonMapper(),

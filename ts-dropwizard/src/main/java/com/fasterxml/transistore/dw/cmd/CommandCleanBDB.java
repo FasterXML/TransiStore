@@ -12,7 +12,7 @@ import com.yammer.dropwizard.config.Bootstrap;
  * Command for cleaning up all the entry data from BDB (but not
  * store metadata)
  */
-public class CommandCleanBDB extends VCommand<BasicTSServiceConfigForDW>
+public class CommandCleanBDB extends CommandBase<BasicTSServiceConfigForDW>
 {
     public CommandCleanBDB() {
         super("nuke",
