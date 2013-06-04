@@ -6,7 +6,6 @@ import java.util.*;
 import com.fasterxml.clustermate.api.ClusterMateConstants;
 import com.fasterxml.clustermate.service.ServiceResponse;
 import com.fasterxml.clustermate.service.msg.StreamingResponseContent;
-import com.fasterxml.clustermate.service.msg.StreamingResponseContentImpl;
 
 @SuppressWarnings("unchecked")
 public class FakeHttpResponse extends ServiceResponse
@@ -81,10 +80,10 @@ public class FakeHttpResponse extends ServiceResponse
     }
     
     public boolean hasFile() {
-        return (_streamingContent != null) && (((StreamingResponseContentImpl) _streamingContent).hasFile());
+        return (_streamingContent != null) && _streamingContent.hasFile();
     }
     public boolean hasInlinedData() {
-        return (_streamingContent != null) && (((StreamingResponseContentImpl) _streamingContent).inline());
+        return (_streamingContent != null) && _streamingContent.inline();
     }
 
     public StreamingResponseContent getStreamingContent() {

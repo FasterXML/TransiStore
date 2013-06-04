@@ -7,8 +7,10 @@ import com.yammer.dropwizard.config.Environment;
 
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
+import com.fasterxml.storemate.store.StoreOperationThrottler;
 import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
+import com.fasterxml.storemate.store.util.PartitionedWriteThrottler;
 
 import com.fasterxml.clustermate.dw.DWBasedService;
 import com.fasterxml.clustermate.dw.HealthCheckForCluster;
@@ -156,7 +158,23 @@ public class BasicTSServiceOnDW
 
         return tasks;
     }
-    
+
+    /**
+     * Method is overridden to provide alternate throttler
+     */
+    protected StoreOperationThrottler _constructThrottler(SharedServiceStuff stuff)
+    {
+        /* First: still need partitioned one, partly to prevent (unlikely
+         * but theoretically possible) PUT/DELETE conflict; but mostly
+         * to keep track of oldest in-flight write operation.
+         */
+        PartitionedWriteThrottler partitions =   
+                new PartitionedWriteThrottler(stuff.getServiceConfig().storeConfig.lockPartitions,
+                    // false -> no need for fairness
+                    false);
+        return new WriterOnlyThrottler(partitions);
+    }
+
     /*
     /**********************************************************************
     /* Extended API
