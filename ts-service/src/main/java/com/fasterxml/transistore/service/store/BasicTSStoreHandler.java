@@ -35,8 +35,6 @@ public class BasicTSStoreHandler extends StoreHandler<BasicTSKey,
         if (stuff.isRunningTests()) {
             return DeferredDeleter.nonDeferring(stores.getEntryStore());
         }
-        // Let's aim for target delay of no more than 50 msecs?
-        // TODO: 
         return new DeferredDeleter(stores.getEntryStore(), stuff.getServiceConfig().deletes);
     }
 
