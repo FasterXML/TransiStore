@@ -19,10 +19,16 @@ public class WriterOnlyThrottler
     protected final Semaphore _putLock = new Semaphore(1, false);
 
     /**
-     * And ditto for file-system reads?
+     * And ditto for file-system reads: needs to improved in future,
+     * but for now this will have to do.
      */
     protected final Semaphore _readLock = new Semaphore(2, false);
-    
+
+    /**
+     * Same also applies to file-system writes.
+     */
+    protected final Semaphore _writeLock = new Semaphore(2, false);
+
     public WriterOnlyThrottler(StoreOperationThrottler delegatee)
     {
         _delegatee = delegatee;
@@ -117,7 +123,7 @@ public class WriterOnlyThrottler
                     "File read operation interrupted");
         }
         try {
-            return _delegatee.performFileRead(cb, operationTime,  value, externalFile);
+            return _delegatee.performFileRead(cb, operationTime, value, externalFile);
         } finally {
             _readLock.release();
         }
@@ -125,10 +131,20 @@ public class WriterOnlyThrottler
 
     @Override
     public <T> T performFileWrite(FileOperationCallback<T> cb,
-            long operationTime, File externalFile)
+            long operationTime, StorableKey key, File externalFile)
         throws IOException, StoreException
     {
-        return _delegatee.performFileWrite(cb, operationTime, externalFile);
+        try {
+            _writeLock.acquire();
+        } catch (InterruptedException e) {
+            throw new StoreException.ServerTimeout(key,
+                    "File write operation interrupted");
+        }
+        try {
+            return _delegatee.performFileWrite(cb, operationTime, key, externalFile);
+        } finally {
+            _writeLock.release();
+        }
     }
 
 }
