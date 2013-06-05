@@ -2,6 +2,8 @@ package com.fasterxml.transistore.dw;
 
 import java.util.*;
 
+import com.yammer.dropwizard.cli.Cli;
+import com.yammer.dropwizard.cli.ServerCommand;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 
@@ -73,7 +75,21 @@ public class BasicTSServiceOnDW
     
     public static void main(String[] args) throws Exception
     {
-        new BasicTSServiceOnDW(TimeMaster.nonTestInstance()).run(args);
+        /* 04-Jun-2013, tatu: Alas, here a bit of nasty hackery is
+         *   called for; problem being that we need to post-process
+         *   configuration somewhat.
+         */
+        new BasicTSServiceOnDW(TimeMaster.nonTestInstance()).customRun(args);
+    }
+
+    /* Goddamit; original run() is final. Bah, humbug. Need to copy, modify...
+     */
+    protected void customRun(String[] arguments) throws Exception {
+        final Bootstrap<BasicTSServiceConfigForDW> bootstrap = new Bootstrap<BasicTSServiceConfigForDW>(this);
+        bootstrap.addCommand(new ServerCommand<BasicTSServiceConfigForDW>(this));
+        initialize(bootstrap);
+        final Cli cli = new Cli(this.getClass(), bootstrap);
+        cli.run(arguments);
     }
     
     /*

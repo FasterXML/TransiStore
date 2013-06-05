@@ -1,7 +1,6 @@
 {
   "http" : {
     "port" : 9090, "adminPort" : 9090
-    ,"gzip": { "enabled" : false }
     ,"shutdownGracePeriod" : "5 seconds"
   },
   "ts" : {

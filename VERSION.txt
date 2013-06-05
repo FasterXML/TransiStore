@@ -1,5 +1,11 @@
 Project: TransiStore
 
+0.9.8 (xx-Jun-2013)
+
+- Ensure that gzip filter will NOT be added by Jetty/DW (was not always
+  being disabled properly)
+- Add basic db/file-access throttling support
+
 0.9.5 (30-Apr-2013)
 
 #6: Change order of 'tstore put' so that target is the last argument
