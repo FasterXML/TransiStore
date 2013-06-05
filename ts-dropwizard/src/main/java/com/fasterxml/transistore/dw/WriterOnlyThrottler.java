@@ -8,15 +8,35 @@ import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.*;
 import com.fasterxml.storemate.store.backend.IterationResult;
 
+/**
+ * This is the standard {@link StoreOperationThrottler} to use with
+ * TransiStore.
+ */
 public class WriterOnlyThrottler
     extends StoreOperationThrottler
 {
     protected final StoreOperationThrottler _delegatee;
 
     /**
-     * Let's start with a very simple mutex for PUTs.
+     * Let's start with a very simple mutex for local DB operations
+     * done as part of PUT operations. Since they should be quick,
+     * can start with a simple mutex.
+     * But allow two concurrent updates, not just one.
      */
-    protected final Semaphore _putLock = new Semaphore(1, false);
+    protected final Semaphore _putLock = new Semaphore(2, false);
+
+    /**
+     * We may want to throttle reads slightly as well. But should be
+     * able to support much higher concurrency than with writes
+     */
+    protected final Semaphore _getLock = new Semaphore(8, false);
+
+    /**
+     * Listings can be pricey as well, so let's throttle to... say,
+     * eight as well. But make this fair, since it may take longer
+     * than other read access.
+     */
+    protected final Semaphore _listLock = new Semaphore(8, true);
 
     /**
      * And ditto for file-system reads: needs to improved in future,
@@ -61,7 +81,16 @@ public class WriterOnlyThrottler
             long operationTime, StorableKey key)
         throws IOException, StoreException
     {
-        return _delegatee.performGet(cb, operationTime, key);
+        try {
+            _getLock.acquire();
+        } catch (InterruptedException e) {
+            throw new StoreException.ServerTimeout(key, "GET operation interrupted");
+        }
+        try {
+            return _delegatee.performGet(cb, operationTime, key);
+        } finally {
+            _getLock.release();
+        }
     }
 
     @Override
@@ -69,7 +98,16 @@ public class WriterOnlyThrottler
             long operationTime)
         throws IOException, StoreException
     {
-        return _delegatee.performList(cb, operationTime);
+        try {
+            _listLock.acquire();
+        } catch (InterruptedException e) {
+            throw new StoreException.ServerTimeout(null, "List operation interrupted");
+        }
+        try {
+            return _delegatee.performList(cb, operationTime);
+        } finally {
+            _listLock.release();
+        }
     }
     
     @Override
@@ -89,14 +127,23 @@ public class WriterOnlyThrottler
         }
     }
 
+    /**
+     * No additional throttling for (soft) deletions because they are
+     * already queued at higher level (applied sequentially).
+     */
     @Override
     public Storable performSoftDelete(StoreOperationCallback<Storable> cb,
             long operationTime, StorableKey key)
         throws IOException, StoreException
     {
+        
         return _delegatee.performSoftDelete(cb, operationTime, key);
     }
 
+    /**
+     * No additional throttling for hard deletions because they are only
+     * done by background batch processes (clean up tasks).
+     */
     @Override
     public Storable performHardDelete(StoreOperationCallback<Storable> cb,
             long operationTime, StorableKey key)
