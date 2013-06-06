@@ -188,7 +188,7 @@ public class BasicTSServiceOnDW
                 new PartitionedWriteThrottler(stuff.getServiceConfig().storeConfig.lockPartitions,
                     // false -> no need for fairness
                     false);
-        return new WriterOnlyThrottler(partitions);
+        return new BasicTSOperationThrottler(partitions);
     }
 
     /*

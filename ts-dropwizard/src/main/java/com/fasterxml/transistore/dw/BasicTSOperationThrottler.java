@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
+import com.fasterxml.clustermate.service.StartAndStoppable;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.*;
 import com.fasterxml.storemate.store.backend.IterationResult;
@@ -12,9 +13,13 @@ import com.fasterxml.storemate.store.backend.IterationResult;
  * This is the standard {@link StoreOperationThrottler} to use with
  * TransiStore.
  */
-public class WriterOnlyThrottler
+public class BasicTSOperationThrottler
     extends StoreOperationThrottler
+//    implements StartAndStoppable
 {
+    /**
+     * Throttler we delegate to.
+     */
     protected final StoreOperationThrottler _delegatee;
 
     /**
@@ -49,10 +54,30 @@ public class WriterOnlyThrottler
      */
     protected final Semaphore _writeLock = new Semaphore(2, false);
 
-    public WriterOnlyThrottler(StoreOperationThrottler delegatee)
+    /*
+    /**********************************************************************
+    /* Life-cycle
+    /**********************************************************************
+     */
+    
+    public BasicTSOperationThrottler(StoreOperationThrottler delegatee)
     {
         _delegatee = delegatee;
     }
+
+    /*
+    @Override
+    public void start() throws Exception {
+    }
+
+    @Override
+    public void prepareForStop() throws Exception {
+    }
+
+    @Override
+    public void stop() throws Exception {
+    }
+    */
 
     /*
     /**********************************************************************
@@ -193,5 +218,4 @@ public class WriterOnlyThrottler
             _writeLock.release();
         }
     }
-
 }
