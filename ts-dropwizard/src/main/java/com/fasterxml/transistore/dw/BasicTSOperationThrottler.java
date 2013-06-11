@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
-import com.fasterxml.clustermate.service.StartAndStoppable;
+//import com.fasterxml.clustermate.service.StartAndStoppable;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.*;
 import com.fasterxml.storemate.store.backend.IterationResult;
