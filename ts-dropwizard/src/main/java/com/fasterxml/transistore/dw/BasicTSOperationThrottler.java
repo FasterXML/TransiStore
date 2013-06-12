@@ -18,11 +18,6 @@ public class BasicTSOperationThrottler
 //    implements StartAndStoppable
 {
     /**
-     * Throttler we delegate to.
-     */
-    protected final StoreOperationThrottler _delegatee;
-
-    /**
      * Let's start with a very simple mutex for local DB operations
      * done as part of PUT operations. Since they should be quick,
      * can start with a simple mutex.
@@ -60,10 +55,7 @@ public class BasicTSOperationThrottler
     /**********************************************************************
      */
     
-    public BasicTSOperationThrottler(StoreOperationThrottler delegatee)
-    {
-        _delegatee = delegatee;
-    }
+    public BasicTSOperationThrottler() { }
 
     /*
     @Override
@@ -78,22 +70,6 @@ public class BasicTSOperationThrottler
     public void stop() throws Exception {
     }
     */
-
-    /*
-    /**********************************************************************
-    /* Metadata access
-    /**********************************************************************
-     */
-
-    @Override
-    public long getOldestInFlightTimestamp() {
-        return (_delegatee == null) ? 0 : _delegatee.getOldestInFlightTimestamp();
-    }
-
-    @Override
-    public int getInFlightWritesCount() {
-        return (_delegatee == null) ? 0 : _delegatee.getInFlightWritesCount();
-    }
 
     /*
     /**********************************************************************
@@ -112,7 +88,7 @@ public class BasicTSOperationThrottler
             throw new StoreException.ServerTimeout(key, "GET operation interrupted");
         }
         try {
-            return _delegatee.performGet(cb, operationTime, key);
+            return cb.perform(operationTime, key, null);
         } finally {
             _getLock.release();
         }
@@ -129,7 +105,7 @@ public class BasicTSOperationThrottler
             throw new StoreException.ServerTimeout(null, "List operation interrupted");
         }
         try {
-            return _delegatee.performList(cb, operationTime);
+            return cb.perform(operationTime, null, null);
         } finally {
             _listLock.release();
         }
@@ -146,7 +122,7 @@ public class BasicTSOperationThrottler
             throw new StoreException.ServerTimeout(key, "PUT operation interrupted");
         }
         try {
-            return _delegatee.performPut(cb, operationTime, key, value);
+            return cb.perform(operationTime, key, value);
         } finally {
             _putLock.release();
         }
@@ -161,8 +137,7 @@ public class BasicTSOperationThrottler
             long operationTime, StorableKey key)
         throws IOException, StoreException
     {
-        
-        return _delegatee.performSoftDelete(cb, operationTime, key);
+        return cb.perform(operationTime, key, null);
     }
 
     /**
@@ -174,7 +149,7 @@ public class BasicTSOperationThrottler
             long operationTime, StorableKey key)
         throws IOException, StoreException
     {
-        return _delegatee.performHardDelete(cb, operationTime, key);
+        return cb.perform(operationTime, key, null);
     }
 
     /*
@@ -195,7 +170,7 @@ public class BasicTSOperationThrottler
                     "File read operation interrupted");
         }
         try {
-            return _delegatee.performFileRead(cb, operationTime, value, externalFile);
+            return cb.perform(operationTime, (value == null) ? null : value.getKey(), value, externalFile);
         } finally {
             _readLock.release();
         }
@@ -213,7 +188,7 @@ public class BasicTSOperationThrottler
                     "File write operation interrupted");
         }
         try {
-            return _delegatee.performFileWrite(cb, operationTime, key, externalFile);
+            return cb.perform(operationTime, key, null, externalFile);
         } finally {
             _writeLock.release();
         }

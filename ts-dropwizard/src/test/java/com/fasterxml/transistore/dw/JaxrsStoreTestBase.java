@@ -115,7 +115,7 @@ public abstract class JaxrsStoreTestBase extends TestCase
         StoreBackend backend = b.buildCreateAndInit();
         // null -> default throttler
         StorableStore store = new StorableStoreImpl(config.storeConfig,
-                backend, timeMaster, files, null);
+                backend, timeMaster, files, null, null);
         SharedTSStuffImpl stuff = new SharedTSStuffImpl(config, timeMaster,
                 _entryConverter, files);
         BasicTSStores stores = new BasicTSStores(config, timeMaster, stuff.jsonMapper(),

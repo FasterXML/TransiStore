@@ -12,14 +12,10 @@ import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.StoreOperationThrottler;
 import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
-import com.fasterxml.storemate.store.util.PartitionedWriteThrottler;
 
 import com.fasterxml.clustermate.dw.DWBasedService;
-import com.fasterxml.clustermate.dw.HealthCheckForCluster;
-import com.fasterxml.clustermate.dw.HealthCheckForStore;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.Stores;
-import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
 import com.fasterxml.clustermate.service.cleanup.FileCleaner;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
@@ -156,9 +152,14 @@ public class BasicTSServiceOnDW
     protected void addHealthChecks(SharedServiceStuff stuff,
             Environment environment)
     {
+        /* TODO: Once DropWizard 0.7 out, convert these, require new Metrics
+         * 
+         */
+        /*
         ServiceConfig config = stuff.getServiceConfig();
         environment.addHealthCheck(new HealthCheckForStore(config, _stores));
         environment.addHealthCheck(new HealthCheckForCluster(config, _cluster));
+*/
     }
 
     @Override
@@ -180,15 +181,7 @@ public class BasicTSServiceOnDW
      */
     protected StoreOperationThrottler _constructThrottler(SharedServiceStuff stuff)
     {
-        /* First: still need partitioned one, partly to prevent (unlikely
-         * but theoretically possible) PUT/DELETE conflict; but mostly
-         * to keep track of oldest in-flight write operation.
-         */
-        PartitionedWriteThrottler partitions =   
-                new PartitionedWriteThrottler(stuff.getServiceConfig().storeConfig.lockPartitions,
-                    // false -> no need for fairness
-                    false);
-        return new BasicTSOperationThrottler(partitions);
+        return new BasicTSOperationThrottler();
     }
 
     /*

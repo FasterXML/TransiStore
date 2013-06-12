@@ -85,7 +85,7 @@ public abstract class CommandBase<T extends Configuration> extends ConfiguredCom
                 .with(_mapper.convertValue(v.storeBackendConfig, b.getConfigClass()))
                 .buildCreateAndInit();
         // null -> simple throttler
-        StorableStore store = new StorableStoreImpl(v.storeConfig, backend, tm, files, null);
+        StorableStore store = new StorableStoreImpl(v.storeConfig, backend, tm, files, null, null);
         StoredEntryConverter<?,?,?> conv0 = v.getEntryConverter();
         @SuppressWarnings("unchecked")
         StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> entryConv

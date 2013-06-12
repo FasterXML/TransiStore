@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.skife.config.TimeSpan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.StorableStore;
@@ -33,6 +35,8 @@ public class TwoNodesConflictTest extends ClusterTestBase
     // collision
     private final static int TEST_PORT1 = 9210;
     private final static int TEST_PORT2 = 9211;
+
+    private final Logger LOG = LoggerFactory.getLogger(getClass());
     
     /**
      * First a simple test to verify that newer (by comparing server-local timestamps)
@@ -113,14 +117,39 @@ public class TwoNodesConflictTest extends ClusterTestBase
             assertEquals(DATA2.length, data.length);
             Assert.assertArrayEquals(DATA2, data);
 
-            // And now... should reconcile I think? :-)
+            // And now... should reconcile I think. With grace period of 1 sec, need to advance time a bit
+            // and all in all, may take a while so:
+
+            final long start = System.currentTimeMillis();
             
-            // TODO!!!
-        
+            int round = 1;
+            while (true) {
+                timeMaster.advanceCurrentTimeMillis(2000L);
+                Thread.sleep(10L);
+
+                response = new FakeHttpResponse();
+                service2.getStoreHandler().getEntry(new FakeHttpRequest(), response, KEY);
+                assertEquals(200, response.getStatus());
+                data = collectOutput(response);
+                if (data.length == DATA1.length) {
+                    // looks good so far; verify
+                    Assert.assertArrayEquals(DATA1, data);
+                    break;
+                } else {
+                    // but if not yet changed, ensure it's the original data...
+                    assertEquals(DATA2.length, data.length);
+                    Assert.assertArrayEquals(DATA2, data);
+                }
+                if (++round > 10) {
+                    fail("Did not resolve conflict in 10 rounds");
+                }
+            }
+            LOG.info("Conflict resolved in {} rounds, {} msecs", round, System.currentTimeMillis()-start);
+            
         } finally {
             service1.prepareForStop();
             service2.prepareForStop();
-            Thread.sleep(10L);
+            Thread.sleep(20L);
             service1._stop();
             service2._stop();
         }
