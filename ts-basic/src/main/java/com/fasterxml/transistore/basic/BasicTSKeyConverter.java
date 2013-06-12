@@ -77,6 +77,10 @@ public class BasicTSKeyConverter
             public BasicTSKey withBytes(byte[] buffer, int offset, int length) {
                 int partitionIdLength = ((buffer[offset] & 0xFF) << 8)
                         | (buffer[offset+1] & 0xFF);
+                if (partitionIdLength > length) {
+                    throw new IllegalArgumentException("Invalid partition id length ("+partitionIdLength
+                            +" / 0x"+Integer.toHexString(partitionIdLength)+"): total key length only "+length+")");
+                }
                 return new BasicTSKey(rawKey, partitionIdLength);
             }
         });

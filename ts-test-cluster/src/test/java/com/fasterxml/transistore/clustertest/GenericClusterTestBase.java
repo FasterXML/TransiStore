@@ -17,6 +17,7 @@ import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.shared.hash.BlockMurmur3Hasher;
+import com.fasterxml.storemate.shared.util.UTF8Encoder;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.backend.StoreBackendConfig;
@@ -32,13 +33,35 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
 import junit.framework.TestCase;
 
-public abstract class ClusterTestBase0 extends TestCase
+/**
+ * Backend-independent part of tests, to be extended by concrete
+ * implementations that plug specific StorableStore backend.
+ */
+public abstract class GenericClusterTestBase extends TestCase
 {
     protected final static int SINGLE_TEST_PORT = 7777;
     
     // null -> require client id with key
     protected final BasicTSKeyConverter _keyConverter = BasicTSKeyConverter.defaultInstance();
 
+    /*
+    /**********************************************************************
+    /* Low-level StorableStore helpers
+    /**********************************************************************
+     */
+    
+    protected int calcChecksum(byte[] data) {
+        return calcChecksum(data, 0, data.length);
+    }
+
+    protected int calcChecksum(byte[] data, int offset, int len ) {
+        return BlockMurmur3Hasher.instance.hash(0, data, offset, len);
+    }
+
+    public StorableKey storableKey(String str) {
+        return new StorableKey(UTF8Encoder.encodeAsUTF8(str));
+    }
+    
     /*
     /**********************************************************************
     /* Configuration setting helpers
@@ -220,7 +243,6 @@ public abstract class ClusterTestBase0 extends TestCase
 
     protected byte[] collectOutput(FakeHttpResponse response) throws IOException
     {
-        assertTrue(response.hasStreamingContent());
         ByteArrayOutputStream bytes = new ByteArrayOutputStream(4000);
         response.getStreamingContent().writeContent(bytes);
         return bytes.toByteArray();

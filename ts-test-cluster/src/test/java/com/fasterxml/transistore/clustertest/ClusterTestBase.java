@@ -8,7 +8,7 @@ import com.fasterxml.storemate.store.backend.StoreBackendConfig;
 /**
  * Shared base class for unit tests; contains shared utility methods.
  */
-public abstract class ClusterTestBase extends ClusterTestBase0
+public abstract class ClusterTestBase extends GenericClusterTestBase
 {
     /*
     /**********************************************************************

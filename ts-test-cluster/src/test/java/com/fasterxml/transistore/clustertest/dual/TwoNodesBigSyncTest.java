@@ -158,7 +158,6 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
             for (i = 0; i < ENTRIES; ++i) {
                 verifyEntry(i, rnd, service1, service2);
             }
-            
         } finally {
             // and That's All, Folks!
             service1.prepareForStop();
@@ -170,7 +169,6 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
         try { Thread.sleep(20L); } catch (InterruptedException e) { }
         service1.waitForStopped();
         service2.waitForStopped();
-        
     }
 
     protected BasicTSServiceConfigForDW createTwoNodeConfig(String name, int port, ClusterConfig cluster)

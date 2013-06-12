@@ -35,8 +35,8 @@ public class TwoNodesSimpleTest extends ClusterTestBase
 {
     // use ports that differ from other tests, just to minimize chance of
     // collision
-    private final static int TEST_PORT1 = 9020;
-    private final static int TEST_PORT2 = 9021;
+    private final static int TEST_PORT1 = 9230;
+    private final static int TEST_PORT2 = 9231;
     
     public void testSimpleTwoNode() throws Exception
     {
