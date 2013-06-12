@@ -6,6 +6,7 @@ import com.yammer.dropwizard.cli.Cli;
 import com.yammer.dropwizard.cli.ServerCommand;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
+import com.yammer.metrics.core.HealthCheck;
 
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
@@ -160,6 +161,14 @@ public class BasicTSServiceOnDW
         environment.addHealthCheck(new HealthCheckForStore(config, _stores));
         environment.addHealthCheck(new HealthCheckForCluster(config, _cluster));
 */
+        HealthCheck hc = new HealthCheck("bogusCheck-pre-DW-0.7") {
+            @Override
+            protected Result check() throws Exception {
+                return Result.healthy("Fine and Dandy!");
+            }
+            
+        };
+        environment.addHealthCheck(hc);
     }
 
     @Override
