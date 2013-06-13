@@ -15,6 +15,7 @@ import com.fasterxml.clustermate.service.cfg.NodeConfig;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.Storable;
+import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
@@ -135,16 +136,16 @@ public class FourNodesSimpleTest extends ClusterTestBase
             
             // turns out it should be last one (0x3 with modulo of 0x3)
             Storable entry;
-            entry = service1.getEntryStore().findEntry(KEY.asStorableKey());
+            entry = service1.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY.asStorableKey());
             assertNull(entry);
             assertEquals(0, service1.getEntryStore().getEntryCount());
-            entry = service2.getEntryStore().findEntry(KEY.asStorableKey());
+            entry = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY.asStorableKey());
             assertNull(entry);
             assertEquals(0, service2.getEntryStore().getEntryCount());
-            entry = service3.getEntryStore().findEntry(KEY.asStorableKey());
+            entry = service3.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY.asStorableKey());
             assertNull(entry);
             assertEquals(0, service3.getEntryStore().getEntryCount());
-            entry = service4.getEntryStore().findEntry(KEY.asStorableKey());
+            entry = service4.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY.asStorableKey());
             assertNotNull(entry);
             assertEquals(1, service4.getEntryStore().getEntryCount());
 
@@ -197,12 +198,16 @@ public class FourNodesSimpleTest extends ClusterTestBase
                 fail("Should not have the data after full DELETE: got entry with "+data.length+" bytes");
             }
 
-            assertEquals("Store #4 should have 1 tombstone", 1, ((AdminStorableStore) service4.getEntryStore()).getTombstoneCount(3000L));
-            assertEquals("Store #3 should have 1 tombstone", 1, ((AdminStorableStore) service3.getEntryStore()).getTombstoneCount(3000L));
+            assertEquals("Store #4 should have 1 tombstone", 1,
+                    ((AdminStorableStore) service4.getEntryStore()).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 3000L));
+            assertEquals("Store #3 should have 1 tombstone", 1,
+                    ((AdminStorableStore) service3.getEntryStore()).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 3000L));
             
             // and we may clean tombstones, too
-            assertEquals("Should have removed 1 tombstone from store #4", 1, ((AdminStorableStore) service4.getEntryStore()).removeTombstones(100));
-            assertEquals("Should have removed 1 tombstone from store #3", 1, ((AdminStorableStore) service3.getEntryStore()).removeTombstones(100));
+            assertEquals("Should have removed 1 tombstone from store #4", 1,
+                    ((AdminStorableStore) service4.getEntryStore()).removeTombstones(StoreOperationSource.ADMIN_TOOL, 100));
+            assertEquals("Should have removed 1 tombstone from store #3", 1,
+                    ((AdminStorableStore) service3.getEntryStore()).removeTombstones(StoreOperationSource.ADMIN_TOOL, 100));
             assertEquals("Shouldn't have tombstones, entries, any more", "0/0/0/0",
                     storeCounts(service1, service2, service3, service4));
             

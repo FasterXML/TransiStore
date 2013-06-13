@@ -12,6 +12,7 @@ import com.fasterxml.clustermate.service.store.StoredEntryConverter;
 import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.Storable;
+import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
@@ -33,7 +34,7 @@ public class CommandDumpBDB extends CommandBase<BasicTSServiceConfigForDW>
         Stores<BasicTSKey, StoredEntry<BasicTSKey>> stores = openReadOnlyStores(configuration);
         AdminStorableStore store = (AdminStorableStore) stores.getEntryStore();
         // true/false -> include deleted?
-        List<Storable> entries = store.dumpEntries(5000, false);
+        List<Storable> entries = store.dumpEntries(StoreOperationSource.ADMIN_TOOL, 5000, false);
         StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> factory = stores.getEntryConverter();
         System.out.println("Key,Path,Size,StoredSize,Compressed,Inlined");
         for (Storable raw : entries) {

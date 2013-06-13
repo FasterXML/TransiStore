@@ -10,6 +10,7 @@ import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.StoreConfig;
+import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.dw.util.*;
 
@@ -76,7 +77,7 @@ public class LargeFileTest extends JaxrsStoreTestBase
         Assert.assertArrayEquals(BIG_DATA, data);
 
         // and more fundamentally, verify store had it:
-        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(INTERNAL_KEY1.asStorableKey()));
+        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, INTERNAL_KEY1.asStorableKey()));
         assertNotNull(entry);
         assertTrue(entry.hasExternalData());
         assertFalse(entry.hasInlineData());
@@ -158,7 +159,7 @@ public class LargeFileTest extends JaxrsStoreTestBase
         assertEquals(BIG_DATA_ORIG.length, data.length);
         Assert.assertArrayEquals(BIG_DATA_ORIG, data);
 
-        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(INTERNAL_KEY1.asStorableKey()));
+        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, INTERNAL_KEY1.asStorableKey()));
         assertNotNull(entry);
         assertTrue(entry.hasExternalData());
         assertFalse(entry.hasInlineData());

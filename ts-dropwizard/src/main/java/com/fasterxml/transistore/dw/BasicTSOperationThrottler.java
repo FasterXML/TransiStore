@@ -78,8 +78,9 @@ public class BasicTSOperationThrottler
      */
     
     @Override
-    public Storable performGet(StoreOperationCallback<Storable> cb,
-            long operationTime, StorableKey key)
+    public Storable performGet(StoreOperationSource source,
+            long operationTime, StorableKey key,
+            StoreOperationCallback<Storable> cb)
         throws IOException, StoreException
     {
         try {
@@ -95,8 +96,8 @@ public class BasicTSOperationThrottler
     }
 
     @Override
-    public IterationResult performList(StoreOperationCallback<IterationResult> cb,
-            long operationTime)
+    public IterationResult performList(StoreOperationSource source,
+            long operationTime, StoreOperationCallback<IterationResult> cb)
         throws IOException, StoreException
     {
         try {
@@ -112,8 +113,9 @@ public class BasicTSOperationThrottler
     }
     
     @Override
-    public StorableCreationResult performPut(StoreOperationCallback<StorableCreationResult> cb,
-            long operationTime, StorableKey key, Storable value)
+    public StorableCreationResult performPut(StoreOperationSource source,
+            long operationTime, StorableKey key, Storable value,
+            StoreOperationCallback<StorableCreationResult> cb)
         throws IOException, StoreException
     {
         try {
@@ -133,8 +135,9 @@ public class BasicTSOperationThrottler
      * already queued at higher level (applied sequentially).
      */
     @Override
-    public Storable performSoftDelete(StoreOperationCallback<Storable> cb,
-            long operationTime, StorableKey key)
+    public Storable performSoftDelete(StoreOperationSource source,
+            long operationTime, StorableKey key,
+            StoreOperationCallback<Storable> cb)
         throws IOException, StoreException
     {
         return cb.perform(operationTime, key, null);
@@ -145,8 +148,9 @@ public class BasicTSOperationThrottler
      * done by background batch processes (clean up tasks).
      */
     @Override
-    public Storable performHardDelete(StoreOperationCallback<Storable> cb,
-            long operationTime, StorableKey key)
+    public Storable performHardDelete(StoreOperationSource source,
+            long operationTime, StorableKey key,
+            StoreOperationCallback<Storable> cb)
         throws IOException, StoreException
     {
         return cb.perform(operationTime, key, null);
@@ -159,8 +163,9 @@ public class BasicTSOperationThrottler
      */
 
     @Override
-    public <T> T performFileRead(FileOperationCallback<T> cb,
-            long operationTime, Storable value, File externalFile)
+    public <T> T performFileRead(StoreOperationSource source,
+            long operationTime, Storable value, File externalFile,
+            FileOperationCallback<T> cb)
         throws IOException, StoreException
     {
         try {
@@ -177,8 +182,9 @@ public class BasicTSOperationThrottler
     }
 
     @Override
-    public <T> T performFileWrite(FileOperationCallback<T> cb,
-            long operationTime, StorableKey key, File externalFile)
+    public <T> T performFileWrite(StoreOperationSource source,
+            long operationTime, StorableKey key, File externalFile,
+            FileOperationCallback<T> cb)
         throws IOException, StoreException
     {
         try {

@@ -20,6 +20,7 @@ import com.fasterxml.storemate.shared.hash.BlockMurmur3Hasher;
 import com.fasterxml.storemate.shared.util.UTF8Encoder;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.StoreException;
+import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.storemate.store.backend.StoreBackendConfig;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -419,13 +420,13 @@ public abstract class GenericClusterTestBase extends TestCase
     {
         StringBuilder sb = new StringBuilder();
         sb.append(store1.getEntryStore().getEntryCount());
-        long ts = ((AdminStorableStore) store1.getEntryStore()).getTombstoneCount(5000L);
+        long ts = ((AdminStorableStore) store1.getEntryStore()).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 5000L);
         if (ts > 0) {
             sb.append('(').append(ts).append(')');
         }
         for (StoreForTests store : stores) {
             sb.append('/').append(store.getEntryStore().getEntryCount());
-            ts = ((AdminStorableStore)store.getEntryStore()).getTombstoneCount(5000L);
+            ts = ((AdminStorableStore)store.getEntryStore()).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 5000L);
             if (ts > 0) {
                 sb.append('(').append(ts).append(')');
             }

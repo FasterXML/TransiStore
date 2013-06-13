@@ -16,6 +16,7 @@ import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.StoreException;
+import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.storemate.store.backend.IterationAction;
 import com.fasterxml.storemate.store.backend.StorableLastModIterationCallback;
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -73,7 +74,8 @@ public class LocalEntryCleaner
         }
         
         final long tombstoneThreshold = _timeMaster.currentTimeMillis() - _tombstoneTTLMsecs;
-        _entryStore.iterateEntriesByModifiedTime(new StorableLastModIterationCallback() {
+        _entryStore.iterateEntriesByModifiedTime(StoreOperationSource.CLEANUP,
+                0L, new StorableLastModIterationCallback() {
             @Override
             public IterationAction verifyTimestamp(long timestamp) {
                 return IterationAction.PROCESS_ENTRY;
@@ -133,7 +135,7 @@ public class LocalEntryCleaner
             {
                 // TODO: should we add a wait or yield every N deletes?
                 try {
-                    _entryStore.hardDelete(key, true);
+                    _entryStore.hardDelete(StoreOperationSource.CLEANUP, key, true);
                 } catch (StoreException e) {
                     throw e;
                 } catch (IOException e) {
@@ -141,7 +143,7 @@ public class LocalEntryCleaner
                 }
             }
         
-        }, 0L);
+        });
         
         return stats;
     }
