@@ -145,6 +145,7 @@ public class TwoNodesConflictTest extends ClusterTestBase
                     // !!! TODO: enable
 //                    fail("Did not resolve conflict in 10 rounds");
 LOG.error("Did not resolve conflict in 10 rounds");
+break;
                 }
             }
             
