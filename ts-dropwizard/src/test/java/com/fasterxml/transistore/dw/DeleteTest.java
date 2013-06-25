@@ -92,7 +92,7 @@ public class DeleteTest extends JaxrsStoreTestBase
         resource.getHandler().getEntry(new FakeHttpRequest(), response, INTERNAL_KEY2);
         assertEquals(204, response.getStatus());
         // even though store has the entry
-        Storable rawEntry = entries.findEntry(StoreOperationSource.REQUEST, INTERNAL_KEY2.asStorableKey());
+        Storable rawEntry = entries.findEntry(StoreOperationSource.REQUEST, null, INTERNAL_KEY2.asStorableKey());
         assertNotNull(rawEntry);
 
         assertTrue(rawEntry.isDeleted());
@@ -105,7 +105,7 @@ public class DeleteTest extends JaxrsStoreTestBase
         assertEquals(Long.toHexString(deleteTime), Long.toHexString(entry.getLastModifiedTime()));
 
         // but the other entry is there
-        entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, INTERNAL_KEY1.asStorableKey()));
+        entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, null, INTERNAL_KEY1.asStorableKey()));
         assertNotNull(entry);
         assertFalse(entry.isDeleted());
         response = new FakeHttpResponse();

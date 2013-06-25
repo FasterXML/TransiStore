@@ -77,7 +77,8 @@ public class LargeFileTest extends JaxrsStoreTestBase
         Assert.assertArrayEquals(BIG_DATA, data);
 
         // and more fundamentally, verify store had it:
-        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, INTERNAL_KEY1.asStorableKey()));
+        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST,
+                null, INTERNAL_KEY1.asStorableKey()));
         assertNotNull(entry);
         assertTrue(entry.hasExternalData());
         assertFalse(entry.hasInlineData());
@@ -159,7 +160,8 @@ public class LargeFileTest extends JaxrsStoreTestBase
         assertEquals(BIG_DATA_ORIG.length, data.length);
         Assert.assertArrayEquals(BIG_DATA_ORIG, data);
 
-        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, INTERNAL_KEY1.asStorableKey()));
+        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST,
+                null, INTERNAL_KEY1.asStorableKey()));
         assertNotNull(entry);
         assertTrue(entry.hasExternalData());
         assertFalse(entry.hasInlineData());

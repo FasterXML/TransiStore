@@ -72,7 +72,8 @@ public class MediumFileTest extends JaxrsStoreTestBase
         Assert.assertArrayEquals(BIG_DATA, data);
 
         // and more fundamentally, verify store had it:
-        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, INTERNAL_KEY1.asStorableKey()));
+        StoredEntry<BasicTSKey> entry = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST,
+                null, INTERNAL_KEY1.asStorableKey()));
         assertNotNull(entry);
         assertTrue(entry.hasExternalData());
         assertFalse(entry.hasInlineData());

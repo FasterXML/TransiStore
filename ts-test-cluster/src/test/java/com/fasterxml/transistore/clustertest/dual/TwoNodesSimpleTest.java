@@ -196,7 +196,8 @@ public class TwoNodesSimpleTest extends ClusterTestBase
             assertEquals(2, service2.getEntryStore().getEntryCount());
 
             // sanity check: verify that entry/entries were uploaded with full info
-            Storable entry1 = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY1.asStorableKey());
+            Storable entry1 = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST,
+                    null, KEY1.asStorableKey());
             assertNotNull(entry1);
             assertEquals(CONTENT1.length, entry1.getOriginalLength());
             assertEquals(Compression.LZF, entry1.getCompression());
@@ -211,7 +212,8 @@ public class TwoNodesSimpleTest extends ClusterTestBase
 
             assertEquals(START_TIME + 1L, entry1.getLastModified());
 
-            Storable entry2 = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY2.asStorableKey());
+            Storable entry2 = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST,
+                    null, KEY2.asStorableKey());
             assertNotNull(entry2);
             assertEquals(CONTENT2.length, entry2.getOriginalLength());
             assertEquals(Compression.LZF, entry2.getCompression());
@@ -242,7 +244,8 @@ public class TwoNodesSimpleTest extends ClusterTestBase
                     service1, service2);
 	
             // but wait! Let's verify that stuff is moved without corruption...
-            Storable entryCopy1 = service1.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY1.asStorableKey());
+            Storable entryCopy1 = service1.getEntryStore().findEntry(StoreOperationSource.REQUEST,
+                    null, KEY1.asStorableKey());
             assertNotNull(entryCopy1);
             assertEquals(entry1.getOriginalLength(), entryCopy1.getOriginalLength());
             assertEquals(entry1.getStorageLength(), entryCopy1.getStorageLength());
@@ -253,7 +256,8 @@ public class TwoNodesSimpleTest extends ClusterTestBase
             assertEquals(entry1.getContentHash(), entryCopy1.getContentHash());
             assertEquals(entry1.getCompressedHash(), entryCopy1.getCompressedHash());
 
-            Storable entryCopy2 = service1.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY2.asStorableKey());
+            Storable entryCopy2 = service1.getEntryStore().findEntry(StoreOperationSource.REQUEST,
+                    null, KEY2.asStorableKey());
             assertNotNull(entryCopy2);
             assertEquals(entry2.getOriginalLength(), entryCopy2.getOriginalLength());
             assertEquals(entry2.getStorageLength(), entryCopy2.getStorageLength());

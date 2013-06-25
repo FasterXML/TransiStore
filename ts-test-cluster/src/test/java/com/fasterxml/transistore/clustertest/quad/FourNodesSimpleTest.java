@@ -136,16 +136,16 @@ public class FourNodesSimpleTest extends ClusterTestBase
             
             // turns out it should be last one (0x3 with modulo of 0x3)
             Storable entry;
-            entry = service1.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY.asStorableKey());
+            entry = service1.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNull(entry);
             assertEquals(0, service1.getEntryStore().getEntryCount());
-            entry = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY.asStorableKey());
+            entry = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNull(entry);
             assertEquals(0, service2.getEntryStore().getEntryCount());
-            entry = service3.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY.asStorableKey());
+            entry = service3.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNull(entry);
             assertEquals(0, service3.getEntryStore().getEntryCount());
-            entry = service4.getEntryStore().findEntry(StoreOperationSource.REQUEST, KEY.asStorableKey());
+            entry = service4.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNotNull(entry);
             assertEquals(1, service4.getEntryStore().getEntryCount());
 

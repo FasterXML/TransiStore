@@ -73,13 +73,16 @@ public class LastUpdatedTest extends JaxrsStoreTestBase
         final StorableStore entries = resource.getStores().getEntryStore();
         assertEquals(3, entries.getEntryCount());
 
-        StoredEntry<BasicTSKey> entry2 = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, KEY2.asStorableKey()));
+        StoredEntry<BasicTSKey> entry2 = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST,
+                null, KEY2.asStorableKey()));
         assertNotNull(entry2);
         assertEquals(0L, resource.getStores().getLastAccessStore().findLastAccessTime(entry2));
-        StoredEntry<BasicTSKey> entry1b = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, KEY1B.asStorableKey()));
+        StoredEntry<BasicTSKey> entry1b = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST,
+                null, KEY1B.asStorableKey()));
         assertNotNull(entry1b);
         assertEquals(0L, resource.getStores().getLastAccessStore().findLastAccessTime(entry1b));
-        StoredEntry<BasicTSKey> entry1a = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, KEY1A.asStorableKey()));
+        StoredEntry<BasicTSKey> entry1a = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST,
+                null, KEY1A.asStorableKey()));
         assertNotNull(entry1a);
         assertEquals(0L, resource.getStores().getLastAccessStore().findLastAccessTime(entry1a));
 
@@ -102,7 +105,8 @@ public class LastUpdatedTest extends JaxrsStoreTestBase
         assertEquals(UPDATE_TIME1, resource.getStores().getLastAccessStore().findLastAccessTime(entry2));
         assertEquals(UPDATE_TIME2, resource.getStores().getLastAccessStore().findLastAccessTime(entry1a));
 
-        entry1b = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST, KEY1B.asStorableKey()));
+        entry1b = rawToEntry(entries.findEntry(StoreOperationSource.REQUEST,
+                null, KEY1B.asStorableKey()));
         assertEquals(TSLastAccess.SIMPLE, entry1b.getLastAccessUpdateMethod());
 
         // as well as vice-versa

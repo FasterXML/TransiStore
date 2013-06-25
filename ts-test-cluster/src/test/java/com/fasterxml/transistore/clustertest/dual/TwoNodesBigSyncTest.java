@@ -186,10 +186,12 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
             StoreForTests store1, StoreForTests store2) throws Exception
     {
         final BasicTSKey key = generateKey(rnd, index);
-        if (store1.getEntryStore().findEntry(StoreOperationSource.ADMIN_TOOL, key.asStorableKey()) == null) {
+        if (store1.getEntryStore().findEntry(StoreOperationSource.ADMIN_TOOL,
+                null, key.asStorableKey()) == null) {
             fail("Entry #"+index+"/"+ENTRIES+" missing from original store");
         }
-        Storable copy = store2.getEntryStore().findEntry(StoreOperationSource.ADMIN_TOOL, key.asStorableKey());
+        Storable copy = store2.getEntryStore().findEntry(StoreOperationSource.ADMIN_TOOL,
+                null, key.asStorableKey());
         if (copy == null) {
             fail("Entry #"+index+"/"+ENTRIES+" missing from destination store");
         }
