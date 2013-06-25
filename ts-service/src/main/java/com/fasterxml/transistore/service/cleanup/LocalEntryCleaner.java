@@ -74,7 +74,7 @@ public class LocalEntryCleaner
         }
         
         final long tombstoneThreshold = _timeMaster.currentTimeMillis() - _tombstoneTTLMsecs;
-        _entryStore.iterateEntriesByModifiedTime(StoreOperationSource.CLEANUP,
+        _entryStore.iterateEntriesByModifiedTime(StoreOperationSource.CLEANUP, null,
                 0L, new StorableLastModIterationCallback() {
             @Override
             public IterationAction verifyTimestamp(long timestamp) {
@@ -135,7 +135,7 @@ public class LocalEntryCleaner
             {
                 // TODO: should we add a wait or yield every N deletes?
                 try {
-                    _entryStore.hardDelete(StoreOperationSource.CLEANUP, key, true);
+                    _entryStore.hardDelete(StoreOperationSource.CLEANUP, null, key, true);
                 } catch (StoreException e) {
                     throw e;
                 } catch (IOException e) {

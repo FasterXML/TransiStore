@@ -76,6 +76,15 @@ public class BasicTSOperationThrottler
     /* Operation throttling
     /**********************************************************************
      */
+
+    @Override
+    public Boolean performHas(StoreOperationSource source, long operationTime,
+            StorableKey key, StoreOperationCallback<Boolean> cb)
+            throws IOException, StoreException
+    {
+        // For now let's NOT throttle 'has' access... may reconsider in future:
+        return cb.perform(operationTime, key, null);
+    }
     
     @Override
     public Storable performGet(StoreOperationSource source,
