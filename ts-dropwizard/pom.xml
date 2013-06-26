@@ -27,6 +27,10 @@
     <!--  also using common stuff from StoreMate/ClusterMate -->
     <dependency>
       <groupId>com.fasterxml.storemate</groupId>
+      <artifactId>storemate-store</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.storemate</groupId>
       <artifactId>storemate-backend-bdb-je</artifactId>
     </dependency>
     <dependency>

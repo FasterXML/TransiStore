@@ -20,11 +20,7 @@ import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
 import com.fasterxml.clustermate.service.cleanup.FileCleaner;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
-import com.fasterxml.clustermate.service.servlet.StoreEntryServlet;
-import com.fasterxml.clustermate.service.store.StoreHandler;
-import com.fasterxml.clustermate.service.store.StoredEntry;
-import com.fasterxml.clustermate.service.store.StoredEntryConverter;
-import com.fasterxml.clustermate.service.store.StoresImpl;
+import com.fasterxml.clustermate.service.store.*;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSListItem;
@@ -137,10 +133,11 @@ public class BasicTSServiceOnDW
     }
 
     @Override
-    protected StoreEntryServlet<BasicTSKey, StoredEntry<BasicTSKey>> constructStoreEntryServlet(SharedServiceStuff stuff,
-            ClusterViewByServer cluster, StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> storeHandler)
+    protected BasicTSStoreEntryServlet constructStoreEntryServlet(SharedServiceStuff stuff,
+            ClusterViewByServer cluster,
+            StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> storeHandler)
     {
-        return new StoreEntryServlet<BasicTSKey, StoredEntry<BasicTSKey>>(stuff, _cluster, storeHandler);
+        return new BasicTSStoreEntryServlet(stuff, _cluster, storeHandler);
     }
 
     /*

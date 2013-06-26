@@ -28,6 +28,18 @@ public class BasicTSServiceConfig
 
     protected StoredEntryConverter<?,?,?> _entryConverter;
 
+    /**
+     * It is possible to output additional timing information; by default
+     * we don't do it.
+     */
+    public boolean printTimings = false;
+    
+    /*
+    /**********************************************************************
+    /* Construction
+    /**********************************************************************
+     */
+    
     public BasicTSServiceConfig() {
         this(new BasicTSEntryConverter());
     }

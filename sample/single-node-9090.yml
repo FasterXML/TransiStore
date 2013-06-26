@@ -4,7 +4,8 @@
     ,"shutdownGracePeriod" : "5 seconds"
   },
   "ts" : {
-    "metadataDirectory" : "data-tstore-nodes/"
+    "printTimings" : true
+    ,"metadataDirectory" : "data-tstore-nodes/"
     ,"storeConfig" : {
       "dataRootForFiles" : "data-tstore-blobs/"
     }
