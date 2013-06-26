@@ -42,12 +42,12 @@ public class BasicTSOperationThrottler
      * And ditto for file-system reads: needs to improved in future,
      * but for now this will have to do.
      */
-    protected final Semaphore _readLock = new Semaphore(4, true);
+    protected final Semaphore _readLock = new Semaphore(6, true);
 
     /**
      * Same also applies to file-system writes.
      */
-    protected final Semaphore _writeLock = new Semaphore(2, false);
+    protected final Semaphore _writeLock = new Semaphore(3, false);
 
     /*
     /**********************************************************************
