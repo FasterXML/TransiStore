@@ -2,6 +2,9 @@ package com.fasterxml.transistore.dw;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.clustermate.service.servlet.ServletServiceRequest;
@@ -18,8 +21,10 @@ import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 @SuppressWarnings("serial")
 public class BasicTSStoreEntryServlet extends StoreEntryServlet<BasicTSKey, StoredEntry<BasicTSKey>>
 {
+    private final Logger LOG = LoggerFactory.getLogger("TIMING");
+
     protected final boolean _printTimings;
-    
+
     public BasicTSStoreEntryServlet(SharedServiceStuff stuff,
             ClusterViewByServer cluster,
             StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> storeHandler)
@@ -86,17 +91,18 @@ public class BasicTSStoreEntryServlet extends StoreEntryServlet<BasicTSKey, Stor
             OperationDiagnostics stats)
     {
         if (stats == null) {
-            System.out.printf("%s: no-stats\n", verb);
+            System.out.printf("%s -> NO-STATS", verb);
             return;
         }
-        System.out.printf("TIMING:%s -> DB=%s, File=%s, Req/Resp=%.2f, TOTAL=%.2f msec; %d/%d bytes r/w\n",
+        String msg = String.format("%s -> DB=%s, File=%s, Req/Resp=%.2f, TOTAL=%.2f msec; %d/%d bytes r/w",
                 verb,
                 _time(stats.getDbAccess()),
                 _time(stats.getFileAccess()),
-                (stats.getContentCopyNanos()>>10) / 1000.0,
+                (stats.getRequestResponseTotal()>>10) / 1000.0,
                 (stats.getNanosSpent() >> 10) / 1000.0,
                 request.getBytesRead(), response.getBytesWritten()
                 );
+        LOG.info(msg);
     }
 
     protected String _time(TotalTime time)
