@@ -29,7 +29,7 @@ public class BasicTSOperationThrottler
      * We may want to throttle reads slightly as well. But should be
      * able to support much higher concurrency than with writes
      */
-    protected final Semaphore _getLock = new Semaphore(8, false);
+    protected final Semaphore _getLock = new Semaphore(6, false);
 
     /**
      * Listings can be pricey as well, so let's throttle to... say,
@@ -41,13 +41,15 @@ public class BasicTSOperationThrottler
     /**
      * And ditto for file-system reads: needs to improved in future,
      * but for now this will have to do.
+     * Specifically, looks like modern file systems can handle concurrency
+     * quite well.
      */
-    protected final Semaphore _readLock = new Semaphore(6, true);
+    protected final Semaphore _fsReadLock = new Semaphore(8, true);
 
     /**
      * Same also applies to file-system writes.
      */
-    protected final Semaphore _writeLock = new Semaphore(3, false);
+    protected final Semaphore _fsWriteLock = new Semaphore(4, false);
 
     /*
     /**********************************************************************
@@ -178,7 +180,7 @@ public class BasicTSOperationThrottler
         throws IOException, StoreException
     {
         try {
-            _readLock.acquire();
+            _fsReadLock.acquire();
         } catch (InterruptedException e) {
             throw new StoreException.ServerTimeout((value == null) ? null : value.getKey(),
                     "File read operation interrupted");
@@ -186,7 +188,7 @@ public class BasicTSOperationThrottler
         try {
             return cb.perform(operationTime, (value == null) ? null : value.getKey(), value, externalFile);
         } finally {
-            _readLock.release();
+            _fsReadLock.release();
         }
     }
 
@@ -197,7 +199,7 @@ public class BasicTSOperationThrottler
         throws IOException, StoreException
     {
         try {
-            _writeLock.acquire();
+            _fsWriteLock.acquire();
         } catch (InterruptedException e) {
             throw new StoreException.ServerTimeout(key,
                     "File write operation interrupted");
@@ -205,7 +207,7 @@ public class BasicTSOperationThrottler
         try {
             return cb.perform(operationTime, key, null, externalFile);
         } finally {
-            _writeLock.release();
+            _fsWriteLock.release();
         }
     }
 }
