@@ -163,7 +163,6 @@ public class BasicTSServiceOnDW
             protected Result check() throws Exception {
                 return Result.healthy("Fine and Dandy!");
             }
-            
         };
         environment.addHealthCheck(hc);
     }
@@ -185,6 +184,7 @@ public class BasicTSServiceOnDW
     /**
      * Method is overridden to provide alternate throttler
      */
+    @Override
     protected StoreOperationThrottler _constructThrottler(SharedServiceStuff stuff)
     {
         return new BasicTSOperationThrottler();

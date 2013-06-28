@@ -199,8 +199,7 @@ public class BasicTSOperationThrottler
         try {
             _writeLock.acquire();
         } catch (InterruptedException e) {
-            throw new StoreException.ServerTimeout(key,
-                    "File write operation interrupted");
+            throw new StoreException.ServerTimeout(key, "File write operation interrupted");
         }
         try {
             return cb.perform(operationTime, key, null, externalFile);
