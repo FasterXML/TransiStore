@@ -17,6 +17,8 @@ public class BasicTSOperationThrottler
     extends StoreOperationThrottler
 //    implements StartAndStoppable
 {
+    private final static boolean DISABLED = false;
+
     /**
      * Let's start with a very simple mutex for local DB operations
      * done as part of PUT operations. Since they should be quick,
@@ -44,12 +46,12 @@ public class BasicTSOperationThrottler
      * Specifically, looks like modern file systems can handle concurrency
      * quite well.
      */
-    protected final Semaphore _fsReadLock = new Semaphore(6, true);
+    protected final Semaphore _fsReadLock = new Semaphore(5, true);
 
     /**
      * Same also applies to file-system writes.
      */
-    protected final Semaphore _fsWriteLock = new Semaphore(6, true);
+    protected final Semaphore _fsWriteLock = new Semaphore(5, true);
 
     /*
     /**********************************************************************
@@ -94,6 +96,10 @@ public class BasicTSOperationThrottler
             StoreOperationCallback<Storable> cb)
         throws IOException, StoreException
     {
+	if (DISABLED) {
+            return cb.perform(operationTime, key, null);
+	}
+
         try {
             _getLock.acquire();
         } catch (InterruptedException e) {
@@ -111,6 +117,10 @@ public class BasicTSOperationThrottler
             long operationTime, StoreOperationCallback<IterationResult> cb)
         throws IOException, StoreException
     {
+	if (DISABLED) {
+            return cb.perform(operationTime, null, null);
+	}
+
         try {
             _listLock.acquire();
         } catch (InterruptedException e) {
@@ -129,6 +139,10 @@ public class BasicTSOperationThrottler
             StoreOperationCallback<StorableCreationResult> cb)
         throws IOException, StoreException
     {
+	if (DISABLED) {
+            return cb.perform(operationTime, key, value);
+	}
+
         try {
             _putLock.acquire();
         } catch (InterruptedException e) {
@@ -179,6 +193,10 @@ public class BasicTSOperationThrottler
             FileOperationCallback<T> cb)
         throws IOException, StoreException
     {
+	if (DISABLED) {
+            return cb.perform(operationTime, (value == null) ? null : value.getKey(), value, externalFile);
+	}
+
         try {
             _fsReadLock.acquire();
         } catch (InterruptedException e) {
@@ -198,6 +216,10 @@ public class BasicTSOperationThrottler
             FileOperationCallback<T> cb)
         throws IOException, StoreException
     {
+	if (DISABLED) {
+            return cb.perform(operationTime, key, null, externalFile);
+	}
+
         try {
             _fsWriteLock.acquire();
         } catch (InterruptedException e) {
