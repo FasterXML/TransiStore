@@ -23,7 +23,7 @@ public class BasicTSOperationThrottler
      * can start with a simple mutex.
      * But allow two concurrent updates, not just one.
      */
-    protected final Semaphore _putLock = new Semaphore(2, false);
+    protected final Semaphore _putLock = new Semaphore(2, true);
 
     /**
      * We may want to throttle reads slightly as well. But should be
@@ -36,7 +36,7 @@ public class BasicTSOperationThrottler
      * eight as well. But make this fair, since it may take longer
      * than other read access.
      */
-    protected final Semaphore _listLock = new Semaphore(8, true);
+    protected final Semaphore _listLock = new Semaphore(8, false);
 
     /**
      * And ditto for file-system reads: needs to improved in future,
@@ -44,12 +44,12 @@ public class BasicTSOperationThrottler
      * Specifically, looks like modern file systems can handle concurrency
      * quite well.
      */
-    protected final Semaphore _fsReadLock = new Semaphore(8, true);
+    protected final Semaphore _fsReadLock = new Semaphore(6, true);
 
     /**
      * Same also applies to file-system writes.
      */
-    protected final Semaphore _fsWriteLock = new Semaphore(4, false);
+    protected final Semaphore _fsWriteLock = new Semaphore(6, true);
 
     /*
     /**********************************************************************
