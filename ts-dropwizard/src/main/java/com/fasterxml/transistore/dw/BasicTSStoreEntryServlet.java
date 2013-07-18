@@ -2,9 +2,6 @@ package com.fasterxml.transistore.dw;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.clustermate.service.servlet.ServletServiceRequest;
@@ -14,6 +11,7 @@ import com.fasterxml.clustermate.service.store.StoreHandler;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.storemate.store.util.OperationDiagnostics;
 import com.fasterxml.storemate.store.util.TotalTime;
+import com.fasterxml.storemate.store.util.TotalTimeAndBytes;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
@@ -21,7 +19,7 @@ import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 @SuppressWarnings("serial")
 public class BasicTSStoreEntryServlet extends StoreEntryServlet<BasicTSKey, StoredEntry<BasicTSKey>>
 {
-    private final Logger LOG = LoggerFactory.getLogger("TIMING");
+//    private final Logger LOG = LoggerFactory.getLogger("TIMING");
 
     protected final boolean _printTimings;
 
@@ -91,10 +89,10 @@ public class BasicTSStoreEntryServlet extends StoreEntryServlet<BasicTSKey, Stor
             OperationDiagnostics stats)
     {
         if (stats == null) {
-            System.out.printf("%s -> NO-STATS", verb);
+            System.out.printf("PERF/%s -> NO-STATS", verb);
             return;
         }
-        String msg = String.format("%s -> DB=%s, File=%s, Req/Resp=%.2f, TOTAL=%.2f msec; %d/%d bytes r/w",
+        String msg = String.format("PERF/%s -> DB=%s, File=%s, Req/Resp=%.2f, TOTAL=%.2f msec; %d/%d bytes r/w",
                 verb,
                 _time(stats.getDbAccess()),
                 _time(stats.getFileAccess()),
@@ -110,8 +108,27 @@ public class BasicTSStoreEntryServlet extends StoreEntryServlet<BasicTSKey, Stor
         if (time == null) {
             return "-";
         }
-        double msec1 = ((int) time.getTotalTimeWithoutWait()>>10) / 1000.0;
-        double msec2 = ((int) time.getTotalTimeWithWait()>>10) / 1000.0;
-        return String.format("%.2f(w:%.2f)", msec1, (msec2 - msec1));
+        long nanos1 = time.getTotalTimeWithoutWait();
+        int usecs1 = (int) (nanos1 >> 10);
+        long nanos2 = time.getTotalTimeWithWait() - nanos1;
+        int usecs2;
+        if (nanos2 < 0L) { // shouldn't happen but...
+            usecs2 = -1;
+        } else {
+            usecs2 = (int) (nanos2 >> 10);
+            // also -- truncate 0.1 msecs into 0, to reduce noise
+            if (usecs2 < 100) {
+                usecs2 = 0;
+            }
+        }
+        
+        double msec1 = usecs1 / 1000.0;
+        double msec2 = usecs2 / 1000.0;
+        if (time instanceof TotalTimeAndBytes) {
+            TotalTimeAndBytes timeB = (TotalTimeAndBytes) time;
+            long bytes = timeB.getBytes();
+            return String.format("%.2f(w:%.2f)/%dB", msec1, msec2, bytes);
+        }
+        return String.format("%.2f(w:%.2f)", msec1, msec2);
     }
 }
