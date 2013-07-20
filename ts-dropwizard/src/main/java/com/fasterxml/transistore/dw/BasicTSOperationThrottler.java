@@ -46,12 +46,12 @@ public class BasicTSOperationThrottler
      * Specifically, looks like modern file systems can handle concurrency
      * quite well.
      */
-    protected final Semaphore _fsReadLock = new Semaphore(5, true);
+    protected final Semaphore _fsReadLock = new Semaphore(6, true);
 
     /**
      * Same also applies to file-system writes.
      */
-    protected final Semaphore _fsWriteLock = new Semaphore(5, true);
+    protected final Semaphore _fsWriteLock = new Semaphore(4, true);
 
     /*
     /**********************************************************************
@@ -96,9 +96,9 @@ public class BasicTSOperationThrottler
             StoreOperationCallback<Storable> cb)
         throws IOException, StoreException
     {
-	if (DISABLED) {
+        if (DISABLED || source != StoreOperationSource.REQUEST) {
             return cb.perform(operationTime, key, null);
-	}
+        }
 
         try {
             _getLock.acquire();
@@ -117,9 +117,9 @@ public class BasicTSOperationThrottler
             long operationTime, StoreOperationCallback<IterationResult> cb)
         throws IOException, StoreException
     {
-	if (DISABLED) {
+        if (DISABLED || source != StoreOperationSource.REQUEST) {
             return cb.perform(operationTime, null, null);
-	}
+        }
 
         try {
             _listLock.acquire();
@@ -139,9 +139,9 @@ public class BasicTSOperationThrottler
             StoreOperationCallback<StorableCreationResult> cb)
         throws IOException, StoreException
     {
-	if (DISABLED) {
+        if (DISABLED || source != StoreOperationSource.REQUEST) {
             return cb.perform(operationTime, key, value);
-	}
+        }
 
         try {
             _putLock.acquire();
@@ -193,9 +193,9 @@ public class BasicTSOperationThrottler
             FileOperationCallback<T> cb)
         throws IOException, StoreException
     {
-	if (DISABLED) {
+        if (DISABLED) {
             return cb.perform(operationTime, (value == null) ? null : value.getKey(), value, externalFile);
-	}
+        }
 
         try {
             _fsReadLock.acquire();
@@ -216,9 +216,9 @@ public class BasicTSOperationThrottler
             FileOperationCallback<T> cb)
         throws IOException, StoreException
     {
-	if (DISABLED) {
+        if (DISABLED || source != StoreOperationSource.REQUEST) {
             return cb.perform(operationTime, key, null, externalFile);
-	}
+        }
 
         try {
             _fsWriteLock.acquire();
