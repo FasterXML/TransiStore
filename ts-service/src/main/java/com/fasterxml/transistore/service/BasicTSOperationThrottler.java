@@ -1,4 +1,4 @@
-package com.fasterxml.transistore.dw;
+package com.fasterxml.transistore.service;
 
 import java.io.File;
 import java.io.IOException;
