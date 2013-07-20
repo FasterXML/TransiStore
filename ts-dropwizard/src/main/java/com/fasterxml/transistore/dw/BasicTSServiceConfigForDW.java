@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.storemate.backend.bdbje.BDBJEBuilder;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 import com.fasterxml.clustermate.dw.DWConfigBase;
+import com.yammer.dropwizard.config.HttpConfiguration;
 
 /**
  * Wrapper class used when embedding configuration to be used for
@@ -34,5 +35,18 @@ public class BasicTSServiceConfigForDW
     @Override
     public BasicTSServiceConfig getServiceConfig() {
         return ts;
+    }
+
+    /**
+     * Need to override this method to ensure that under no circumstances
+     * do we let GZIP compression be enabled.
+     */
+    @Override
+    public void setHttpConfiguration(HttpConfiguration config)
+    {
+        if (config != null) {
+            config.getGzipConfiguration().setEnabled(false);
+        }
+        super.setHttpConfiguration(config);
     }
 }
