@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
+
 //import com.fasterxml.clustermate.service.StartAndStoppable;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.*;
 import com.fasterxml.storemate.store.backend.IterationResult;
+import com.fasterxml.transistore.service.ReadWriteOperationPrioritizer.Lease;
 
 /**
  * This is the standard {@link StoreOperationThrottler} to use with
@@ -40,18 +42,13 @@ public class BasicTSOperationThrottler
      */
     protected final Semaphore _listLock = new Semaphore(8, false);
 
-    /**
-     * And ditto for file-system reads: needs to improved in future,
-     * but for now this will have to do.
-     * Specifically, looks like modern file systems can handle concurrency
-     * quite well.
-     */
+    /*
     protected final Semaphore _fsReadLock = new Semaphore(6, true);
 
-    /**
-     * Same also applies to file-system writes.
-     */
     protected final Semaphore _fsWriteLock = new Semaphore(4, true);
+    */
+
+    protected final ReadWriteOperationPrioritizer _fsReadWrites;
 
     /*
     /**********************************************************************
@@ -59,7 +56,9 @@ public class BasicTSOperationThrottler
     /**********************************************************************
      */
     
-    public BasicTSOperationThrottler() { }
+    public BasicTSOperationThrottler() {
+    	_fsReadWrites = new ReadWriteOperationPrioritizer();
+    }
 
     /*
     @Override
@@ -196,9 +195,9 @@ public class BasicTSOperationThrottler
         if (DISABLED) {
             return cb.perform(operationTime, (value == null) ? null : value.getKey(), value, externalFile);
         }
-
+        Lease l;  
         try {
-            _fsReadLock.acquire();
+        	l = _fsReadWrites.obtainReadLease();
         } catch (InterruptedException e) {
             throw new StoreException.ServerTimeout((value == null) ? null : value.getKey(),
                     "File read operation interrupted");
@@ -206,7 +205,7 @@ public class BasicTSOperationThrottler
         try {
             return cb.perform(operationTime, (value == null) ? null : value.getKey(), value, externalFile);
         } finally {
-            _fsReadLock.release();
+        	l.returnLease();
         }
     }
 
@@ -219,16 +218,16 @@ public class BasicTSOperationThrottler
         if (DISABLED || source != StoreOperationSource.REQUEST) {
             return cb.perform(operationTime, key, null, externalFile);
         }
-
+        Lease l;  
         try {
-            _fsWriteLock.acquire();
+        	l = _fsReadWrites.obtainWriteLease();
         } catch (InterruptedException e) {
             throw new StoreException.ServerTimeout(key, "File write operation interrupted");
         }
         try {
             return cb.perform(operationTime, key, null, externalFile);
         } finally {
-            _fsWriteLock.release();
+        	l.returnLease();
         }
     }
 }
