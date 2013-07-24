@@ -33,14 +33,14 @@ public class BasicTSOperationThrottler
      * We may want to throttle reads slightly as well. But should be
      * able to support much higher concurrency than with writes
      */
-    protected final Semaphore _getLock = new Semaphore(6, false);
+    protected final Semaphore _getLock = new Semaphore(6, true);
 
     /**
      * Listings can be pricey as well, so let's throttle to... say,
      * eight as well. But make this fair, since it may take longer
      * than other read access.
      */
-    protected final Semaphore _listLock = new Semaphore(8, false);
+    protected final Semaphore _listLock = new Semaphore(8, true);
 
     /*
     protected final Semaphore _fsReadLock = new Semaphore(6, true);
