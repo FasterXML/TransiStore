@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * throttling logic for contested read/write operations (mostly for
  * file system, although theoretically also for DBs if necessary).
  *<p>
- * Basic idea is simply: when things are going smoothly, we will allow
+ * Basic idea is simple: when things are going smoothly, we will allow
  * a reasonable number of concurrent reads and/or writes to proceed
  * without throttling. But if limit on either is reached, queuing is
  * used to apply specific ratio to try to avoid starving of either
