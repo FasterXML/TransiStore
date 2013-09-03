@@ -12,7 +12,9 @@ import com.yammer.dropwizard.validation.Validator;
 
 import com.fasterxml.clustermate.api.EntryKeyConverter;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
+import com.fasterxml.clustermate.service.cleanup.CleanerUpper;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
+import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -73,6 +75,28 @@ public class StoreForTests extends BasicTSServiceOnDW
         return service;
     }
 
+    /**
+     * Method for enabling default cleanup tasks for test runs. Needs to be called
+     * after instance is constructed, but before it is started.
+     * 
+     * @since 0.9.8
+     */
+    public void enableCleanupTasks()
+    {
+        enableCleanupTasks(constructCleanerUpper(_serviceStuff, _stores, _cluster));
+    }
+
+    /**
+     * @since 0.9.8
+     */
+    public void enableCleanupTasks(CleanerUpper<BasicTSKey, StoredEntry<BasicTSKey>> cleanup)
+    {
+        if (_cleanerUpper != null) {
+            throw new IllegalStateException("Already had CleanerUpper registered");
+        }
+        _cleanerUpper = cleanup;
+    }
+    
     /*
     /**********************************************************************
     /* Life-cycle
