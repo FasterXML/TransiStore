@@ -141,14 +141,17 @@ public class ListCmd extends TStoreCmdBase
     }
 
     protected String ageMsecs(long msecs) {
-        return ageSecs((int) (msecs / 1000.0));
+        return ageSecs(msecs / 1000);
     }
 
     protected String ageSecs(long secs0)
     {
         int secs = (secs0 < Integer.MAX_VALUE) ? ((int) secs0) : Integer.MAX_VALUE;
         if (secs < 60) {
-            return String.format("%2ds   ", secs);
+        	if (secs < 10) {
+        		return new StringBuilder(6).append(' ').append(secs).append("s   ").toString();
+        	}
+    		return new StringBuilder(6).append(secs).append("s   ").toString();
         }
         int mins = (secs / 60);
         secs -= (mins * 60);

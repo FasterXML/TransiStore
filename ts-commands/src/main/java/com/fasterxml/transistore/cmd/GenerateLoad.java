@@ -152,7 +152,7 @@ public class GenerateLoad extends TStoreCmdBase
         long startTime = System.nanoTime();
         BasicTSKey entryKey = contentKey(_prefix.getPartitionId(),
                 _prefix.getPath() + "/entry_"+Integer.toHexString(index));
-        PutOperationResult result = _client.putContent(entryKey, stuff);
+        PutOperationResult result = _client.putContent(null, entryKey, stuff);
         int msecs = (int) ((System.nanoTime() - startTime) >> 20); // about right
         _logPut(result, threadId, msecs, entryKey.toString());
         return true;

@@ -41,7 +41,7 @@ public class ByteRangesTest extends ClusterTestBase
         // Add test content
         final BasicTSKey SMALL_KEY = contentKey("testRange-item1");
         final byte[] SMALL_CONTENT = "Something pretty small to store, not compressed".getBytes("UTF-8");
-        PutOperationResult result = client.putContent(clientConfig, SMALL_KEY, SMALL_CONTENT);
+        PutOperationResult result = client.putContent(clientConfig, null, SMALL_KEY, SMALL_CONTENT);
         assertTrue(result.succeededOptimally());
 
         // first: verify that we can do GET, but not find the entry:
@@ -60,7 +60,7 @@ public class ByteRangesTest extends ClusterTestBase
         LENGTH = 77;
         final BasicTSKey MED_KEY = contentKey("testRange-item2");
         final byte[] MED_CONTENT = biggerSomewhatCompressibleData(3000);
-        result = client.putContent(clientConfig, MED_KEY, MED_CONTENT);
+        result = client.putContent(clientConfig, null, MED_KEY, MED_CONTENT);
         assertTrue(result.succeededOptimally());
         data = client.getPartialContentAsBytes(clientConfig, MED_KEY, new ByteRange(OFFSET, LENGTH));
         assertNotNull(data);
@@ -75,7 +75,7 @@ public class ByteRangesTest extends ClusterTestBase
         final byte[] BIG_CONTENT = biggerSomewhatCompressibleData(200 * 1024); // 200k
         OFFSET = 128456;
         LENGTH = 5600;
-        result = client.putContent(clientConfig, BIG_KEY, BIG_CONTENT);
+        result = client.putContent(clientConfig, null, BIG_KEY, BIG_CONTENT);
         assertTrue(result.succeededOptimally());
         data = client.getPartialContentAsBytes(clientConfig, BIG_KEY, new ByteRange(OFFSET, LENGTH));
         assertNotNull(data);

@@ -24,5 +24,12 @@
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-client</artifactId>
     </dependency>
+
+    <!-- Config-magic for config (time values) -->
+    <dependency>
+      <groupId>org.skife.config</groupId>
+      <artifactId>config-magic</artifactId>
+    </dependency>
+
   </dependencies>
 </project>

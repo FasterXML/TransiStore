@@ -3,13 +3,15 @@ package com.fasterxml.transistore.cmd;
 import java.io.*;
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import org.skife.config.TimeSpan;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.clustermate.client.NodeFailure;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 
 import io.airlift.command.Arguments;
 import io.airlift.command.Command;
+import io.airlift.command.Option;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
@@ -22,6 +24,9 @@ public class PutCmd extends TStoreCmdBase
     private final static String STDIN_MARKER = "-";
     
     private final static File STDIN_MARKER_FILE = new File(STDIN_MARKER);
+
+    @Option(name = { "--ttl" }, description = "Maximum time-to-live (default: '7d')")
+    protected String _ttl;
     
     @Arguments(title="arguments",
             description = "Target (first argument) and File(s) and/or directories to copy recursively (remaining arguments)."
@@ -54,6 +59,18 @@ public class PutCmd extends TStoreCmdBase
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid prefix '"+arguments.get(lastArgIndex)+"', problem: "+e.getMessage());
         }
+
+        // Explicitly defined TTL?
+        String ttlStr = _ttl;
+        TSPutCallParameters params = new TSPutCallParameters();
+        
+        if (ttlStr != null) {
+        	try {
+        		params = params.withTTL(new TimeSpan(ttlStr));
+        	} catch (Exception e) {
+        		throw new IllegalArgumentException("Invalid 'ttl' value \""+ttlStr+"\": has to be a valid TimeSpan (like \"7d\")");
+        	}
+        }
         
         // similarly verify that files/directories actually exist first
         List<File> input = new ArrayList<File>();
@@ -76,7 +93,7 @@ public class PutCmd extends TStoreCmdBase
             if (jgen != null) {
                 jgen.writeStartArray();
             }
-            int fileCount = _putStuff(client, input, jgen);
+            int fileCount = _putStuff(client, params, input, jgen);
             if (jgen == null) {
                 System.out.printf("COMPLETE: uploaded %s files\n", fileCount);
             } else {
@@ -96,24 +113,26 @@ public class PutCmd extends TStoreCmdBase
         client.stop();
     }
 
-    private int _putStuff(BasicTSClient client, List<File> input, JsonGenerator jgen)
+    private int _putStuff(BasicTSClient client, TSPutCallParameters params,
+    		List<File> input, JsonGenerator jgen)
         throws InterruptedException, IOException
     {
         int count = 0;
         
         for (File file : input) {
             if (file == STDIN_MARKER_FILE) {
-                _copyStdIn(client, file, jgen);
+                _copyStdIn(client, params, file, jgen);
                 ++count;
             } else {
-                count += _copyFileOrDir(client, file, new File(file.getName()), jgen);
+                count += _copyFileOrDir(client, params, file, new File(file.getName()), jgen);
             }
         }
         return count;
     }
 
-    private void _copyStdIn(BasicTSClient client, File dst, JsonGenerator jgen)
-            throws InterruptedException, IOException
+    private void _copyStdIn(BasicTSClient client, TSPutCallParameters params,
+    		File dst, JsonGenerator jgen)
+        throws InterruptedException, IOException
     {
         // Let's actually copy stuff from stdin into a temporary file, upload that
         File tmpFile = File.createTempFile("tstore", ".tmp");
@@ -127,11 +146,12 @@ public class PutCmd extends TStoreCmdBase
             out.write(buffer, 0, count);
         }
         out.close();
-        _copyFile(client, tmpFile, dst, jgen);
+        _copyFile(client, params, tmpFile, dst, jgen);
     }
     
-    private int _copyFileOrDir(BasicTSClient client, File src, File dst, JsonGenerator jgen)
-            throws InterruptedException, IOException
+    private int _copyFileOrDir(BasicTSClient client, TSPutCallParameters params,
+    		File src, File dst, JsonGenerator jgen)
+        throws InterruptedException, IOException
     {
         if (src.isDirectory()) {
             if (isTextual) {
@@ -140,7 +160,7 @@ public class PutCmd extends TStoreCmdBase
             int count = 0;
             for (File f : src.listFiles()) {
                 File dir = new File(dst, f.getName());
-                count += _copyFileOrDir(client, f, dir, jgen);
+                count += _copyFileOrDir(client, params, f, dir, jgen);
             }
             if (isTextual) {
                 System.out.printf("-> directory '%s' complete with %d files.\n",
@@ -148,21 +168,22 @@ public class PutCmd extends TStoreCmdBase
             }
             return count;
         }
-        return _copyFile(client, src, dst, jgen);
+        return _copyFile(client, params, src, dst, jgen);
     }
     
-    private int _copyFile(BasicTSClient client, File src, File dst, JsonGenerator jgen)
-            throws InterruptedException, IOException
+    private int _copyFile(BasicTSClient client, TSPutCallParameters params,
+    		File src, File dst, JsonGenerator jgen)
+        throws InterruptedException, IOException
     {
         // use byte-backed for some, just to get better testing...
         boolean isSmall = (src.length() < SMALL_FILE);
         
         BasicTSKey key = (dst == STDIN_MARKER_FILE) ? _target : keyFor(dst);
-        
+
         final long nanoStart = System.nanoTime();
         
-        PutOperationResult putResult = isSmall ? client.putContent(key, readFile(src))
-                : client.putContent(key, src);
+        PutOperationResult putResult = isSmall ? client.putContent(params, key, readFile(src))
+                : client.putContent(params, key, src);
         if (!putResult.succeededMinimally()) {
             NodeFailure fail = putResult.getFirstFail();
             int status = fail.getFirstCallFailure().getStatusCode();
