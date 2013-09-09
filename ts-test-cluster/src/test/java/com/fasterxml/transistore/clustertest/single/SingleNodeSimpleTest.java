@@ -7,6 +7,7 @@ import static org.junit.Assert.assertArrayEquals;
 
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
+import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.StoreConfig;
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -31,7 +32,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1", true, SINGLE_TEST_PORT);
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
-                new TimeMasterForClusterTesting(100L), false);
+                new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
         startServices(service);
 
         // Ok: now, let's try doing some basic stuff
@@ -92,7 +93,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
         initTestLogging(); // reduce noise
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1F", true, SINGLE_TEST_PORT);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
-                new TimeMasterForClusterTesting(100L), false);
+                new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
         startServices(service);
 
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()

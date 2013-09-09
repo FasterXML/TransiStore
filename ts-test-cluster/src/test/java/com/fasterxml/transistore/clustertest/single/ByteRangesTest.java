@@ -5,6 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.Arrays;
 
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
+import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.storemate.shared.ByteRange;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -26,8 +27,8 @@ public class ByteRangesTest extends ClusterTestBase
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ByteRanges", true, SINGLE_TEST_PORT);
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
-                new TimeMasterForClusterTesting(100L), false);
-        service._start();
+                new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
+        startServices(service);
 
         // Ok: now, let's try doing some basic stuff
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()

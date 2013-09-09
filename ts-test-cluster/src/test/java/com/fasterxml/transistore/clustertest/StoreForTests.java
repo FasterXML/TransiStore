@@ -10,13 +10,14 @@ import com.yammer.dropwizard.config.ServerFactory;
 import com.yammer.dropwizard.json.ObjectMapperFactory;
 import com.yammer.dropwizard.validation.Validator;
 
-import com.fasterxml.clustermate.api.EntryKeyConverter;
-import com.fasterxml.clustermate.service.SharedServiceStuff;
-import com.fasterxml.clustermate.service.cleanup.CleanerUpper;
-import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
-import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.file.FileManager;
+
+import com.fasterxml.clustermate.api.EntryKeyConverter;
+import com.fasterxml.clustermate.dw.RunMode;
+import com.fasterxml.clustermate.service.SharedServiceStuff;
+import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
@@ -27,31 +28,27 @@ import com.fasterxml.transistore.dw.BasicTSServiceOnDW;
  */
 public class StoreForTests extends BasicTSServiceOnDW
 {
-    protected Server _jettyServer;
-
     /**
      * We keep type-safe reference to the <code>TimeMaster</code> 
      */
     protected final TimeMasterForClusterTesting _testTimer;
 
-    /**
-     * Flag to indicate whether full initialization of the service, including
-     * background threads, should be done (true), or just minimal (false)
-     */
-    protected final boolean _fullInit;
-
+    protected final BasicTSServiceConfigForDW _serviceConfig;
+    
     protected final AtomicBoolean _preStopped = new AtomicBoolean(false);
 
+    protected Server _jettyServer;
+    
     /*
     /**********************************************************************
     /* Construction
     /**********************************************************************
      */
 
-    protected StoreForTests(TimeMasterForClusterTesting tm, boolean fullInit) {
-        super(tm, true);
+    protected StoreForTests(BasicTSServiceConfigForDW cfg, TimeMasterForClusterTesting tm, RunMode mode) {
+        super(tm, mode);
+        _serviceConfig = cfg;
         _testTimer = tm;
-        _fullInit = fullInit;
     }
 
     /**
@@ -60,41 +57,23 @@ public class StoreForTests extends BasicTSServiceOnDW
      * NOTE: <code>start()</code> method is not called; caller must do that.
      */
     public static StoreForTests createTestService(BasicTSServiceConfigForDW config,
-            TimeMasterForClusterTesting timeMaster, boolean fullInit)
+            TimeMasterForClusterTesting timeMaster, RunMode mode)
         throws Exception
     {
-        StoreForTests service = new StoreForTests(timeMaster, fullInit);
-        Bootstrap<BasicTSServiceConfigForDW> bootstrap = new Bootstrap<BasicTSServiceConfigForDW>(service);
-        final Environment environment = new Environment("TestService", config,
+        return new StoreForTests(config, timeMaster, mode);
+    }
+
+    public void startTestService() throws Exception
+    {
+        Bootstrap<BasicTSServiceConfigForDW> bootstrap = new Bootstrap<BasicTSServiceConfigForDW>(this);
+        final Environment environment = new Environment("TestService", _serviceConfig,
                 new ObjectMapperFactory(), new Validator());
-        bootstrap.runWithBundles(config, environment);
-        service.run(config, environment);
-        final Server server = new ServerFactory(config.getHttpConfiguration(),
+        bootstrap.runWithBundles(_serviceConfig, environment);
+        run(_serviceConfig, environment);
+        final Server server = new ServerFactory(_serviceConfig.getHttpConfiguration(),
                 "StoreForTests").buildServer(environment);
-        service._jettyServer = server;
-        return service;
-    }
-
-    /**
-     * Method for enabling default cleanup tasks for test runs. Needs to be called
-     * after instance is constructed, but before it is started.
-     * 
-     * @since 0.9.8
-     */
-    public void enableCleanupTasks()
-    {
-        enableCleanupTasks(constructCleanerUpper(_serviceStuff, _stores, _cluster));
-    }
-
-    /**
-     * @since 0.9.8
-     */
-    public void enableCleanupTasks(CleanerUpper<BasicTSKey, StoredEntry<BasicTSKey>> cleanup)
-    {
-        if (_cleanerUpper != null) {
-            throw new IllegalStateException("Already had CleanerUpper registered");
-        }
-        _cleanerUpper = cleanup;
+        _jettyServer = server;
+        server.start();
     }
     
     /*
@@ -102,15 +81,6 @@ public class StoreForTests extends BasicTSServiceOnDW
     /* Life-cycle
     /**********************************************************************
      */
-    
-    @Override
-    public void _start() throws Exception
-    {
-        _jettyServer.start();
-        if (_fullInit) {
-            super._start();
-        }
-    }
 
     @Override
     public void _stop() throws Exception
@@ -132,14 +102,13 @@ public class StoreForTests extends BasicTSServiceOnDW
 
     public void prepareForStop()
     {
-        if (_fullInit) {
-            if (!_preStopped.get()) {
-                _preStopped.set(true);
-                try {
-                    super._prepareForStop();
-                } catch (Exception e) {
-                    System.err.printf("prepareForStop fail (%s): %s\n", e.getClass().getName(), e.getMessage());
-                }
+        if (!_preStopped.get()) {
+            _preStopped.set(true);
+            try {
+                super._prepareForStop();
+            } catch (Exception e) {
+                System.err.printf("prepareForStop fail (%s): %s\n", e.getClass().getName(), e.getMessage());
+e.printStackTrace();                
             }
         }
     }

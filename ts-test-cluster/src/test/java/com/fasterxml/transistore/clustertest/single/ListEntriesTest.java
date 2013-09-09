@@ -6,6 +6,7 @@ import com.fasterxml.clustermate.api.ListItemType;
 import com.fasterxml.clustermate.client.operation.ListOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.client.operation.StoreEntryLister;
+import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
 
@@ -29,8 +30,8 @@ public class ListEntriesTest extends ClusterTestBase
         
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListId", true, SINGLE_TEST_PORT);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
-                new TimeMasterForClusterTesting(100L), false); // false -> minimal background tasks
-        service._start();
+                new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL); // false -> minimal background tasks
+        startServices(service);
 
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
              .setOptimalOks(1).setMaxOks(1).build();
@@ -110,8 +111,8 @@ public class ListEntriesTest extends ClusterTestBase
         
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListFullItem", true, SINGLE_TEST_PORT);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
-                new TimeMasterForClusterTesting(100L), false); // false -> minimal background tasks
-        service._start();
+                new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL); // false -> minimal background tasks
+        startServices(service);
 
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
              .setOptimalOks(1).setMaxOks(1).build();

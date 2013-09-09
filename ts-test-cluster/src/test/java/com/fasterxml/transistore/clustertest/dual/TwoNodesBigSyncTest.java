@@ -14,6 +14,7 @@ import com.fasterxml.storemate.store.StoreOperationSource;
 import com.yammer.dropwizard.util.Duration;
 
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
+import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.std.ChecksumUtil;
 
@@ -64,10 +65,10 @@ public class TwoNodesBigSyncTest extends ClusterTestBase
         final long START_TIME = 200L;
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(START_TIME);
         // important: last argument 'true' so that background sync thread gets started
-        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, true);
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_FULL);
         BasicTSServiceConfigForDW serviceConfig2 = createTwoNodeConfig("fullStack2sync_2",
                 TEST_PORT2, clusterConfig);
-        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, true);
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_FULL);
 
         // but only start first one...
         startServices(service1);

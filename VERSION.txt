@@ -1,6 +1,6 @@
 Project: TransiStore
 
-0.9.8 (xx-Jun-2013)
+0.9.8 (xx-Sep-2013)
 
 - Ensure that gzip filter will NOT be added by Jetty/DW (was not always
   being disabled properly)

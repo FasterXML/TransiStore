@@ -9,6 +9,7 @@ import com.yammer.dropwizard.util.Duration;
 import com.fasterxml.clustermate.client.NodesForKey;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
+import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
 import com.fasterxml.clustermate.service.cfg.NodeConfig;
@@ -58,29 +59,25 @@ public class FourNodesSimpleTest extends ClusterTestBase
         
         BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack4_1", true, TEST_PORT1, cc1)
                 .setShutdownGracePeriod(shutdownDelay);
-        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, true);        
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_FULL);        
         BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack4_2", true, TEST_PORT2, cc1)
                 .setShutdownGracePeriod(shutdownDelay);
-        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, true);
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_FULL);
         BasicTSServiceConfigForDW serviceConfig3 = createNodeConfig("fullStack4_3", true, TEST_PORT3, cc1)
                 .setShutdownGracePeriod(shutdownDelay);
-        StoreForTests service3 = StoreForTests.createTestService(serviceConfig3, timeMaster, true);
+        StoreForTests service3 = StoreForTests.createTestService(serviceConfig3, timeMaster, RunMode.TEST_FULL);
         BasicTSServiceConfigForDW serviceConfig4 = createNodeConfig("fullStack4_4", true, TEST_PORT4, cc1)
                 .setShutdownGracePeriod(shutdownDelay);
-        StoreForTests service4 = StoreForTests.createTestService(serviceConfig4, timeMaster, true);
+        StoreForTests service4 = StoreForTests.createTestService(serviceConfig4, timeMaster, RunMode.TEST_FULL);
 
         // need to do some acrobatics to only try clean shutdown when things work...
         boolean passed = false; 
 //        int rounds = 0;
         
+        // then start them all
+        startServices(service1, service2, service3, service4);
+
         try {
-        
-            // then start them all
-            service1._start();
-            service2._start();
-            service3._start();
-            service4._start();
-    
             // require just a single ok, so we can test replication nicely
             BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
 	            .setMinimalOksToSucceed(1)

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.StorableStore;
 
+import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -57,17 +58,17 @@ public class TwoNodesConflictTest extends ClusterTestBase
         final long START_TIME = 200L;
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(START_TIME);
         // important: last argument 'true' so that background sync thread gets started
-        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, true);
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_FULL);
         BasicTSServiceConfigForDW serviceConfig2 = createTwoNodeConfig("fullStack2sync_2",
                 TEST_PORT2, clusterConfig);
-        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, true);
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_FULL);
+
+        // Start up both
+        startServices(service1, service2);
 
         final StorableStore entries1 = service1.getStoreHandler().getStores().getEntryStore();
         final StorableStore entries2 = service2.getStoreHandler().getStores().getEntryStore();
         
-        // Start up both
-        startServices(service1, service2);
-
         try {
             final BasicTSKey KEY = contentKey("entry");
 

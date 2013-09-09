@@ -170,15 +170,13 @@ public abstract class GenericClusterTestBase extends TestCase
     /**********************************************************************
      */
     
-    protected void startServices(StoreForTests... services)
+    protected void startServices(StoreForTests... services) throws Exception
     {
         for (StoreForTests service : services) {
             try {
-                service._start();
+                service.startTestService();
             } catch (java.net.BindException e) {
                 fail("Failed to start test server due to bind exception: "+e.getMessage());
-            } catch (Exception e) {
-                fail("Failed to start test server due to: "+e.getMessage());
             }
         }
     }

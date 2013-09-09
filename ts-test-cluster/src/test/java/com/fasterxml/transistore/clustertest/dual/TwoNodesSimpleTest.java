@@ -18,6 +18,7 @@ import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.clustermate.client.NodesForKey;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
+import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cluster.ClusterPeer;
 
@@ -53,11 +54,11 @@ public class TwoNodesSimpleTest extends ClusterTestBase
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(200L);
         
         // false -> don't bother with full init of background tasks:
-        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, false);
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_MINIMAL);
 
         BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2_2", true, TEST_PORT2, clusterConfig);
         serviceConfig2.getServiceConfig().cluster = clusterConfig;
-        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, false);
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_MINIMAL);
 
         // then start both
         startServices(service1, service2);
@@ -135,11 +136,11 @@ public class TwoNodesSimpleTest extends ClusterTestBase
         final long START_TIME = 200L;
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(START_TIME);
         // important: last argument 'true' so that background sync thread gets started
-        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, true);
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_FULL);
         BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2b_2", true, TEST_PORT2, clusterConfig)
         		.setShutdownGracePeriod(shutdownDelay);
         serviceConfig2.getServiceConfig().cluster = clusterConfig;
-        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, true);
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_FULL);
 
         startServices(service1, service2);
         try {

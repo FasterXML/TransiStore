@@ -15,6 +15,7 @@ import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
 
 import com.fasterxml.clustermate.dw.DWBasedService;
+import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
@@ -48,12 +49,8 @@ public class BasicTSServiceOnDW
     /**********************************************************************
      */
 
-    protected BasicTSServiceOnDW(TimeMaster timings) {
-        this(timings, false);
-    }
-
-    protected BasicTSServiceOnDW(TimeMaster timings, boolean testMode) {
-        super(timings, testMode);
+    protected BasicTSServiceOnDW(TimeMaster timings, RunMode mode) {
+        super(timings, mode);
         
     }
 
@@ -73,7 +70,7 @@ public class BasicTSServiceOnDW
          *   called for; problem being that we need to post-process
          *   configuration somewhat.
          */
-        new BasicTSServiceOnDW(TimeMaster.nonTestInstance()).customRun(args);
+        new BasicTSServiceOnDW(TimeMaster.nonTestInstance(), RunMode.FULL).customRun(args);
     }
 
     /* Goddamit; original run() is final. Bah, humbug. Need to copy, modify...
