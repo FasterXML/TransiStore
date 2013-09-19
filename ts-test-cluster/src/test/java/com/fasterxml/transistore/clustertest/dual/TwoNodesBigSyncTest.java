@@ -29,10 +29,12 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
 public class TwoNodesBigSyncTest extends ClusterTestBase
 {
+    final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_SYNC;
+
     // use ports that differ from other tests, just to minimize chance of
     // collision
-    private final static int TEST_PORT1 = 9020;
-    private final static int TEST_PORT2 = 9021;
+    private final static int TEST_PORT1 = PORT_BASE+0;
+    private final static int TEST_PORT2 = PORT_BASE+1;
 
     /**
      * Would be awesome to run with higher number -- test should work for

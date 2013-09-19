@@ -20,11 +20,13 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  */
 public class ByteRangesTest extends ClusterTestBase
 {
+    final static int PORT_BASE = PORT_BASE_SINGLE + PORT_DELTA_RANGE;
+    
     public void testSimpleSingleNode() throws Exception
     {
         initTestLogging(); // reduce noise
         
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ByteRanges", true, SINGLE_TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ByteRanges", true, PORT_BASE);
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
@@ -35,7 +37,7 @@ public class ByteRangesTest extends ClusterTestBase
 	        .setOptimalOks(1)
 	        .setMaxOks(1)
 	        .build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_BASE));
 
         // // // Small content: inlined, not-compressed
         

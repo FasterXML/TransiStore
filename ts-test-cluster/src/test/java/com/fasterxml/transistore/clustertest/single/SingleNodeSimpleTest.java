@@ -23,13 +23,18 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  */
 public class SingleNodeSimpleTest extends ClusterTestBase
 {
+    final static int PORT_BASE = PORT_BASE_SINGLE + PORT_DELTA_SIMPLE;
+
+    final static int PORT_1 = PORT_BASE + 0;
+    final static int PORT_2 = PORT_BASE + 1;
+    
     final static int MAX_PAYLOAD_IN_MEMORY = StoreConfig.DEFAULT_MIN_PAYLOAD_FOR_STREAMING-1;
     
     public void testSimpleSingleNode() throws Exception
     {
         initTestLogging(); // reduce noise
         
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1", true, SINGLE_TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1", true, PORT_1);
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
@@ -42,7 +47,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
                 .setMaxOks(1)
                 .setAllowRetries(false) // no retries!
                 .build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
 
         /* 02-Nov-2012, tatu: Minor twist -- use non-ASCII character(s) in
          *   there to trigger possible encoding probs. Ditto for embedded slash.
@@ -91,7 +96,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
     public void testSingleNodeWithFile() throws Exception
     {
         initTestLogging(); // reduce noise
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1F", true, SINGLE_TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1F", true, PORT_1);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
         startServices(service);
@@ -100,7 +105,7 @@ public class SingleNodeSimpleTest extends ClusterTestBase
                 .setOptimalOks(1).setMaxOks(1)
                 .setAllowRetries(false) // no retries!
                 .build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
         final BasicTSKey KEY = contentKey("testSimple-file");
 
         try {

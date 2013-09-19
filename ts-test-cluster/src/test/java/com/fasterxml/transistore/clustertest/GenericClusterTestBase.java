@@ -40,8 +40,6 @@ import junit.framework.TestCase;
  */
 public abstract class GenericClusterTestBase extends TestCase
 {
-    protected final static int SINGLE_TEST_PORT = 7777;
-    
     // null -> require client id with key
     protected final BasicTSKeyConverter _keyConverter = BasicTSKeyConverter.defaultInstance();
 

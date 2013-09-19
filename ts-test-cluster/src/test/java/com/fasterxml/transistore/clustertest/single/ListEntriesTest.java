@@ -20,6 +20,11 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
 public class ListEntriesTest extends ClusterTestBase
 {
+    final static int PORT_BASE = PORT_BASE_SINGLE + PORT_DELTA_LIST;
+
+    final static int PORT_1 = PORT_BASE + 0;
+    final static int PORT_2 = PORT_BASE + 1;
+    
     private final static String PARTITION1 = "a";
     private final static String PARTITION2 = "b";
     private final static String PARTITION3 = "c";
@@ -28,14 +33,14 @@ public class ListEntriesTest extends ClusterTestBase
     {
         initTestLogging(); // reduce noise
         
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListId", true, SINGLE_TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListId", true, PORT_1);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL); // false -> minimal background tasks
         startServices(service);
 
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
              .setOptimalOks(1).setMaxOks(1).build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
 
         // First, set up test data: 5 things to iterate, 3 others
         addEntry(client, PARTITION2, "foo");
@@ -109,14 +114,14 @@ public class ListEntriesTest extends ClusterTestBase
     {
         initTestLogging(); // reduce noise
         
-        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListFullItem", true, SINGLE_TEST_PORT);
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListFullItem", true, PORT_2);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL); // false -> minimal background tasks
         startServices(service);
 
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
              .setOptimalOks(1).setMaxOks(1).build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", SINGLE_TEST_PORT));
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_2));
 
         // First, set up test data: 5 things to iterate, 3 others
         addEntry(client, PARTITION2, "foo");

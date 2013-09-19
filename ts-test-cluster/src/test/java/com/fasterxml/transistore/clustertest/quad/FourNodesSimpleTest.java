@@ -32,12 +32,14 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  */
 public class FourNodesSimpleTest extends ClusterTestBase
 {
+    final static int PORT_BASE = PORT_BASE_QUAD + PORT_DELTA_SIMPLE;
+    
     // use ports that differ from other tests, just to minimize chance of
     // collision
-    private final static int TEST_PORT1 = 9040;
-    private final static int TEST_PORT2 = 9041;
-    private final static int TEST_PORT3 = 9042;
-    private final static int TEST_PORT4 = 9043;
+    private final static int TEST_PORT1 = PORT_BASE + 0;
+    private final static int TEST_PORT2 = PORT_BASE + 1;
+    private final static int TEST_PORT3 = PORT_BASE + 2;
+    private final static int TEST_PORT4 = PORT_BASE + 3;
     
     public void testSimpleFourNode() throws Exception
     {
@@ -218,6 +220,8 @@ public class FourNodesSimpleTest extends ClusterTestBase
                 service2.prepareForStop();
                 service3.prepareForStop();
                 service4.prepareForStop();
+                
+                Thread.sleep(10L);
  
                 // and only then force stopping of the Servlet container (Jetty):
                 service1._stop();
@@ -226,7 +230,7 @@ public class FourNodesSimpleTest extends ClusterTestBase
                 service4._stop();
 
                 if (passed) { // takes a bit for threads to stop it seems...
-                    try { Thread.sleep(20L); } catch (InterruptedException e) { }
+                    Thread.sleep(10L);
                 }
             } catch (Exception e) {
                 System.err.println("Test shutdown failed: "+e.getMessage());

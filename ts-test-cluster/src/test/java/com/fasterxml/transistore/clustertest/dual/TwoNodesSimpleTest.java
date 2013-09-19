@@ -35,13 +35,16 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  */
 public class TwoNodesSimpleTest extends ClusterTestBase
 {
+    final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_SIMPLE;
+    
     // use ports that differ from other tests, just to minimize chance of
     // collision
-    private final static int TEST_PORT1 = 9230;
-    private final static int TEST_PORT2 = 9231;
     
     public void testSimpleTwoNode() throws Exception
     {
+        final int TEST_PORT1 = PORT_BASE + 0;
+        final int TEST_PORT2 = PORT_BASE + 1;
+
         initTestLogging(); // reduce noise
 
         IpAndPort endpoint1 = new IpAndPort("localhost:"+TEST_PORT1);
@@ -121,6 +124,9 @@ public class TwoNodesSimpleTest extends ClusterTestBase
     public void testTwoNodeSync() throws Exception
     {
         initTestLogging(); // reduce noise
+
+        final int TEST_PORT1 = PORT_BASE + 2;
+        final int TEST_PORT2 = PORT_BASE + 3;
 
         IpAndPort endpoint1 = new IpAndPort("localhost:"+TEST_PORT1);
         IpAndPort endpoint2 = new IpAndPort("localhost:"+TEST_PORT2);

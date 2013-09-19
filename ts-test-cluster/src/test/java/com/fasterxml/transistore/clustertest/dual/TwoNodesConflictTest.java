@@ -10,10 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.StorableStore;
-
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
-
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
@@ -32,10 +30,12 @@ import com.yammer.dropwizard.util.Duration;
  */
 public class TwoNodesConflictTest extends ClusterTestBase
 {
+    final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_CONFLICT;
+    
     // use ports that differ from other tests, just to minimize chance of
     // collision
-    private final static int TEST_PORT1 = 9210;
-    private final static int TEST_PORT2 = 9211;
+    private final static int TEST_PORT1 = PORT_BASE + 0;
+    private final static int TEST_PORT2 = PORT_BASE + 1;
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
     
@@ -51,15 +51,15 @@ public class TwoNodesConflictTest extends ClusterTestBase
         IpAndPort endpoint2 = new IpAndPort("localhost:"+TEST_PORT2);
 
         ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 360);
-        BasicTSServiceConfigForDW serviceConfig1 = createTwoNodeConfig("fullStack2sync_1",
+        BasicTSServiceConfigForDW serviceConfig1 = createTwoNodeConfig("fullStack2Conflict_1",
                 TEST_PORT1, clusterConfig);
         
         // all nodes need same (or at least similar enough) cluster config:
-        final long START_TIME = 200L;
+        final long START_TIME = 1000L;
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(START_TIME);
         // important: last argument 'true' so that background sync thread gets started
         StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_FULL);
-        BasicTSServiceConfigForDW serviceConfig2 = createTwoNodeConfig("fullStack2sync_2",
+        BasicTSServiceConfigForDW serviceConfig2 = createTwoNodeConfig("fullStack2Conflict_2",
                 TEST_PORT2, clusterConfig);
         StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_FULL);
 
@@ -91,7 +91,7 @@ public class TwoNodesConflictTest extends ClusterTestBase
             assertEquals(200, response.getStatus());
             
             // But make sure second is created bit later:
-            timeMaster.advanceCurrentTimeMillis(10L); // -> at 210           
+            timeMaster.advanceCurrentTimeMillis(90L); // -> at 1090           
 
             response = new FakeHttpResponse();
             service2.getStoreHandler().putEntry(new FakeHttpRequest(), response,
@@ -99,7 +99,6 @@ public class TwoNodesConflictTest extends ClusterTestBase
                     null, null, null);
             assertEquals(200, response.getStatus());
 
-            
             assertEquals(1, entries1.getEntryCount());
             assertEquals(1, entries2.getEntryCount());
 
@@ -118,16 +117,20 @@ public class TwoNodesConflictTest extends ClusterTestBase
             assertEquals(DATA2.length, data.length);
             Assert.assertArrayEquals(DATA2, data);
 
-            // And now... should reconcile I think. With grace period of 1 sec, need to advance time a bit
-            // and all in all, may take a while so:
+            // And now... should reconcile I think. With grace period of at most 10 secs,
+            // need to advance time a bit and all in all, may take a while so:
 
             final long start = System.currentTimeMillis();
             
             int round = 1;
+            final int MAX_ROUNDS = 20; // 5 is enough from Eclipse, locally; but from CLI more is needed?
+            timeMaster.advanceCurrentTimeMillis(12000L);
+            Thread.sleep(50L);
+            
             while (true) {
-                timeMaster.advanceCurrentTimeMillis(2000L);
-                Thread.sleep(10L);
-
+                assertEquals(1, entries1.getEntryCount());
+                assertEquals(1, entries2.getEntryCount());
+                
                 response = new FakeHttpResponse();
                 service2.getStoreHandler().getEntry(new FakeHttpRequest(), response, KEY);
                 assertEquals(200, response.getStatus());
@@ -142,22 +145,24 @@ public class TwoNodesConflictTest extends ClusterTestBase
                     assertEquals(DATA2.length, data.length);
                     Assert.assertArrayEquals(DATA2, data);
                 }
-                if (++round > 10) {
-                    // !!! TODO: enable
-//                    fail("Did not resolve conflict in 10 rounds");
-LOG.error("Did not resolve conflict in 10 rounds");
-break;
+                if (round >= MAX_ROUNDS) {
+                    fail("Did not resolve conflict in "+round+" rounds");
                 }
+                ++round;
+                timeMaster.advanceCurrentTimeMillis(1000L);
+                Thread.sleep(40L);
             }
-            
         } finally {
             service1.prepareForStop();
             service2.prepareForStop();
-            Thread.sleep(20L);
+
+            timeMaster.advanceTimeToWakeAll();
+            Thread.sleep(10L);
+
             service1._stop();
             service2._stop();
         }
-        try { Thread.sleep(20L); } catch (InterruptedException e) { }
+        Thread.sleep(10L);
         service1.waitForStopped();
         service2.waitForStopped();
     }
