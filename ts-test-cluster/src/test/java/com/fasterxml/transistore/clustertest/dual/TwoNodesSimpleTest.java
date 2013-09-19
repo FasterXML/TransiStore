@@ -53,13 +53,13 @@ public class TwoNodesSimpleTest extends ClusterTestBase
         // both nodes need same (or at least similar enough) cluster config:
         ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 100);
 
-        BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2_1", true, TEST_PORT1, clusterConfig);
+        BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2simple_1", true, TEST_PORT1, clusterConfig);
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(200L);
         
         // false -> don't bother with full init of background tasks:
         StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_MINIMAL);
 
-        BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2_2", true, TEST_PORT2, clusterConfig);
+        BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2simple_2", true, TEST_PORT2, clusterConfig);
         serviceConfig2.getServiceConfig().cluster = clusterConfig;
         StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_MINIMAL);
 

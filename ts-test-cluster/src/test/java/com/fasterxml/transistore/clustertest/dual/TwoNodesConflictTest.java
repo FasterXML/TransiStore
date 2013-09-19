@@ -123,7 +123,7 @@ public class TwoNodesConflictTest extends ClusterTestBase
             final long start = System.currentTimeMillis();
             
             int round = 1;
-            final int MAX_ROUNDS = 20; // 5 is enough from Eclipse, locally; but from CLI more is needed?
+            final int MAX_ROUNDS = 80; // 5 is enough from Eclipse, locally; but from CLI more is needed?
             timeMaster.advanceCurrentTimeMillis(12000L);
             Thread.sleep(50L);
             
@@ -138,7 +138,9 @@ public class TwoNodesConflictTest extends ClusterTestBase
                 if (data.length == DATA1.length) {
                     // looks good so far; verify
                     Assert.assertArrayEquals(DATA1, data);
-                    LOG.info("Conflict resolved in {} rounds, {} msecs", round, System.currentTimeMillis()-start);
+                    if (round > 5) {
+                        testWarn("Conflict resolved in %s rounds, %s msecs", round, System.currentTimeMillis()-start);
+                    }
                     break;
                 } else {
                     // but if not yet changed, ensure it's the original data...
@@ -150,7 +152,7 @@ public class TwoNodesConflictTest extends ClusterTestBase
                 }
                 ++round;
                 timeMaster.advanceCurrentTimeMillis(1000L);
-                Thread.sleep(40L);
+                Thread.sleep(25L);
             }
         } finally {
             service1.prepareForStop();
