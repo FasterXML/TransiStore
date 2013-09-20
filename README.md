@@ -1,6 +1,6 @@
 # TransiStore
 
-TransiStore is a distributed data store for temporary (time-bound, possibly but not necessarily transient) data, such as intermediate processing results (for Map/Reduce, Hadoop), staging area between high-volume procuders and consumers (log processing and aggregation), or just as general-purpose store for data exchange.
+TransiStore is a distributed data store for temporary (time-bound, possibly but not necessarily transient) data, such as intermediate processing results (for Map/Reduce, Hadoop), staging area between high-volume producers and consumers (log processing and aggregation), or just as general-purpose store for data exchange.
 
 TransiStore is built on [ClusterMate](https://github.com/cowtowncoder/ClusterMate) platform, and serves as a sample system.
 Note that implementing storage system with different behavior, using `ClusterMate` (possibly using `TransiStore` as sample code) is highly encouraged: it is not meant as "The" storage system; although if it works as-is for your use case, all the better.
@@ -26,14 +26,14 @@ Storage layer comes from [ClusterMate](https://github.com/cowtowncoder/ClusterMa
 Here are some highlights (for more refer to `StoreMate` project) of storage system:
 
 * Pluggable backends: default implementation uses `BDB-JE` for local storage, but there is also experimental `LevelDB` backend.
-* Automatic on-the-fly (de)compression; negotiated using standard HTTP; supports multiple compression methods (client can pre-compress instead of server, or defer uncompression)
+* Automatic on-the-fly (de)compression; negotiated using standard HTTP; supports multiple compression methods (client can pre-compress instead of server, or defer decompression)
 * Partial content queries (HTTP Range supported)
 * Key-range queries.
 
 and additional features that `ClusterMate` provides are:
 
 * Peer-to-peer content synchronization used for on-going content synchronization, recovery, and bootstrapping of newly added nodes
-* Configurable redundance (number of copies to store), with different client-controlled minimal required writes.
+* Configurable redundancy (number of copies to store), with different client-controlled minimal required writes.
 * Client-configurable data expiration rates (per-entry time-to-live) to ensure that content will not live forever even if no explicit deletions are performed
 * Key partitioning to support cluster-wide key-range queries (routing by partition; queries within single partition) -- note: key structure fully configurable at `ClusterMate` level; TransiStore uses a simple `partition + path` key structure.
 
