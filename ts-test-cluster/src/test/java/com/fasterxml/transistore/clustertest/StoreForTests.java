@@ -108,7 +108,6 @@ public class StoreForTests extends BasicTSServiceOnDW
                 super._prepareForStop();
             } catch (Exception e) {
                 System.err.printf("prepareForStop fail (%s): %s\n", e.getClass().getName(), e.getMessage());
-e.printStackTrace();                
             }
         }
     }

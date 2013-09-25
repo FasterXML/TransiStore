@@ -19,6 +19,7 @@ public abstract class ClusterTestBase extends GenericClusterTestBase
     protected static int PORT_DELTA_CONFLICT = 50;
     protected static int PORT_DELTA_LIST = 60;
     protected static int PORT_DELTA_RANGE = 70;
+    protected static int PORT_DELTA_EXPIRATION = 80;
 
     /*
     /**********************************************************************
