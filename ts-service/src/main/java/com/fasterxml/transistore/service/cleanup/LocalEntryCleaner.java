@@ -5,20 +5,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.*;
 
-import com.fasterxml.clustermate.service.LastAccessStore;
-import com.fasterxml.clustermate.service.SharedServiceStuff;
-import com.fasterxml.clustermate.service.Stores;
-import com.fasterxml.clustermate.service.cleanup.CleanupTask;
-import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
-import com.fasterxml.clustermate.service.store.StoredEntry;
-import com.fasterxml.clustermate.service.store.StoredEntryConverter;
 import com.fasterxml.storemate.shared.StorableKey;
+import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.storemate.store.backend.IterationAction;
+import com.fasterxml.storemate.store.backend.IterationResult;
 import com.fasterxml.storemate.store.backend.StorableLastModIterationCallback;
+
+import com.fasterxml.clustermate.service.*;
+import com.fasterxml.clustermate.service.cleanup.CleanupTask;
+import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
+import com.fasterxml.clustermate.service.store.StoredEntry;
+import com.fasterxml.clustermate.service.store.StoredEntryConverter;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.service.BasicTSEntry;
 
@@ -60,21 +62,44 @@ public class LocalEntryCleaner
         _lastAccessStore = (LastAccessStore<BasicTSKey, BasicTSEntry>) stores.getLastAccessStore();
         _isTesting = stuff.isRunningTests();
     }
-    
+
+    @Override
+    protected void prepareForStop()
+    {
+        // Could we do something here?
+        super.prepareForStop();
+    }
+
     @Override
     protected LocalCleanupStats _cleanUp() throws Exception
     {
         final LocalCleanupStats stats = new LocalCleanupStats();
+        try {
+            boolean fullyCompleted = _cleanUp0(stats);
+            _reportEndSuccess(stats, fullyCompleted);
+            return stats;
+        } catch (Exception e) {
+            _reportEndFail(stats, e);
+            throw e;
+        }
+    }
 
+    protected boolean _cleanUp0(final LocalCleanupStats stats) throws Exception
+    {
+        if (shouldStop()) { // shouldn't get called if so but...
+            _reportProblem("LocalEntryCleanup task called when 'shouldStop()' returns false: should not happen; quitting");
+            return false;
+        }
         if (_entryStore.isClosed()) {
             if (!_isTesting) {
-                LOG.warn("LocalEntryCleanup task cancelled: Entry DB has been closed");
+                _reportProblem("LocalEntryCleanup task cancelled: Entry DB has been closed");
             }
-            return stats;
+            return false;
         }
+        _reportStart();
         
         final long tombstoneThreshold = _timeMaster.currentTimeMillis() - _tombstoneTTLMsecs;
-        _entryStore.iterateEntriesByModifiedTime(StoreOperationSource.CLEANUP, null,
+        IterationResult r = _entryStore.iterateEntriesByModifiedTime(StoreOperationSource.CLEANUP, null,
                 0L, new StorableLastModIterationCallback() {
             @Override
             public IterationAction verifyTimestamp(long timestamp) {
@@ -87,6 +112,7 @@ public class LocalEntryCleaner
                 // first things first: do we need to quit?
                 // TODO: maybe consider max runtime?
                 if (shouldStop()) {
+                    _reportProblem("Stopping "+LocalEntryCleaner.class.getName()+" early due to shutdown");
                     return IterationAction.TERMINATE_ITERATION;
                 }
                 return IterationAction.PROCESS_ENTRY;
@@ -131,20 +157,73 @@ public class LocalEntryCleaner
                 return IterationAction.PROCESS_ENTRY;
             }
 
-            private void delete(StorableKey key) throws StoreException
+            private boolean delete(StorableKey key) throws StoreException
             {
                 // TODO: should we add a wait or yield every N deletes?
                 try {
                     _entryStore.hardDelete(StoreOperationSource.CLEANUP, null, key, true);
+                    return true;
+                } catch (StoreException.DB e) {
+                    /* 26-Sep-2013, tatu: We got some of these in production; need to be able
+                     *    to gracefully skip.
+                     */
+                    if (e.getType() != StoreException.DBProblem.SECONDARY_INDEX_CORRUPTION) {
+                        throw e;
+                    }
                 } catch (StoreException e) {
                     throw e;
                 } catch (IOException e) {
                     throw new StoreException.IO(key, e);
                 }
+
+                if (++stats.corruptEntries == 1) { // report only first occurence
+                    String keyStr = _entryConverter.keyConverter().rawToString(key);
+                    _reportProblem("Corrupt entry (key '"+keyStr+"'): need to skip (will only report aggregates after first fail");
+                }
+                return false;
             }
-        
         });
-        
-        return stats;
+        return (r == IterationResult.FULLY_ITERATED);
     }
+
+    /*
+    /**********************************************************************
+    /* Overridable reporting methods
+    /**********************************************************************
+     */
+
+    protected void _reportStart()
+    {
+        if (LOG != null) {
+            LOG.info("Starting local entry cleanup: will remove tombstones older than {}",
+                    TimeMaster.timeDesc(_tombstoneTTLMsecs));
+        }
+    }
+
+    protected void _reportProblem(String msg)
+    {
+        if (LOG != null) {
+            LOG.warn(msg);
+        }
+    }
+    
+    protected void _reportEndFail(LocalCleanupStats stats, Exception e)
+    {
+        if (LOG != null) {
+            LOG.info("Failed the local entry cleanup, problem (of type {}): {}. Results: {}",
+                    e.getClass().getName(), e.getMessage(), stats);
+        }
+    }
+    
+    protected void _reportEndSuccess(LocalCleanupStats stats, boolean fullyCompleted)
+    {
+        if (LOG != null) {
+            if (fullyCompleted) {
+                LOG.info("Completed local entry cleanup: {}", stats);
+            } else {
+                LOG.info("Terminated local entry cleanup, after partial processing: {}", stats);
+            }
+        }
+    }
+
 }

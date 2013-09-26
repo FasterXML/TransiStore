@@ -18,6 +18,12 @@ public class LocalCleanupStats
     // Number of skipped (non-expired) non-tombstone entries
     protected int remainingEntries = 0;
 
+    /**
+     * Alas, it may be possible for secondary index to get corrupt (should not,
+     * if we are using transactions); if so, count.
+     */
+    protected int corruptEntries = 0;
+    
     // And then "something other"; should not get any hits...
     protected int unknownEntries = 0;
 
@@ -28,19 +34,32 @@ public class LocalCleanupStats
     public void addRemainingTombstone() { ++remainingTombstones; }
     public void addRemainingEntry() { ++remainingEntries; }
 
+    public void addCorruptEntry() { ++corruptEntries; }
+    
     public void addUnknownEntry() { ++unknownEntries; }
 
     @Override
     public String toString()
     {
-        return new StringBuilder(60)
+        StringBuilder sb = new StringBuilder(60)
             .append("Removed: ").append(expiredTombstones)
             .append(" expired tombstones, ").append(expiredEntriesMaxTTL)
             .append(" (max-TTL) / ").append(expiredEntriesLastAccess)
             .append(" (last-access) entries; left: ").append(remainingTombstones)
             .append(" tombstones, ").append(remainingEntries)
-            .append(" entries and skipped ").append(unknownEntries).append(" unknown entries")
-            .toString();
+            .append(" entries");
+        if (corruptEntries > 0) {
+            sb = sb.append("; had to work around ").append(corruptEntries)
+                    .append(" CORRUPT");
+        } else {
+            sb = sb.append("; had NO corrupt");
+        }
+        if (unknownEntries > 0) {
+            sb = sb.append(" skipped over ").append(unknownEntries).append(" unknown");
+        } else {
+            sb = sb.append(", NO unknown");
+        }
+        sb = sb.append(" entries");
+        return sb.toString();
     }
-
 }
