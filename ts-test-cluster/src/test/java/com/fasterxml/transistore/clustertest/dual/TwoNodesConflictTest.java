@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.skife.config.TimeSpan;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.StorableStore;
@@ -36,8 +34,6 @@ public class TwoNodesConflictTest extends ClusterTestBase
     // collision
     private final static int TEST_PORT1 = PORT_BASE + 0;
     private final static int TEST_PORT2 = PORT_BASE + 1;
-
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
     
     /**
      * First a simple test to verify that newer (by comparing server-local timestamps)

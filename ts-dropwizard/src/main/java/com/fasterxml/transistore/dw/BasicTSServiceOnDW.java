@@ -19,6 +19,7 @@ import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
+import com.fasterxml.clustermate.service.cleanup.DiskUsageTracker;
 import com.fasterxml.clustermate.service.cleanup.FileCleaner;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.clustermate.service.store.*;
@@ -173,8 +174,10 @@ public class BasicTSServiceOnDW
         tasks.add(new LocalEntryCleaner());
         // then remove orphan dirs
         tasks.add(new FileCleaner());
-        // and finally last-accessed entries
+        // then last-accessed entries, if any
         tasks.add(new LastAccessCleaner());
+        // and finally disk space usage tracker
+        tasks.add(new DiskUsageTracker());
 
         return tasks;
     }
