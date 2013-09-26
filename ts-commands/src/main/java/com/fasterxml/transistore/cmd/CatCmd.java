@@ -61,10 +61,11 @@ public class CatCmd extends TStoreCmdBase
                                     long bytes = 0L;
 
                                     @Override
-                                    public void processContent(byte[] content, int offset, int length)
+                                    public boolean processContent(byte[] content, int offset, int length)
                                             throws IOException {
                                         out.write(content, offset, length);
                                         bytes += length;
+                                        return true;
                                     }
 
                                     @Override
