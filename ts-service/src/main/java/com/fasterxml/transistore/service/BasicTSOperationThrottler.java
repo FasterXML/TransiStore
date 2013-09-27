@@ -55,9 +55,9 @@ public class BasicTSOperationThrottler
     /* Life-cycle
     /**********************************************************************
      */
-    
+
     public BasicTSOperationThrottler() {
-    	_fsReadWrites = new ReadWriteOperationPrioritizer();
+        _fsReadWrites = new ReadWriteOperationPrioritizer();
     }
 
     /*
@@ -197,7 +197,7 @@ public class BasicTSOperationThrottler
         }
         Lease l;  
         try {
-        	l = _fsReadWrites.obtainReadLease();
+            l = _fsReadWrites.obtainReadLease();
         } catch (InterruptedException e) {
             throw new StoreException.ServerTimeout((value == null) ? null : value.getKey(),
                     "File read operation interrupted");
@@ -205,7 +205,7 @@ public class BasicTSOperationThrottler
         try {
             return cb.perform(operationTime, (value == null) ? null : value.getKey(), value, externalFile);
         } finally {
-        	l.returnLease();
+            l.returnLease();
         }
     }
 
