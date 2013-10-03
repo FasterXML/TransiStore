@@ -21,6 +21,14 @@ public abstract class ClusterTestBase extends GenericClusterTestBase
     protected static int PORT_DELTA_RANGE = 70;
     protected static int PORT_DELTA_EXPIRATION = 80;
 
+    /**
+     * This compile-time flag is here to remind that tests use (or not)
+     * BDB-JE transctions. This should make no difference under normal test
+     * conditions, since we don't do anything to cause problems. But
+     * at higher level we may experience other issues with shutdown.
+     */
+    protected final static boolean USE_TRANSACTIONS = false;
+    
     /*
     /**********************************************************************
     /* Configuration setting helpers
@@ -28,7 +36,13 @@ public abstract class ClusterTestBase extends GenericClusterTestBase
      */
 
     @Override
-    protected StoreBackendConfig createBackendConfig(File dataDir) {
-        return new BDBJEConfig(dataDir);
+    protected StoreBackendConfig createBackendConfig(File dataDir)
+    {
+        BDBJEConfig config = new BDBJEConfig(dataDir);
+        /* 03-Oct-2013, tatu: Should we verify that BDB-JE transactions may
+         *   be used?
+         */
+        config.useTransactions = USE_TRANSACTIONS;
+        return config;
     }
 }
