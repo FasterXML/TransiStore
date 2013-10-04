@@ -9,10 +9,6 @@ import org.skife.config.TimeSpan;
 
 import ch.qos.logback.classic.Level;
 
-import com.fasterxml.clustermate.client.StoreClientBootstrapper;
-import com.fasterxml.clustermate.service.cfg.ClusterConfig;
-import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
-import com.fasterxml.clustermate.service.cfg.NodeConfig;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.shared.compress.Compressors;
@@ -22,6 +18,11 @@ import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.storemate.store.backend.StoreBackendConfig;
+
+import com.fasterxml.clustermate.client.StoreClientBootstrapper;
+import com.fasterxml.clustermate.service.cfg.ClusterConfig;
+import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
+import com.fasterxml.clustermate.service.cfg.NodeConfig;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
@@ -70,13 +71,13 @@ public abstract class GenericClusterTestBase extends TestCase
     protected BasicTSServiceConfigForDW createSimpleTestConfig(String testSuffix, boolean cleanUp)
         throws IOException
     {
-        // BDB and file store settings:
+        // Entry DB and file store settings:
         File testRoot = getTestScratchDir(testSuffix, cleanUp);
         BasicTSServiceConfigForDW config = new BasicTSServiceConfigForDW();
-        File bdbRoot = new File(testRoot, "bdb-v");
-        config.getServiceConfig().metadataDirectory = bdbRoot;
-        config.getServiceConfig().storeConfig.dataRootForFiles = new File(testRoot, "storemate-files");
-        File storeDataDir = new File(testRoot, "storemate-bdb");
+        File dbRoot = new File(testRoot, "v-test-entries");
+        config.getServiceConfig().metadataDirectory = dbRoot;
+        config.getServiceConfig().storeConfig.dataRootForFiles = new File(testRoot, "v-files");
+        File storeDataDir = new File(testRoot, "v-store");
         config.getServiceConfig().overrideStoreBackendConfig(createBackendConfig(storeDataDir));
         return config;
     }

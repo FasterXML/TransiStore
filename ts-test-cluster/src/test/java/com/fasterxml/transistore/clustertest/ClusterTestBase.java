@@ -39,9 +39,8 @@ public abstract class ClusterTestBase extends GenericClusterTestBase
     protected StoreBackendConfig createBackendConfig(File dataDir)
     {
         BDBJEConfig config = new BDBJEConfig(dataDir);
-        /* 03-Oct-2013, tatu: Should we verify that BDB-JE transactions may
-         *   be used?
-         */
+        // 03-Oct-2013, tatu: Should we verify that BDB-JE transactions may
+        //   be used?
         config.useTransactions = USE_TRANSACTIONS;
         return config;
     }
