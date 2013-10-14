@@ -1,4 +1,4 @@
-package com.fasterxml.transistore.clustertest.dual;
+package com.fasterxml.transistore.clustertest.base.dual;
 
 import java.io.*;
 import java.util.Random;
@@ -27,7 +27,7 @@ import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-public class TwoNodesBigSyncTest extends ClusterTestBase0
+public class TwoNodesSyncTestBase extends ClusterTestBase0
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_SYNC;
 

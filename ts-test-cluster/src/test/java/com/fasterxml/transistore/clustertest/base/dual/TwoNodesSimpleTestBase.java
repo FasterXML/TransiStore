@@ -1,4 +1,4 @@
-package com.fasterxml.transistore.clustertest.dual;
+package com.fasterxml.transistore.clustertest.base.dual;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -33,7 +33,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  * Simple CRUD tests for two-node setup (with 100% overlapping key range),
  * using basic two-way replication by client. Both nodes run on same JVM.
  */
-public class TwoNodesSimpleTest extends ClusterTestBase0
+public class TwoNodesSimpleTestBase extends ClusterTestBase0
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_SIMPLE;
     

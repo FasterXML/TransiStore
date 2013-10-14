@@ -1,4 +1,4 @@
-package com.fasterxml.transistore.clustertest.bdb_jdk;
+package com.fasterxml.transistore.clustertest.leveldb_ahc;
 
 import java.io.File;
 
@@ -8,15 +8,16 @@ import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 import com.fasterxml.transistore.clustertest.base.single.ListEntriesTestBase;
 
-public class ListEntriesTest extends ListEntriesTestBase
+public class SingleNodeListEntriesTest extends ListEntriesTestBase
 {
     @Override
-    protected StoreBackendConfig createBackendConfig(ServiceConfig serviceConfig, File dataDir) {
-        return bdbBackendConfig(serviceConfig, dataDir);
+    protected StoreBackendConfig createBackendConfig(ServiceConfig serviceConfig,
+            File dataDir) {
+        return levelDBBackendConfig(serviceConfig, dataDir);
     }
 
     @Override
     protected StoreClientBootstrapper<?, ?, ?, ?> createClientBootstrapper(BasicTSClientConfig clientConfig) {
-        return bootstrapperWithJDK(clientConfig);
+        return bootstrapperWithAHC(clientConfig);
     }
 }

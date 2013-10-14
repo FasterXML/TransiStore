@@ -1,4 +1,4 @@
-package com.fasterxml.transistore.clustertest.dual;
+package com.fasterxml.transistore.clustertest.base.dual;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import com.yammer.dropwizard.util.Duration;
  * will only eventually have a single piece of content associated
  * with the key.
  */
-public class TwoNodesConflictTest extends ClusterTestBase0
+public class TwoNodesConflictTestBase extends ClusterTestBase0
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_CONFLICT;
     

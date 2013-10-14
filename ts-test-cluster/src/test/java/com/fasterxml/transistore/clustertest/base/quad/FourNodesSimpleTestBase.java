@@ -1,4 +1,4 @@
-package com.fasterxml.transistore.clustertest.quad;
+package com.fasterxml.transistore.clustertest.base.quad;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -30,7 +30,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  * For these tests, we will only send a single copy, to verify the way
  * node-to-node replication works.
  */
-public class FourNodesSimpleTest extends ClusterTestBase0
+public class FourNodesSimpleTestBase extends ClusterTestBase0
 {
     final static int PORT_BASE = PORT_BASE_QUAD + PORT_DELTA_SIMPLE;
     
