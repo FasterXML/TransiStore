@@ -28,8 +28,6 @@ import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
-//import com.fasterxml.transistore.client.jdk.JDKBasedClientBootstrapper;
-import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
 import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
@@ -159,8 +157,12 @@ public abstract class GenericClusterTestBase extends TestCase
 
     protected StoreClientBootstrapper<?,?,?,?> createClientBootstrapper(BasicTSClientConfig clientConfig)
     {
-        return new AHCBasedClientBootstrapper(clientConfig);
-//        return new JDKBasedClientBootstrapper(clientConfig);
+        /* 13-Oct-2013, tatu: Need to support test with both, in near future.
+         *   For now, need to manually toggle between; remember to test both, often.
+         */
+        
+        return new com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper(clientConfig);
+//        return new com.fasterxml.transistore.client.jdk.JDKBasedClientBootstrapper(clientConfig);
     }
 
     /*
