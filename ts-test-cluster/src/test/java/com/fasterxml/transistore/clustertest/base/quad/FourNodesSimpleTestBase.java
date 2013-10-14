@@ -188,7 +188,7 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             }
 
             // but then tombstone should propagate; faster than PUT propagation
-            /*rounds =*/ expectState("0/0/1(1)/1(1)", "Entry should have tombstone for both nodes", 5, 8,
+            /*rounds =*/ expectState("0/0/1(1)/1(1)", "Entry should have tombstone for both nodes", 5, 10,
                     service1, service2, service3, service4);         
 
 // System.err.println("Took "+rounds+" rounds to DELETE");            

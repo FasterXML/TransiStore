@@ -124,7 +124,7 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
             }
             LOG.warn("Test sent all {} requests, {} kB of data", ENTRIES, totalBytes);
             // and should now have all the entries in the first store
-            assertEquals(ENTRIES, service1.getEntryStore().getEntryCount());
+            assertEquals(ENTRIES, entryCount(service1.getEntryStore()));
 
             // Then the second phase; start up second store, let things... sync
             startServices(service2);
@@ -143,7 +143,7 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
             final long start = System.currentTimeMillis();
             
             for (; true; ++i) {
-                long entries = service2.getEntryStore().getEntryCount();
+                long entries = entryCount(service2.getEntryStore());
                 if (entries == ENTRIES) {
                     break;
                 }
