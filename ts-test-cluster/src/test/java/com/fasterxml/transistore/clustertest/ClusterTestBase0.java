@@ -3,6 +3,7 @@ package com.fasterxml.transistore.clustertest;
 import java.io.*;
 
 import com.fasterxml.clustermate.client.StoreClientBootstrapper;
+import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.storemate.backend.bdbje.BDBJEConfig;
 import com.fasterxml.storemate.store.backend.StoreBackendConfig;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
@@ -49,7 +50,7 @@ public abstract class ClusterTestBase0 extends GenericClusterTestBase
     }
 
     @Override
-    protected StoreBackendConfig createBackendConfig(File dataDir)
+    protected StoreBackendConfig createBackendConfig(ServiceConfig serviceConfig, File dataDir)
     {
         BDBJEConfig config = new BDBJEConfig(dataDir);
         // 03-Oct-2013, tatu: Should we verify that BDB-JE transactions may

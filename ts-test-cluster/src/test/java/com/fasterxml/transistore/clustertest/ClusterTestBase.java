@@ -3,7 +3,10 @@ package com.fasterxml.transistore.clustertest;
 import java.io.*;
 
 import com.fasterxml.clustermate.client.StoreClientBootstrapper;
+import com.fasterxml.clustermate.service.cfg.ServiceConfig;
+import com.fasterxml.storemate.backend.bdbje.BDBJEBuilder;
 import com.fasterxml.storemate.backend.bdbje.BDBJEConfig;
+import com.fasterxml.storemate.backend.leveldb.LevelDBBuilder;
 import com.fasterxml.storemate.backend.leveldb.LevelDBConfig;
 import com.fasterxml.storemate.store.backend.StoreBackendConfig;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
@@ -32,7 +35,8 @@ public abstract class ClusterTestBase extends GenericClusterTestBase
      */
 
     @Override
-    protected abstract StoreBackendConfig createBackendConfig(File dataDir);
+    protected abstract StoreBackendConfig createBackendConfig(ServiceConfig serviceConfig,
+            File dataDir);
 
     /*
     /**********************************************************************
@@ -40,16 +44,18 @@ public abstract class ClusterTestBase extends GenericClusterTestBase
     /**********************************************************************
      */
 
-    protected StoreBackendConfig bdbBackendConfig(File dataDir)
+    protected StoreBackendConfig bdbBackendConfig(ServiceConfig serviceConfig, File dataDir)
     {
+        serviceConfig.storeBackendType = BDBJEBuilder.class;
         BDBJEConfig config = new BDBJEConfig(dataDir);
         return config;
     }
 
-    protected StoreBackendConfig levelDBBackendConfig(File dataDir)
+    protected StoreBackendConfig levelDBBackendConfig(ServiceConfig serviceConfig, File dataDir)
     {
-        LevelDBConfig config = new LevelDBConfig(dataDir);
-        return config;
+        serviceConfig.storeBackendType = LevelDBBuilder.class;
+        LevelDBConfig backendConfig = new LevelDBConfig(dataDir);
+        return backendConfig;
     }
     
     /*

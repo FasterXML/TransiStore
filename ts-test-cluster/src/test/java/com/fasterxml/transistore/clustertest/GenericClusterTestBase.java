@@ -18,12 +18,11 @@ import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.storemate.store.backend.StoreBackendConfig;
-
 import com.fasterxml.clustermate.client.StoreClientBootstrapper;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
 import com.fasterxml.clustermate.service.cfg.NodeConfig;
-
+import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSKeyConverter;
 import com.fasterxml.transistore.client.BasicTSClient;
@@ -76,11 +75,12 @@ public abstract class GenericClusterTestBase extends TestCase
         config.getServiceConfig().metadataDirectory = dbRoot;
         config.getServiceConfig().storeConfig.dataRootForFiles = new File(testRoot, "v-files");
         File storeDataDir = new File(testRoot, "v-store");
-        config.getServiceConfig().overrideStoreBackendConfig(createBackendConfig(storeDataDir));
+        config.getServiceConfig().overrideStoreBackendConfig(createBackendConfig(config.getServiceConfig(),
+                storeDataDir));
         return config;
     }
 
-    protected abstract StoreBackendConfig createBackendConfig(File dataDir);
+    protected abstract StoreBackendConfig createBackendConfig(ServiceConfig config, File dataDir);
     
     protected BasicTSServiceConfigForDW createNodeConfig(String testSuffix,
             boolean cleanUp, int port, ClusterConfig cluster)
