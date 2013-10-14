@@ -1,15 +1,17 @@
-package com.fasterxml.transistore.clustertest.single;
+package com.fasterxml.transistore.clustertest.base.single;
 
 import java.io.*;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 
+import com.fasterxml.storemate.shared.IpAndPort;
+import com.fasterxml.storemate.store.StoreConfig;
+
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.dw.RunMode;
-import com.fasterxml.storemate.shared.IpAndPort;
-import com.fasterxml.storemate.store.StoreConfig;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
@@ -21,7 +23,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  * Set of simple (CRUD) tests for a single-node system, running within
  * JVM.
  */
-public class SingleNodeSimpleTest extends ClusterTestBase
+public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
 {
     final static int PORT_BASE = PORT_BASE_SINGLE + PORT_DELTA_SIMPLE;
 

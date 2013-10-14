@@ -11,7 +11,7 @@ import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.clustertest.ClusterTestBase;
+import com.fasterxml.transistore.clustertest.ClusterTestBase0;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.FakeHttpRequest;
 import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
@@ -26,7 +26,7 @@ import com.yammer.dropwizard.util.Duration;
  * will only eventually have a single piece of content associated
  * with the key.
  */
-public class TwoNodesConflictTest extends ClusterTestBase
+public class TwoNodesConflictTest extends ClusterTestBase0
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_CONFLICT;
     

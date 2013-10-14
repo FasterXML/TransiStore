@@ -19,7 +19,7 @@ import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
-import com.fasterxml.transistore.clustertest.ClusterTestBase;
+import com.fasterxml.transistore.clustertest.ClusterTestBase0;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
@@ -30,7 +30,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  * For these tests, we will only send a single copy, to verify the way
  * node-to-node replication works.
  */
-public class FourNodesSimpleTest extends ClusterTestBase
+public class FourNodesSimpleTest extends ClusterTestBase0
 {
     final static int PORT_BASE = PORT_BASE_QUAD + PORT_DELTA_SIMPLE;
     

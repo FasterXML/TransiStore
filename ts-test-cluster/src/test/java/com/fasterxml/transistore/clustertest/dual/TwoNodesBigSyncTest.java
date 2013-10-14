@@ -20,14 +20,14 @@ import com.fasterxml.clustermate.std.ChecksumUtil;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
-import com.fasterxml.transistore.clustertest.ClusterTestBase;
+import com.fasterxml.transistore.clustertest.ClusterTestBase0;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.FakeHttpRequest;
 import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-public class TwoNodesBigSyncTest extends ClusterTestBase
+public class TwoNodesBigSyncTest extends ClusterTestBase0
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_SYNC;
 

@@ -24,7 +24,7 @@ import com.fasterxml.clustermate.service.cluster.ClusterPeer;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
-import com.fasterxml.transistore.clustertest.ClusterTestBase;
+import com.fasterxml.transistore.clustertest.ClusterTestBase0;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
@@ -33,7 +33,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  * Simple CRUD tests for two-node setup (with 100% overlapping key range),
  * using basic two-way replication by client. Both nodes run on same JVM.
  */
-public class TwoNodesSimpleTest extends ClusterTestBase
+public class TwoNodesSimpleTest extends ClusterTestBase0
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_SIMPLE;
     

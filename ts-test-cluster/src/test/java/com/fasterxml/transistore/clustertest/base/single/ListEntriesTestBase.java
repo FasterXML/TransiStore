@@ -1,14 +1,15 @@
-package com.fasterxml.transistore.clustertest.single;
+package com.fasterxml.transistore.clustertest.base.single;
 
 import java.util.List;
+
+import com.fasterxml.storemate.shared.IpAndPort;
+import com.fasterxml.storemate.shared.StorableKey;
 
 import com.fasterxml.clustermate.api.ListItemType;
 import com.fasterxml.clustermate.client.operation.ListOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.client.operation.StoreEntryLister;
 import com.fasterxml.clustermate.dw.RunMode;
-import com.fasterxml.storemate.shared.IpAndPort;
-import com.fasterxml.storemate.shared.StorableKey;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSListItem;
@@ -18,7 +19,7 @@ import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-public class ListEntriesTest extends ClusterTestBase
+public abstract class ListEntriesTestBase extends ClusterTestBase
 {
     final static int PORT_BASE = PORT_BASE_SINGLE + PORT_DELTA_LIST;
 

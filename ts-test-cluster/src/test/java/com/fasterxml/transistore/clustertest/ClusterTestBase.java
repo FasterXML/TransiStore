@@ -2,11 +2,15 @@ package com.fasterxml.transistore.clustertest;
 
 import java.io.*;
 
+import com.fasterxml.clustermate.client.StoreClientBootstrapper;
 import com.fasterxml.storemate.backend.bdbje.BDBJEConfig;
+import com.fasterxml.storemate.backend.leveldb.LevelDBConfig;
 import com.fasterxml.storemate.store.backend.StoreBackendConfig;
+import com.fasterxml.transistore.client.BasicTSClientConfig;
 
 /**
- * Shared base class for unit tests; contains shared utility methods.
+ * Shared base class for unit tests, regardless of backend DB
+ * or http client used.
  */
 public abstract class ClusterTestBase extends GenericClusterTestBase
 {
@@ -20,28 +24,47 @@ public abstract class ClusterTestBase extends GenericClusterTestBase
     protected static int PORT_DELTA_LIST = 60;
     protected static int PORT_DELTA_RANGE = 70;
     protected static int PORT_DELTA_EXPIRATION = 80;
-
-    /**
-     * This compile-time flag is here to remind that tests use (or not)
-     * BDB-JE transctions. This should make no difference under normal test
-     * conditions, since we don't do anything to cause problems. But
-     * at higher level we may experience other issues with shutdown.
-     */
-    protected final static boolean USE_TRANSACTIONS = false;
     
     /*
     /**********************************************************************
-    /* Configuration setting helpers
+    /* Abstract methods for actual tests to implement
     /**********************************************************************
      */
 
     @Override
-    protected StoreBackendConfig createBackendConfig(File dataDir)
+    protected abstract StoreBackendConfig createBackendConfig(File dataDir);
+
+    /*
+    /**********************************************************************
+    /* Helper methods for subclasses; backend DB
+    /**********************************************************************
+     */
+
+    protected StoreBackendConfig bdbBackendConfig(File dataDir)
     {
         BDBJEConfig config = new BDBJEConfig(dataDir);
-        // 03-Oct-2013, tatu: Should we verify that BDB-JE transactions may
-        //   be used?
-        config.useTransactions = USE_TRANSACTIONS;
         return config;
+    }
+
+    protected StoreBackendConfig levelDBBackendConfig(File dataDir)
+    {
+        LevelDBConfig config = new LevelDBConfig(dataDir);
+        return config;
+    }
+    
+    /*
+    /**********************************************************************
+    /* Helper methods for subclasses; HTTP Client
+    /**********************************************************************
+     */
+
+    protected StoreClientBootstrapper<?,?,?,?> bootstrapperWithAHC(BasicTSClientConfig clientConfig)
+    {
+        return new com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper(clientConfig);
+    }
+
+    protected StoreClientBootstrapper<?,?,?,?> bootstrapperWithJDK(BasicTSClientConfig clientConfig)
+    {
+        return new com.fasterxml.transistore.client.jdk.JDKBasedClientBootstrapper(clientConfig);
     }
 }

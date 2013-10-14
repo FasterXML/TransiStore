@@ -1,13 +1,15 @@
-package com.fasterxml.transistore.clustertest.single;
+package com.fasterxml.transistore.clustertest.base.single;
 
 import static org.junit.Assert.assertArrayEquals;
 
 import java.util.Arrays;
 
-import com.fasterxml.clustermate.client.operation.PutOperationResult;
-import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.storemate.shared.ByteRange;
 import com.fasterxml.storemate.shared.IpAndPort;
+
+import com.fasterxml.clustermate.client.operation.PutOperationResult;
+import com.fasterxml.clustermate.dw.RunMode;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
@@ -18,7 +20,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 /**
  * Tests to verify that we can use byte ranges to access part of content.
  */
-public class ByteRangesTest extends ClusterTestBase
+public abstract class ByteRangesTestBase extends ClusterTestBase
 {
     final static int PORT_BASE = PORT_BASE_SINGLE + PORT_DELTA_RANGE;
     

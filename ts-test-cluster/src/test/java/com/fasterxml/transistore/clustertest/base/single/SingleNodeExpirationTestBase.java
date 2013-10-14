@@ -1,4 +1,4 @@
-package com.fasterxml.transistore.clustertest.single;
+package com.fasterxml.transistore.clustertest.base.single;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,8 +7,10 @@ import static org.junit.Assert.assertArrayEquals;
 
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.StoreConfig;
+
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.dw.RunMode;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
@@ -19,7 +21,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 /**
  * Basic test cases for testing expiration of files/data on Vagabond.
  */
-public class SingleNodeExpirationTest extends ClusterTestBase
+public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 {
 	final static int MAX_PAYLOAD_IN_MEMORY = StoreConfig.DEFAULT_MIN_PAYLOAD_FOR_STREAMING - 1;
 

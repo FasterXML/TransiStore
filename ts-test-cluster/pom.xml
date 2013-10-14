@@ -35,6 +35,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!--  For testing, LevelDB -->
+    <dependency>
+      <groupId>com.fasterxml.storemate</groupId>
+      <artifactId>storemate-backend-leveldb</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!--  also using common stuff from StoreMate/ClusterMate -->
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>

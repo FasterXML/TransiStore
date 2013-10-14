@@ -155,15 +155,7 @@ public abstract class GenericClusterTestBase extends TestCase
         return (BasicTSClient) bs.buildAndInitCompletely(5);
     }
 
-    protected StoreClientBootstrapper<?,?,?,?> createClientBootstrapper(BasicTSClientConfig clientConfig)
-    {
-        /* 13-Oct-2013, tatu: Need to support test with both, in near future.
-         *   For now, need to manually toggle between; remember to test both, often.
-         */
-        
-        return new com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper(clientConfig);
-//        return new com.fasterxml.transistore.client.jdk.JDKBasedClientBootstrapper(clientConfig);
-    }
+    protected abstract StoreClientBootstrapper<?,?,?,?> createClientBootstrapper(BasicTSClientConfig clientConfig);
 
     /*
     /**********************************************************************
