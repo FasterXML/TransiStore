@@ -15,6 +15,7 @@ import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.shared.hash.BlockMurmur3Hasher;
 import com.fasterxml.storemate.shared.util.UTF8Encoder;
 import com.fasterxml.storemate.store.AdminStorableStore;
+import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.storemate.store.backend.StoreBackendConfig;
@@ -172,6 +173,20 @@ public abstract class GenericClusterTestBase extends TestCase
                 fail("Failed to start test server due to bind exception: "+e.getMessage());
             }
         }
+    }
+
+    /*
+    /**********************************************************************
+    /* Backend store access
+    /**********************************************************************
+     */
+
+    protected long entryCount(StorableStore store) throws StoreException
+    {
+        if (store.getBackend().hasEfficientEntryCount()) {
+            return store.getEntryCount();
+        }
+        return store.getBackend().countEntries();
     }
     
     /*
@@ -410,13 +425,13 @@ public abstract class GenericClusterTestBase extends TestCase
             throws StoreException
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(store1.getEntryStore().getEntryCount());
+        sb.append(entryCount(store1.getEntryStore()));
         long ts = ((AdminStorableStore) store1.getEntryStore()).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 5000L);
         if (ts > 0) {
             sb.append('(').append(ts).append(')');
         }
         for (StoreForTests store : stores) {
-            sb.append('/').append(store.getEntryStore().getEntryCount());
+            sb.append('/').append(entryCount(store.getEntryStore()));
             ts = ((AdminStorableStore)store.getEntryStore()).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 5000L);
             if (ts > 0) {
                 sb.append('(').append(ts).append(')');

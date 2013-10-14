@@ -24,7 +24,7 @@ import com.fasterxml.clustermate.service.cluster.ClusterPeer;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
-import com.fasterxml.transistore.clustertest.ClusterTestBase0;
+import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
@@ -33,7 +33,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  * Simple CRUD tests for two-node setup (with 100% overlapping key range),
  * using basic two-way replication by client. Both nodes run on same JVM.
  */
-public class TwoNodesSimpleTestBase extends ClusterTestBase0
+public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_SIMPLE;
     
@@ -182,8 +182,8 @@ public class TwoNodesSimpleTestBase extends ClusterTestBase0
             assertEquals(937517304, service1.getKeyConverter().routingHashFor(KEY2));
             
             assertNotSame(service1.getEntryStore(), service2.getEntryStore());
-            assertEquals(0, service1.getEntryStore().getEntryCount());
-            assertEquals(0, service2.getEntryStore().getEntryCount());
+            assertEquals(0, entryCount(service1.getEntryStore()));
+            assertEquals(0, entryCount(service2.getEntryStore()));
 
             // Ok, so, add 2 entries on store 2:
 	        
@@ -199,8 +199,8 @@ public class TwoNodesSimpleTestBase extends ClusterTestBase0
             assertTrue(put.succeededOptimally());
             assertEquals(put.getSuccessCount(), 1);
             
-            assertEquals(0, service1.getEntryStore().getEntryCount());
-            assertEquals(2, service2.getEntryStore().getEntryCount());
+            assertEquals(0, entryCount(service1.getEntryStore()));
+            assertEquals(2, entryCount(service2.getEntryStore()));
 
             // sanity check: verify that entry/entries were uploaded with full info
             Storable entry1 = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST,
@@ -236,9 +236,9 @@ public class TwoNodesSimpleTestBase extends ClusterTestBase0
             assertEquals(START_TIME + 2L, entry2.getLastModified());
             
             // verify they are visible from #2, not #1, 
-            assertEquals(2, service2.getEntryStore().getEntryCount());
+            assertEquals(2, entryCount(service2.getEntryStore()));
             assertEquals("Should not have yet propagated entries to store #1",
-	        		0, service1.getEntryStore().getEntryCount());
+	        		0, entryCount(service1.getEntryStore()));
 
             // ok. start syncing:
             timeMaster.advanceTimeToWakeAll();

@@ -1,10 +1,11 @@
 package com.fasterxml.transistore.clustertest.path;
 
+import junit.framework.TestCase;
+
 import com.fasterxml.clustermate.service.ServiceRequest;
-import com.fasterxml.transistore.clustertest.ClusterTestBase0;
 import com.fasterxml.transistore.clustertest.util.FakeHttpRequest;
 
-public class TestBasicPaths extends ClusterTestBase0
+public class TestBasicPaths extends TestCase
 {
     public void testSimple()
     {

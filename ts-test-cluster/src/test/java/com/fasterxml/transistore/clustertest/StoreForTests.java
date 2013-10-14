@@ -92,7 +92,11 @@ public class StoreForTests extends BasicTSServiceOnDW
             Thread.sleep(20L);
         }
         super._stop();
-        _jettyServer.stop();
+        if (_jettyServer == null) {
+            System.err.println("WARNING: _jettyServer null on _stop(); can't shut down Jetty");
+        } else {
+            _jettyServer.stop();
+        }
     }
 
     public void waitForStopped() throws Exception {

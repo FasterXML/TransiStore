@@ -4,7 +4,10 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.util.Arrays;
 
-import com.yammer.dropwizard.util.Duration;
+import com.fasterxml.storemate.shared.IpAndPort;
+import com.fasterxml.storemate.store.AdminStorableStore;
+import com.fasterxml.storemate.store.Storable;
+import com.fasterxml.storemate.store.StoreOperationSource;
 
 import com.fasterxml.clustermate.client.NodesForKey;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
@@ -13,16 +16,15 @@ import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
 import com.fasterxml.clustermate.service.cfg.NodeConfig;
-import com.fasterxml.storemate.shared.IpAndPort;
-import com.fasterxml.storemate.store.AdminStorableStore;
-import com.fasterxml.storemate.store.Storable;
-import com.fasterxml.storemate.store.StoreOperationSource;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
-import com.fasterxml.transistore.clustertest.ClusterTestBase0;
+import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
+
+import com.yammer.dropwizard.util.Duration;
 
 /**
  * Simple CRUD tests for four-node setup (with 100% overlapping key range),
@@ -30,7 +32,7 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
  * For these tests, we will only send a single copy, to verify the way
  * node-to-node replication works.
  */
-public class FourNodesSimpleTestBase extends ClusterTestBase0
+public abstract class FourNodesSimpleTestBase extends ClusterTestBase
 {
     final static int PORT_BASE = PORT_BASE_QUAD + PORT_DELTA_SIMPLE;
     
@@ -137,16 +139,16 @@ public class FourNodesSimpleTestBase extends ClusterTestBase0
             Storable entry;
             entry = service1.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNull(entry);
-            assertEquals(0, service1.getEntryStore().getEntryCount());
+            assertEquals(0, entryCount(service1.getEntryStore()));
             entry = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNull(entry);
-            assertEquals(0, service2.getEntryStore().getEntryCount());
+            assertEquals(0, entryCount(service2.getEntryStore()));
             entry = service3.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNull(entry);
-            assertEquals(0, service3.getEntryStore().getEntryCount());
+            assertEquals(0, entryCount(service3.getEntryStore()));
             entry = service4.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNotNull(entry);
-            assertEquals(1, service4.getEntryStore().getEntryCount());
+            assertEquals(1, entryCount(service4.getEntryStore()));
 
             // Now: let's let nodes synchronize their state. This may require bit of waiting;
             long need = service1.getTimeMaster().getMaxSleepTimeNeeded();

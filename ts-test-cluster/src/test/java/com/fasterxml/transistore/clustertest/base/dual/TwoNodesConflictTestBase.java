@@ -8,15 +8,18 @@ import org.skife.config.TimeSpan;
 
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.StorableStore;
+
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.clustertest.ClusterTestBase0;
+import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.FakeHttpRequest;
 import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
+
 import com.yammer.dropwizard.util.Duration;
 
 /**
@@ -26,7 +29,7 @@ import com.yammer.dropwizard.util.Duration;
  * will only eventually have a single piece of content associated
  * with the key.
  */
-public class TwoNodesConflictTestBase extends ClusterTestBase0
+public abstract class TwoNodesConflictTestBase extends ClusterTestBase
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_CONFLICT;
     
@@ -69,8 +72,8 @@ public class TwoNodesConflictTestBase extends ClusterTestBase0
             final BasicTSKey KEY = contentKey("entry");
 
             // First: verify that stores are empty:
-            assertEquals(0, entries1.getEntryCount());
-            assertEquals(0, entries2.getEntryCount());
+            assertEquals(0, entryCount(entries1));
+            assertEquals(0, entryCount(entries2));
 
             FakeHttpResponse response = new FakeHttpResponse();
             service1.getStoreHandler().getEntry(new FakeHttpRequest(), response, KEY);
@@ -95,8 +98,8 @@ public class TwoNodesConflictTestBase extends ClusterTestBase0
                     null, null, null);
             assertEquals(200, response.getStatus());
 
-            assertEquals(1, entries1.getEntryCount());
-            assertEquals(1, entries2.getEntryCount());
+            assertEquals(1, entryCount(entries1));
+            assertEquals(1, entryCount(entries2));
 
             // Ok: so we should have a conflict now, n'est pas? Double check...
             response = new FakeHttpResponse();
@@ -124,8 +127,8 @@ public class TwoNodesConflictTestBase extends ClusterTestBase0
             Thread.sleep(50L);
             
             while (true) {
-                assertEquals(1, entries1.getEntryCount());
-                assertEquals(1, entries2.getEntryCount());
+                assertEquals(1, entryCount(entries1));
+                assertEquals(1, entryCount(entries2));
                 
                 response = new FakeHttpResponse();
                 service2.getStoreHandler().getEntry(new FakeHttpRequest(), response, KEY);
