@@ -58,7 +58,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
 
         try {
             // first: verify that we can do GET, but not find the entry:
-            byte[] data = client.getContentAsBytes(clientConfig, KEY);
+            byte[] data = client.getContentAsBytes(null, KEY);
             assertNull("Should not yet have entry", data);
     
             // Then add said content
@@ -69,20 +69,20 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             assertTrue(result.succeededOptimally());
 
             // find it; both with GET and HEAD
-            data = client.getContentAsBytes(clientConfig, KEY);
+            data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should now have the data", data);
             assertArrayEquals(CONTENT, data);
             
-            long len = client.getContentLength(clientConfig, KEY);
+            long len = client.getContentLength(null, KEY);
             assertEquals(LENGTH, len);
     
             // delete:
-            DeleteOperationResult del = client.deleteContent(clientConfig, KEY);
+            DeleteOperationResult del = client.deleteContent(null, KEY);
             assertTrue(del.succeededMinimally());
             assertTrue(del.succeededOptimally());
     
             // after which content ... is no more:
-            data = client.getContentAsBytes(clientConfig, KEY);
+            data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should not have the data after DELETE", data);
         } finally {
             // and That's All, Folks!
@@ -112,7 +112,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
 
         try {
             // first: verify that we can do GET, but not find the entry:
-            byte[] data = client.getContentAsBytes(clientConfig, KEY);
+            byte[] data = client.getContentAsBytes(null, KEY);
             assertNull("Should not yet have entry", data);
             // Then add said content
             int origSize = MAX_PAYLOAD_IN_MEMORY + 100;
@@ -129,20 +129,20 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             }
     
             // find it; both with GET and HEAD
-            data = client.getContentAsBytes(clientConfig, KEY);
+            data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should now have the data", data);
             assertArrayEquals(CONTENT, data);
     
-            long len = client.getContentLength(clientConfig, KEY);
+            long len = client.getContentLength(null, KEY);
             assertEquals(data.length, len);
     
             // delete:
-            DeleteOperationResult del = client.deleteContent(clientConfig, KEY);
+            DeleteOperationResult del = client.deleteContent(null, KEY);
             assertTrue(del.succeededMinimally());
             assertTrue(del.succeededOptimally());
     
             // after which content ... is no more:
-            data = client.getContentAsBytes(clientConfig, KEY);
+            data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should not have the data after DELETE", data);
             // and That's All, Folks!
         } finally {

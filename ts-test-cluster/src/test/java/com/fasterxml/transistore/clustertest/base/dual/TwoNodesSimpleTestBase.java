@@ -79,7 +79,7 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
         final BasicTSKey KEY = contentKey("testSimple2/this&that/some item");
         
         // first: verify that we can do GET, but not find the entry:
-        byte[] data = client.getContentAsBytes(clientConfig, KEY);
+        byte[] data = client.getContentAsBytes(null, KEY);
         assertNull("Should not yet have entry", data);
 
         // Then add said content
@@ -90,23 +90,23 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
         assertEquals(result.getSuccessCount(), 2);
 
         // find it; both with GET and HEAD
-        data = client.getContentAsBytes(clientConfig, KEY);
+        data = client.getContentAsBytes(null, KEY);
         assertNotNull("Should now have the data", data);
         assertArrayEquals(CONTENT, data);
-        long len = client.getContentLength(clientConfig, KEY);
+        long len = client.getContentLength(null, KEY);
         /* NOTE: should be getting uncompressed length, assuming we don't
          * claim we accept things as compresed (if we did, we'd get 48)
          */
         assertEquals(12000L, len);
 
         // delete:
-        DeleteOperationResult del = client.deleteContent(clientConfig, KEY);
+        DeleteOperationResult del = client.deleteContent(null, KEY);
         assertTrue(del.succeededMinimally());
         assertTrue(del.succeededOptimally());
         assertEquals(del.getSuccessCount(), 2);
 
         // after which content ... is no more:
-        data = client.getContentAsBytes(clientConfig, KEY);
+        data = client.getContentAsBytes(null, KEY);
         assertNotNull("Should not have the data after DELETE", data);
 
         // and That's All, Folks!

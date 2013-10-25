@@ -109,7 +109,7 @@ public class GetCmd extends TStoreCmdBase
         }
 
         int left = Math.max(1, maxEntries);
-        StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(prefix, ListItemType.ids);
+        StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(null, prefix, ListItemType.ids);
         int gotten = 0;
 
         while (true) {
@@ -142,7 +142,7 @@ public class GetCmd extends TStoreCmdBase
                 }
                 
                 // And then just download it
-                File resp = client.getContentAsFile(key, dst);
+                File resp = client.getContentAsFile(null, key, dst);
                 if (jgen != null) {
                     writeJsonEntry(key, dst, jgen);
                 } else {

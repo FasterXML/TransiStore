@@ -81,7 +81,7 @@ public class DeleteCmd extends TStoreCmdBase
     protected int deleteSingle(BasicTSClient client, BasicTSKey path)
             throws IOException, InterruptedException
     {
-        HeadOperationResult headResult = client.headContent(path);
+        HeadOperationResult headResult = client.headContent(null, path);
         if (headResult.entryFound()) {
             _deleteSingle(client, path);
             return 1;
@@ -94,7 +94,7 @@ public class DeleteCmd extends TStoreCmdBase
             throws IOException, InterruptedException
     {
         int left = Math.max(1, maxEntries);
-        StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(path, ListItemType.ids);
+        StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(null, path, ListItemType.ids);
         int gotten = 0;
 
         while (true) {
@@ -117,7 +117,7 @@ public class DeleteCmd extends TStoreCmdBase
     protected boolean _deleteSingle(BasicTSClient client, BasicTSKey path)
         throws IOException, InterruptedException
     {
-        DeleteOperationResult deleteResult = client.deleteContent(path);
+        DeleteOperationResult deleteResult = client.deleteContent(null, path);
         if (!deleteResult.succeededOptimally()) {
             if (!deleteResult.succeededMinimally()) {
                 throw new IOException("Failed to DELETE '"+path+"': "+deleteResult.getFailCount()

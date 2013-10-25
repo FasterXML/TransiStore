@@ -53,7 +53,7 @@ public class CatCmd extends TStoreCmdBase
         for (BasicTSKey path : pathList) {
             GetOperationResult<Long> resp = null;
             try {
-                resp = client.getContent(path,
+                resp = client.getContent(null, path,
                         new GetContentProcessor<Long>() {
                             @Override
                             public GetContentProcessor.Handler<Long> createHandler() {

@@ -109,7 +109,7 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             assertEquals("[180,+180]", nodes.node(1).getActiveRange().toString());
             
             // first: verify that we can do GET, but not find the entry:
-            byte[] data = client.getContentAsBytes(clientConfig, KEY);
+            byte[] data = client.getContentAsBytes(null, KEY);
             assertNull("Should not yet have entry", data);
 
             // Then add said content
@@ -122,11 +122,11 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             service1.getTimeMaster().advanceCurrentTimeMillis(1L);
     
             // find it; both with GET and HEAD
-            data = client.getContentAsBytes(clientConfig, KEY);
+            data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should now have the data", data);
             assertArrayEquals(CONTENT, data);
 
-            long len = client.getContentLength(clientConfig, KEY);
+            long len = client.getContentLength(null, KEY);
             assertEquals(12000L, len);
             service1.getTimeMaster().advanceCurrentTimeMillis(1L);
     
@@ -168,7 +168,7 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
 // System.err.println("Took "+rounds+" rounds to PUT");            
             
             // Then finally delete; will only initially delete from #4
-            DeleteOperationResult del = client.deleteContent(clientConfig, KEY);
+            DeleteOperationResult del = client.deleteContent(null, KEY);
             assertTrue(del.succeededMinimally());
             assertTrue(del.succeededOptimally());
             assertEquals(del.getSuccessCount(), 1);
@@ -182,7 +182,7 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
              * tombstone the definite answer; so that is the "right answer" here,
              * although it does require that client does calls in strict priority order.
              */
-            data = client.getContentAsBytes(clientConfig, KEY);
+            data = client.getContentAsBytes(null, KEY);
             if (data != null && data.length > 0) {
                 fail("Should not have the data after partial DELETE: got entry with "+data.length+" bytes");
             }
@@ -194,7 +194,7 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
 // System.err.println("Took "+rounds+" rounds to DELETE");            
             
             // after which content ... is no more:
-            data = client.getContentAsBytes(clientConfig, KEY);
+            data = client.getContentAsBytes(null, KEY);
             if (data != null && data.length > 0) {
                 fail("Should not have the data after full DELETE: got entry with "+data.length+" bytes");
             }

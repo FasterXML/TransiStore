@@ -52,7 +52,7 @@ public abstract class ByteRangesTestBase extends ClusterTestBase
         // first: verify that we can do GET, but not find the entry:
         int OFFSET = 3;
         int LENGTH = 11;
-        byte[] data = client.getPartialContentAsBytes(clientConfig, SMALL_KEY, new ByteRange(OFFSET, LENGTH));
+        byte[] data = client.getPartialContentAsBytes(null, SMALL_KEY, new ByteRange(OFFSET, LENGTH));
         assertNotNull(data);
         if (data.length != LENGTH) {
         	assertEquals("Range failed for content of "+SMALL_CONTENT.length+" bytes", LENGTH, data.length);
@@ -67,7 +67,7 @@ public abstract class ByteRangesTestBase extends ClusterTestBase
         final byte[] MED_CONTENT = biggerSomewhatCompressibleData(3000);
         result = client.putContent(null, MED_KEY, MED_CONTENT);
         assertTrue(result.succeededOptimally());
-        data = client.getPartialContentAsBytes(clientConfig, MED_KEY, new ByteRange(OFFSET, LENGTH));
+        data = client.getPartialContentAsBytes(null, MED_KEY, new ByteRange(OFFSET, LENGTH));
         assertNotNull(data);
         if (data.length != LENGTH) {
         	assertEquals("Range failed for content of "+MED_CONTENT.length+" bytes", LENGTH, data.length);
@@ -82,7 +82,7 @@ public abstract class ByteRangesTestBase extends ClusterTestBase
         LENGTH = 5600;
         result = client.putContent(null, BIG_KEY, BIG_CONTENT);
         assertTrue(result.succeededOptimally());
-        data = client.getPartialContentAsBytes(clientConfig, BIG_KEY, new ByteRange(OFFSET, LENGTH));
+        data = client.getPartialContentAsBytes(null, BIG_KEY, new ByteRange(OFFSET, LENGTH));
         assertNotNull(data);
         if (data.length != LENGTH) {
         	assertEquals("Range failed for content of "+BIG_CONTENT.length+" bytes", LENGTH, data.length);

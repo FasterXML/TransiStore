@@ -58,7 +58,7 @@ public abstract class ListEntriesTestBase extends ClusterTestBase
         // And then iterate everything under PARTITION 2, first
         //    public final <T> StoreEntryLister<K,T> listContent(K prefix, ListType itemType) throws InterruptedException {
 
-        StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(contentKey(PARTITION2, ""), ListItemType.ids);
+        StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(null, contentKey(PARTITION2, ""), ListItemType.ids);
 
         ListOperationResult<StorableKey> row = lister.listMore(2);
         if (!row.succeeded()) {
@@ -86,7 +86,7 @@ public abstract class ListEntriesTestBase extends ClusterTestBase
         
         // // Second scan; now with longer prefix...
 
-        lister = client.listContent(contentKey(PARTITION2, "dir/"), ListItemType.ids);
+        lister = client.listContent(null, contentKey(PARTITION2, "dir/"), ListItemType.ids);
         row = lister.listMore(1);
         if (!row.succeeded()) {
             fail("Failed: "+row.getFirstFail());
@@ -136,7 +136,7 @@ public abstract class ListEntriesTestBase extends ClusterTestBase
         addEntry(client, PARTITION1, "bar");
         // Also, important: need to list with other types as well; esp. full items
 
-        StoreEntryLister<BasicTSKey, BasicTSListItem> listerFull = client.listContent(contentKey(PARTITION2, ""),
+        StoreEntryLister<BasicTSKey, BasicTSListItem> listerFull = client.listContent(null, contentKey(PARTITION2, ""),
                 ListItemType.fullEntries);
 
         ListOperationResult<BasicTSListItem> rowFull = listerFull.listMore(2);

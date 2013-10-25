@@ -54,7 +54,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 
 		try {
 			// first: verify that we can do GET, but not find the entry:
-			byte[] data = client.getContentAsBytes(KEY);
+			byte[] data = client.getContentAsBytes(null, KEY);
 			assertNull("Should not yet have entry", data);
 
 			// Then add said content
@@ -66,7 +66,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 			assertTrue(result.succeededOptimally());
 
 			// find it; both with GET and HEAD
-			data = client.getContentAsBytes(KEY);
+			data = client.getContentAsBytes(null, KEY);
 			
 			assertNotNull(data);
 			assertEquals(LENGTH, data.length);
@@ -109,7 +109,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 			    BasicTSKey KEY = contentKey("test/expire/looped-file" + i);
 				keys.add(KEY);
 				// first: verify that we can do GET, but not find the entry:
-				byte[] data = client.getContentAsBytes(clientConfig, KEY);
+				byte[] data = client.getContentAsBytes(null, KEY);
 				assertNull("Should not yet have entry", data);
 				// Then add said content
 				int origSize = MAX_PAYLOAD_IN_MEMORY + 100;
@@ -121,11 +121,11 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 				}
 
 				// find it; both with GET and HEAD
-				data = client.getContentAsBytes(clientConfig, KEY);
+				data = client.getContentAsBytes(null, KEY);
 				assertNotNull("Should now have the data", data);
 				assertArrayEquals(CONTENT, data);
 
-				long len = client.getContentLength(clientConfig, KEY);
+				long len = client.getContentLength(null, KEY);
 
 				assertEquals(data.length, len);
 			}
@@ -174,7 +174,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 				BasicTSKey KEY = contentKey("test/expire/multi/file" + i);
 				keys.add(KEY);
 				// first: verify that we can do GET, but not find the entry:
-				byte[] data = client.getContentAsBytes(clientConfig, KEY);
+				byte[] data = client.getContentAsBytes(null, KEY);
 				assertNull("Should not yet have entry", data);
 				// Then add said content
 				int origSize = MAX_PAYLOAD_IN_MEMORY + 100;
@@ -185,10 +185,10 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 					fail("PUT failed, with: " + result.getFirstFail());
 				}
 				// find it; both with GET and HEAD
-				data = client.getContentAsBytes(clientConfig, KEY);
+				data = client.getContentAsBytes(null, KEY);
 				assertNotNull("Should now have the data", data);
 				assertArrayEquals(CONTENT, data);
-				assertEquals(data.length, client.getContentLength(clientConfig, KEY));
+				assertEquals(data.length, client.getContentLength(null, KEY));
 
                     _verifyExpiration(client, timeMaster, KEY);
 			}
@@ -220,7 +220,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 
          // ... but it may take bit longer
          for (int i = 0; i < 10; ++i) {
-             byte[] data = client.getContentAsBytes(key);
+             byte[] data = client.getContentAsBytes(null, key);
               if (data == null) {
                   return;
               }

@@ -13,7 +13,7 @@ public class TSPutCallParameters extends PutCallParameters
     protected final static int NOT_DEFINED = -1;
 	
     protected final int _maxTTLInSeconds;
-	
+
     public TSPutCallParameters() {
         super((StoreClientConfig<?,?>) null);
         _maxTTLInSeconds = NOT_DEFINED;

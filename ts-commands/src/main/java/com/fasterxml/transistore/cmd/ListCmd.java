@@ -87,7 +87,7 @@ public class ListCmd extends TStoreCmdBase
     private ListOperationResult<?> listAsText(BasicTSClient client, BasicTSKey prefix) throws InterruptedException
     {
         int left = Math.max(1, maxEntries);
-        StoreEntryLister<BasicTSKey, BasicTSListItem> lister = client.listContent(prefix, ListItemType.fullEntries);
+        StoreEntryLister<BasicTSKey, BasicTSListItem> lister = client.listContent(null, prefix, ListItemType.fullEntries);
         boolean hasWarned = false;
 
         while (true) {
@@ -178,7 +178,7 @@ public class ListCmd extends TStoreCmdBase
             throws InterruptedException, IOException
     {
         int left = Math.max(1, maxEntries);
-        StoreEntryLister<BasicTSKey, BasicTSListItem> lister = client.listContent(prefix, ListItemType.fullEntries);
+        StoreEntryLister<BasicTSKey, BasicTSListItem> lister = client.listContent(null, prefix, ListItemType.fullEntries);
         // we'll have to deserialize, serialize back...
         ObjectWriter w = jsonWriter(BasicTSListItem.class);
         // let's wrap output in JSON array (or not?)
