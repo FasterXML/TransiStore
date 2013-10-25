@@ -65,7 +65,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             final int LENGTH = 12000;
             final byte[] CONTENT = new byte[LENGTH];
             Arrays.fill(CONTENT, (byte) 0xAC);
-            PutOperationResult result = client.putContent(clientConfig, null, KEY, CONTENT);
+            PutOperationResult result = client.putContent(null, KEY, CONTENT);
             assertTrue(result.succeededOptimally());
 
             // find it; both with GET and HEAD
@@ -123,7 +123,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             fout.write(CONTENT);
             fout.close();
     
-            PutOperationResult result = client.putContent(clientConfig, null, KEY, file);
+            PutOperationResult result = client.putContent(null, KEY, file);
             if (!result.succeededOptimally()) {
                 fail("PUT failed, with: "+result.getFirstFail());
             }

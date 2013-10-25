@@ -85,7 +85,7 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
         // Then add said content
         final byte[] CONTENT = new byte[12000];
         Arrays.fill(CONTENT, (byte) 0xAC);
-        PutOperationResult result = client.putContent(clientConfig, null, KEY, CONTENT);
+        PutOperationResult result = client.putContent(null, KEY, CONTENT);
         assertTrue(result.succeededOptimally());
         assertEquals(result.getSuccessCount(), 2);
 
@@ -191,11 +191,11 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             final byte[] CONTENT1_LZF = lzfCompress(CONTENT1);
             final byte[] CONTENT2 = biggerSomewhatCompressibleData(19000);
             final byte[] CONTENT2_LZF = lzfCompress(CONTENT2);
-            PutOperationResult put = client.putContent(clientConfig, null, KEY1, CONTENT1);
+            PutOperationResult put = client.putContent(null, KEY1, CONTENT1);
             assertTrue(put.succeededOptimally());
             assertEquals(put.getSuccessCount(), 1);
             timeMaster.advanceCurrentTimeMillis(1L); // to 202
-            put = client.putContent(clientConfig, null, KEY2, CONTENT2);
+            put = client.putContent(null, KEY2, CONTENT2);
             assertTrue(put.succeededOptimally());
             assertEquals(put.getSuccessCount(), 1);
             

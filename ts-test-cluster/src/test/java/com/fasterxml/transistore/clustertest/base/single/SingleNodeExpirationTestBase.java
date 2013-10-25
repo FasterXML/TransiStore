@@ -114,7 +114,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 				// Then add said content
 				int origSize = MAX_PAYLOAD_IN_MEMORY + 100;
 				final byte[] CONTENT = biggerSomewhatCompressibleData(origSize);
-				PutOperationResult result = client.putContent(clientConfig,null,
+				PutOperationResult result = client.putContent(null,
 						KEY, CONTENT);
 				if (!result.succeededOptimally()) {
 					fail("PUT failed, with: " + result.getFirstFail());
@@ -179,7 +179,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 				// Then add said content
 				int origSize = MAX_PAYLOAD_IN_MEMORY + 100;
 				final byte[] CONTENT = biggerSomewhatCompressibleData(origSize);
-				PutOperationResult result = client.putContent(clientConfig, null,
+				PutOperationResult result = client.putContent(null,
 						KEY, CONTENT);
 				if (!result.succeededOptimally()) {
 					fail("PUT failed, with: " + result.getFirstFail());
