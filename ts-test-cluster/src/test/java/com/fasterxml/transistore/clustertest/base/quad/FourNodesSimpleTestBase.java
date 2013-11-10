@@ -176,7 +176,7 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             // Ok: now, keeping in mind that deletions are done by using tombstone as marker...
             assertEquals("Store #4 should now have tombstone", "0/0/1/1(1)",
                     storeCounts(service1, service2, service3, service4));
-
+            
             /* At this point things are bit murky: should client try to find a copy
              * (despite a tombstone) or not? Current implementation will consider
              * tombstone the definite answer; so that is the "right answer" here,
@@ -188,7 +188,7 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             }
 
             // but then tombstone should propagate; faster than PUT propagation
-            /*rounds =*/ expectState("0/0/1(1)/1(1)", "Entry should have tombstone for both nodes", 5, 10,
+            /*rounds =*/ expectState("0/0/1(1)/1(1)", "Entry should have tombstone for both nodes", 5, 12,
                     service1, service2, service3, service4);         
 
 // System.err.println("Took "+rounds+" rounds to DELETE");            

@@ -188,6 +188,14 @@ public abstract class GenericClusterTestBase extends TestCase
         }
         return store.getBackend().countEntries();
     }
+
+    protected long indexCount(StorableStore store) throws StoreException
+    {
+        if (store.getBackend().hasEfficientIndexCount()) {
+            return store.getIndexedCount();
+        }
+        return store.getBackend().countIndexed();
+    }
     
     /*
     /**********************************************************************
@@ -401,7 +409,7 @@ public abstract class GenericClusterTestBase extends TestCase
 
     protected int expectState(String EXP, String msg, int expRounds, int maxRounds,
             StoreForTests store1, StoreForTests... stores)
-                    throws InterruptedException, StoreException
+        throws InterruptedException, StoreException
     {
         int round = 1;
         while (true) {
@@ -422,7 +430,7 @@ public abstract class GenericClusterTestBase extends TestCase
     }
     
     protected String storeCounts(StoreForTests store1, StoreForTests... stores)
-            throws StoreException
+        throws StoreException
     {
         StringBuilder sb = new StringBuilder();
         sb.append(entryCount(store1.getEntryStore()));
