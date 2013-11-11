@@ -5,10 +5,14 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.Arrays;
 
 import com.fasterxml.storemate.shared.IpAndPort;
+import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.Storable;
+import com.fasterxml.storemate.store.StorableStore;
+import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.StoreOperationSource;
-
+import com.fasterxml.storemate.store.backend.IterationAction;
+import com.fasterxml.storemate.store.backend.StorableLastModIterationCallback;
 import com.fasterxml.clustermate.client.NodesForKey;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
@@ -16,14 +20,12 @@ import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
 import com.fasterxml.clustermate.service.cfg.NodeConfig;
-
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
-
 import com.yammer.dropwizard.util.Duration;
 
 /**
@@ -81,6 +83,9 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
         // then start them all
         startServices(service1, service2, service3, service4);
 
+        final StorableStore entries3 = service3.getEntryStore();
+        final StorableStore entries4 = service4.getEntryStore();
+        
         try {
             // require just a single ok, so we can test replication nicely
             BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
@@ -143,12 +148,12 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             entry = service2.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNull(entry);
             assertEquals(0, entryCount(service2.getEntryStore()));
-            entry = service3.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
+            entry = entries3.findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNull(entry);
-            assertEquals(0, entryCount(service3.getEntryStore()));
-            entry = service4.getEntryStore().findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
+            assertEquals(0, entryCount(entries3));
+            entry = entries4.findEntry(StoreOperationSource.REQUEST, null, KEY.asStorableKey());
             assertNotNull(entry);
-            assertEquals(1, entryCount(service4.getEntryStore()));
+            assertEquals(1, entryCount(entries4));
 
             // Now: let's let nodes synchronize their state. This may require bit of waiting;
             long need = service1.getTimeMaster().getMaxSleepTimeNeeded();
@@ -166,7 +171,6 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             /*rounds =*/ expectState("0/0/1/1", "Entry should be copied into second node", 12, 18,
                     service1, service2, service3, service4);
 // System.err.println("Took "+rounds+" rounds to PUT");            
-            
             // Then finally delete; will only initially delete from #4
             DeleteOperationResult del = client.deleteContent(null, KEY);
             assertTrue(del.succeededMinimally());
@@ -186,9 +190,8 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             if (data != null && data.length > 0) {
                 fail("Should not have the data after partial DELETE: got entry with "+data.length+" bytes");
             }
-
             // but then tombstone should propagate; faster than PUT propagation
-            /*rounds =*/ expectState("0/0/1(1)/1(1)", "Entry should have tombstone for both nodes", 5, 12,
+            /*rounds =*/ expectState("0/0/1(1)/1(1)", "Entry should have tombstone for both nodes", 5, 8,
                     service1, service2, service3, service4);         
 
 // System.err.println("Took "+rounds+" rounds to DELETE");            
@@ -202,13 +205,13 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             assertEquals("Store #4 should have 1 tombstone", 1,
                     ((AdminStorableStore) service4.getEntryStore()).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 3000L));
             assertEquals("Store #3 should have 1 tombstone", 1,
-                    ((AdminStorableStore) service3.getEntryStore()).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 3000L));
+                    ((AdminStorableStore) entries3).getTombstoneCount(StoreOperationSource.ADMIN_TOOL, 3000L));
             
             // and we may clean tombstones, too
             assertEquals("Should have removed 1 tombstone from store #4", 1,
-                    ((AdminStorableStore) service4.getEntryStore()).removeTombstones(StoreOperationSource.ADMIN_TOOL, 100));
+                    ((AdminStorableStore) entries4).removeTombstones(StoreOperationSource.ADMIN_TOOL, 100));
             assertEquals("Should have removed 1 tombstone from store #3", 1,
-                    ((AdminStorableStore) service3.getEntryStore()).removeTombstones(StoreOperationSource.ADMIN_TOOL, 100));
+                    ((AdminStorableStore) entries3).removeTombstones(StoreOperationSource.ADMIN_TOOL, 100));
             assertEquals("Shouldn't have tombstones, entries, any more", "0/0/0/0",
                     storeCounts(service1, service2, service3, service4));
             
