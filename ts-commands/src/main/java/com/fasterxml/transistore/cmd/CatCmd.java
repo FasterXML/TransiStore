@@ -5,6 +5,7 @@ import java.util.*;
 
 import com.fasterxml.clustermate.client.call.GetContentProcessor;
 import com.fasterxml.clustermate.client.operation.GetOperationResult;
+import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
@@ -60,6 +61,12 @@ public class CatCmd extends TStoreCmdBase
                                 return new GetContentProcessor.Handler<Long>() {
                                     long bytes = 0L;
 
+                                    @Override
+                                    public boolean startContent(int statusCode, Compression compression) {
+                                        // anything we should take into account here?
+                                        return true;
+                                    }
+                                    
                                     @Override
                                     public boolean processContent(byte[] content, int offset, int length)
                                             throws IOException {

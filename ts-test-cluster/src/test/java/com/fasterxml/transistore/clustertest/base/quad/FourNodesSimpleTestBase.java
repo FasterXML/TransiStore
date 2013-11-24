@@ -4,15 +4,14 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.util.Arrays;
 
+import com.yammer.dropwizard.util.Duration;
+
 import com.fasterxml.storemate.shared.IpAndPort;
-import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StorableStore;
-import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.StoreOperationSource;
-import com.fasterxml.storemate.store.backend.IterationAction;
-import com.fasterxml.storemate.store.backend.StorableLastModIterationCallback;
+
 import com.fasterxml.clustermate.client.NodesForKey;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
@@ -20,13 +19,13 @@ import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
 import com.fasterxml.clustermate.service.cfg.KeyRangeAllocationStrategy;
 import com.fasterxml.clustermate.service.cfg.NodeConfig;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.*;
 import com.fasterxml.transistore.clustertest.ClusterTestBase;
 import com.fasterxml.transistore.clustertest.StoreForTests;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
-import com.yammer.dropwizard.util.Duration;
 
 /**
  * Simple CRUD tests for four-node setup (with 100% overlapping key range),
