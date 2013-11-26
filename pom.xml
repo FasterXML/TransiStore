@@ -58,7 +58,7 @@
     <!-- Sometimes rely on SNAPSHOT version just so that we can test local updates,
          get Eclipse to show relevant sources
       -->
-    <version.clustermate>0.9.20-SNAPSHOT</version.clustermate>
+    <version.clustermate>0.9.20</version.clustermate>
   </properties>
 
   <!-- Licensing -->
