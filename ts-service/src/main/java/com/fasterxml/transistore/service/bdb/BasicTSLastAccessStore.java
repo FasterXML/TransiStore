@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.Environment;
 
-import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.bdb.BDBConverters;
 import com.fasterxml.clustermate.service.bdb.BDBLastAccessStore;
-import com.fasterxml.clustermate.service.cfg.LastAccessConfig;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.clustermate.service.store.StoredEntryConverter;
+import com.fasterxml.storemate.store.lastaccess.LastAccessConfig;
+import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.service.TSLastAccess;
 
@@ -26,7 +26,7 @@ public class BasicTSLastAccessStore
     {
         super(env, conv, config);
     }
-
+    
     @Override
     protected DatabaseEntry lastAccessKey(BasicTSKey key, LastAccessUpdateMethod acc0)
     {

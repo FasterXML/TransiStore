@@ -1,9 +1,9 @@
 package com.fasterxml.transistore.service;
 
 import com.fasterxml.clustermate.api.EntryKeyConverter;
-import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.storemate.store.Storable;
+import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 

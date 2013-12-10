@@ -1,6 +1,6 @@
 package com.fasterxml.transistore.service;
 
-import com.fasterxml.clustermate.service.LastAccessUpdateMethod;
+import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
 
 /**
  * Standard set of {@link LastAccessUpdateMethod} choices that "Basic"
