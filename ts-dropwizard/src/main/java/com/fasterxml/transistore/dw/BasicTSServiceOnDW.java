@@ -8,11 +8,13 @@ import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.metrics.core.HealthCheck;
 
+import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.StoreOperationThrottler;
 import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
+import com.fasterxml.storemate.store.state.NodeStateStore;
 
 import com.fasterxml.clustermate.dw.DWBasedService;
 import com.fasterxml.clustermate.dw.RunMode;
@@ -22,6 +24,7 @@ import com.fasterxml.clustermate.service.cleanup.CleanupTask;
 import com.fasterxml.clustermate.service.cleanup.DiskUsageTracker;
 import com.fasterxml.clustermate.service.cleanup.FileCleaner;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
+import com.fasterxml.clustermate.service.state.ActiveNodeState;
 import com.fasterxml.clustermate.service.store.*;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -116,11 +119,12 @@ public class BasicTSServiceOnDW
 
     @Override
     protected StoresImpl<BasicTSKey, StoredEntry<BasicTSKey>> constructStores(SharedServiceStuff stuff,
-            BasicTSServiceConfig serviceConfig, StorableStore store)
+            BasicTSServiceConfig serviceConfig,
+            StorableStore store, NodeStateStore<IpAndPort, ActiveNodeState> nodeStates)
     {
         StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> entryConv = stuff.getEntryConverter();
         return new BasicTSStores(serviceConfig,
-                _timeMaster, stuff.jsonMapper(), entryConv, store);
+                _timeMaster, stuff.jsonMapper(), entryConv, store, nodeStates);
     }
     
     @Override

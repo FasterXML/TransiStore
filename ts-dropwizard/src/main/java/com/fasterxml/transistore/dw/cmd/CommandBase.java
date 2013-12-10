@@ -5,13 +5,17 @@ import java.io.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.storemate.backend.bdbje.BDBJEBuilder;
+import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.backend.StoreBackend;
 import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
 import com.fasterxml.storemate.store.impl.StorableStoreImpl;
+import com.fasterxml.storemate.store.state.NodeStateStore;
 
+import com.fasterxml.clustermate.service.state.ActiveNodeState;
+import com.fasterxml.clustermate.service.state.JacksonBasedConverter;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.clustermate.service.store.StoredEntryConverter;
 
@@ -38,10 +42,11 @@ public abstract class CommandBase<T extends Configuration> extends ConfiguredCom
     
     /*
     /**********************************************************************
-    /* Methods for opening BDB store(s)
+    /* Methods for opening BDB store(s): only used for forced clean-up
+    /* tools and such.
     /**********************************************************************
      */
-    
+
     protected BasicTSStores openReadOnlyStores(BasicTSServiceConfigForDW configuration)
         throws IOException
     {
@@ -90,7 +95,11 @@ public abstract class CommandBase<T extends Configuration> extends ConfiguredCom
         @SuppressWarnings("unchecked")
         StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> entryConv
             = (StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?>) conv0;
-        return new BasicTSStores(v, tm, new ObjectMapper(), entryConv, store);
+        NodeStateStore<IpAndPort, ActiveNodeState> nodeStates =
+                b.buildNodeStateStore(v.metadataDirectory,
+                        new JacksonBasedConverter<IpAndPort>(_mapper, IpAndPort.class),
+                        new JacksonBasedConverter<ActiveNodeState>(_mapper, ActiveNodeState.class));
+        return new BasicTSStores(v, tm, new ObjectMapper(), entryConv, store, nodeStates);
     }
 
     /*
