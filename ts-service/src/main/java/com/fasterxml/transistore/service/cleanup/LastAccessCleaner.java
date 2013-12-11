@@ -7,16 +7,16 @@ import org.slf4j.*;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.backend.IterationAction;
+import com.fasterxml.storemate.store.lastaccess.EntryLastAccessed;
+import com.fasterxml.storemate.store.lastaccess.LastAccessStore;
+import com.fasterxml.storemate.store.lastaccess.LastAccessStore.LastAccessIterationCallback;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.service.BasicTSEntry;
 
-import com.fasterxml.clustermate.service.LastAccessStore;
-import com.fasterxml.clustermate.service.LastAccessStore.LastAccessIterationCallback;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
-import com.fasterxml.clustermate.service.store.EntryLastAccessed;
 
 /**
  * Helper class used to keep track of clean up progress

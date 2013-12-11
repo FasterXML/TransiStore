@@ -14,6 +14,7 @@ import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.storemate.store.backend.IterationAction;
 import com.fasterxml.storemate.store.backend.IterationResult;
 import com.fasterxml.storemate.store.backend.StorableLastModIterationCallback;
+import com.fasterxml.storemate.store.lastaccess.LastAccessStore;
 
 import com.fasterxml.clustermate.service.*;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
