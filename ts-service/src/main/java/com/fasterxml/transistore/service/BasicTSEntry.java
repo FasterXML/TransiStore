@@ -166,7 +166,8 @@ public class BasicTSEntry extends StoredEntry<BasicTSKey>
      */
     
     // Override for diagnostics, debugging:
-    @Override
+    // Default impl is good actually, leave as is
+    /*
     public String toString()
     {
         StringBuilder sb = new StringBuilder(60)
@@ -176,4 +177,5 @@ public class BasicTSEntry extends StoredEntry<BasicTSKey>
         sb.append(']');
         return sb.toString();
     }
+    */
 }
