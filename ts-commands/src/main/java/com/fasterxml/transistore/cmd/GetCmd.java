@@ -81,11 +81,7 @@ public class GetCmd extends TStoreCmdBase
             if (jgen != null) {
                 try { jgen.flush(); } catch (Exception e2) { }
             }
-            System.err.printf("ERROR: (%s): %s", e.getClass().getName(), e.getMessage());
-            if (e instanceof RuntimeException) {
-                e.printStackTrace(System.err);
-            }
-            System.exit(1);
+            terminateWith(e);
         }
         client.stop();
     }

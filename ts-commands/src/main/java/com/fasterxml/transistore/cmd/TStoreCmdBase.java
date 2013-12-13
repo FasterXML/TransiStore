@@ -189,20 +189,14 @@ public abstract class TStoreCmdBase implements Runnable
         System.err.println("WARN: "+str);
     }
 
-    protected void error(String template, Object... args)
-    {
-        String str = (args.length == 0) ? template : String.format(template, args);
-        if (!str.endsWith("\n")) {
-            str += "\n";
-        }
-        System.err.println("ERROR: "+str);
-    }
-
     protected <T> T terminateWith(Throwable e)
     {
-        System.err.printf("ERROR: (%s): %s", e.getClass().getName(), e.getMessage());
+        // NOTE: printStackTrace actually prints exception itself so...
         if (e instanceof RuntimeException) {
+            System.err.print("ERROR/");
             e.printStackTrace(System.err);
+        } else {
+            System.err.println("ERROR/"+e);
         }
         System.exit(1);
         return null;
