@@ -162,7 +162,7 @@ public class ListCmd extends TStoreCmdBase
         mins -= (h * 60);
         if (h < 24) { // even hours quite common, optimize
             if (mins == 0) {
-                return String.format("%2dh   ", h);
+                return String.format("%2dh  ", h);
             }
             return String.format("%2dh%02d", h, mins);
         }
