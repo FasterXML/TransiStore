@@ -2,9 +2,9 @@ package com.fasterxml.transistore.service;
 
 import com.fasterxml.clustermate.api.EntryKeyConverter;
 import com.fasterxml.clustermate.service.store.StoredEntry;
+import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
-
 import com.fasterxml.transistore.basic.BasicTSKey;
 
 public class BasicTSEntry extends StoredEntry<BasicTSKey>
@@ -86,6 +86,11 @@ public class BasicTSEntry extends StoredEntry<BasicTSKey>
     @Override
     public BasicTSKey getKey() { return key; }
 
+    @Override
+    public StorableKey getStorableKey() {
+        return key.asStorableKey();
+    }
+    
     @Override
     public Storable getRaw() { return rawEntry; }
 
