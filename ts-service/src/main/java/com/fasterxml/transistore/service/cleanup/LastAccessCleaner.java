@@ -10,9 +10,9 @@ import com.fasterxml.storemate.store.backend.IterationAction;
 import com.fasterxml.storemate.store.lastaccess.EntryLastAccessed;
 import com.fasterxml.storemate.store.lastaccess.LastAccessStore;
 import com.fasterxml.storemate.store.lastaccess.LastAccessStore.LastAccessIterationCallback;
+import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.service.BasicTSEntry;
-
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
@@ -27,7 +27,7 @@ public class LastAccessCleaner
 {
     private final static Logger LOG = LoggerFactory.getLogger(LastAccessCleaner.class);
 
-    protected LastAccessStore<BasicTSKey, BasicTSEntry> _lastAccessStore;
+    protected LastAccessStore<BasicTSKey, BasicTSEntry, LastAccessUpdateMethod> _lastAccessStore;
     
     protected boolean _isTesting;
 
@@ -41,7 +41,7 @@ public class LastAccessCleaner
             AtomicBoolean shutdown)
     {
         super.init(stuff, stores, cluster, shutdown);
-        _lastAccessStore = (LastAccessStore<BasicTSKey, BasicTSEntry>) stores.getLastAccessStore();
+        _lastAccessStore = (LastAccessStore<BasicTSKey,BasicTSEntry,LastAccessUpdateMethod>) stores.getLastAccessStore();
         _isTesting = stuff.isRunningTests();
     }
     

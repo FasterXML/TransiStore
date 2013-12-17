@@ -3,7 +3,6 @@ package com.fasterxml.transistore.service.store;
 import java.io.File;
 
 import com.sleepycat.je.Environment;
-
 import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.clustermate.service.state.ActiveNodeState;
 import com.fasterxml.clustermate.service.store.StoredEntry;
@@ -15,6 +14,7 @@ import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.lastaccess.LastAccessConfig;
 import com.fasterxml.storemate.store.lastaccess.LastAccessStore;
+import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
 import com.fasterxml.storemate.store.state.NodeStateStore;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.service.bdb.BasicTSLastAccessStore;
@@ -37,7 +37,8 @@ public class BasicTSStores extends StoresImpl<BasicTSKey, StoredEntry<BasicTSKey
     }
 
     @Override
-    protected LastAccessStore<BasicTSKey, StoredEntry<BasicTSKey>> buildAccessStore(Environment env,
+    protected LastAccessStore<BasicTSKey, StoredEntry<BasicTSKey>,LastAccessUpdateMethod>
+    buildAccessStore(Environment env,
             LastAccessConfig config) {
         return new BasicTSLastAccessStore(env, _entryConverter, config);
     }

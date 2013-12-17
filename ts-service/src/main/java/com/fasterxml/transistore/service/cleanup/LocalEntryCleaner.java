@@ -15,13 +15,12 @@ import com.fasterxml.storemate.store.backend.IterationAction;
 import com.fasterxml.storemate.store.backend.IterationResult;
 import com.fasterxml.storemate.store.backend.StorableLastModIterationCallback;
 import com.fasterxml.storemate.store.lastaccess.LastAccessStore;
-
+import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
 import com.fasterxml.clustermate.service.*;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.clustermate.service.store.StoredEntryConverter;
-
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.service.BasicTSEntry;
 
@@ -41,7 +40,7 @@ public class LocalEntryCleaner
 
     protected StorableStore _entryStore;
 
-    protected LastAccessStore<BasicTSKey, BasicTSEntry> _lastAccessStore;
+    protected LastAccessStore<BasicTSKey,BasicTSEntry,LastAccessUpdateMethod> _lastAccessStore;
 
     protected StoredEntryConverter<BasicTSKey,BasicTSEntry,?> _entryConverter;
     
@@ -60,7 +59,7 @@ public class LocalEntryCleaner
         _tombstoneTTLMsecs = stuff.getServiceConfig().cfgTombstoneTTL.getMillis();
         _entryConverter = stuff.getEntryConverter();
         _entryStore = stores.getEntryStore();
-        _lastAccessStore = (LastAccessStore<BasicTSKey, BasicTSEntry>) stores.getLastAccessStore();
+        _lastAccessStore = (LastAccessStore<BasicTSKey, BasicTSEntry,LastAccessUpdateMethod>) stores.getLastAccessStore();
         _isTesting = stuff.isRunningTests();
     }
 
