@@ -1,11 +1,12 @@
 Project: TransiStore
 
-0.9.8 (xx-Sep-2013)
+0.9.8 (03-Jan-2013)
 
 - Ensure that gzip filter will NOT be added by Jetty/DW (was not always
   being disabled properly)
 - Add basic db/file-access throttling support
 - Make clean-up tasks more robust wrt possible secondary-index problems
+- Based on ClusterMate-0.9.21
 
 0.9.5 (30-Apr-2013)
 
