@@ -9,5 +9,5 @@ fi
 java -Xmx1024M -Xms1024M -XX:-UseParallelOldGC \
   -Ddw.http.port=$PORT \
   -Ddw.http.adminPort=$PORT \
-  -jar ../../ts-server/target/transistore-server-0.9.8-SNAPSHOT.jar \
+  -jar ../../ts-server/target/transistore-server-0.9.9-SNAPSHOT.jar \
   server ../../sample/two-leveldb-7070-9090.yml
