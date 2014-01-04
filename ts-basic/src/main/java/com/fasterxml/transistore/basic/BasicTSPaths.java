@@ -13,8 +13,8 @@ import com.fasterxml.clustermate.api.RequestPathStrategy;
  *<ul>
  * <li>Store entries under ".../store/":
  *  <ul>
- *    <li>".../store/entry" for single-entry</li>
- *    <li>".../store/list" for range access</li>
+ *    <li>".../store/entry" for single-entry access</li>
+ *    <li>".../store/entries" for range (ordered multi-entry) access</li>
  *    <li>".../store/status" for store status (admin interface)</li>
  *    <li>".../store/findEntry" for redirecting single-entry</li>
  *    <li>".../store/findList" for redirecting range access</li>
@@ -42,10 +42,10 @@ public class BasicTSPaths extends RequestPathStrategy
     protected final static String FIRST_SEGMENT_SYNC = "sync";
 
     protected final static String SECOND_SEGMENT_STORE_ENTRY = "entry";
-    protected final static String SECOND_SEGMENT_STORE_LIST = "list";
+    protected final static String SECOND_SEGMENT_STORE_ENTRIES= "entries";
     protected final static String SECOND_SEGMENT_STORE_STATUS = "status";
     protected final static String SECOND_SEGMENT_STORE_FIND_ENTRY = "findEntry";
-    protected final static String SECOND_SEGMENT_STORE_FIND_LIST = "findList";
+    protected final static String SECOND_SEGMENT_STORE_FIND_ENTRIES = "findEntries";
 
     protected final static String SECOND_SEGMENT_NODE_STATUS = "status";
     protected final static String SECOND_SEGMENT_NODE_METRICS = "metrics";
@@ -74,9 +74,9 @@ public class BasicTSPaths extends RequestPathStrategy
         case STORE_FIND_ENTRY:
             return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_FIND_ENTRY);
         case STORE_FIND_LIST:
-            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_FIND_LIST);
+            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_FIND_ENTRIES);
         case STORE_LIST:
-            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_LIST);
+            return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRIES);
         case STORE_STATUS:
             return (B) _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_STATUS);
 
@@ -102,7 +102,7 @@ public class BasicTSPaths extends RequestPathStrategy
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_ENTRY)) {
                 return PathType.STORE_ENTRY;
             }
-            if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_LIST)) {
+            if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_ENTRIES)) {
                 return PathType.STORE_LIST;
             }
         } else if (pathDecoder.matchPathSegment(FIRST_SEGMENT_NODE)) {
