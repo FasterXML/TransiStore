@@ -59,7 +59,7 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
      */
 
     @Override
-    public <B extends RequestPathBuilder<PathType,B>> B appendPath(B basePath, PathType type)
+    public <B extends RequestPathBuilder<B>> B appendPath(B basePath, PathType type)
     {
         switch (type) {
         case NODE_METRICS:
@@ -129,15 +129,15 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
     /**********************************************************************
      */
     
-    protected <B extends RequestPathBuilder<PathType,B>> B _storePath(B nodeRoot) {
+    protected <B extends RequestPathBuilder<B>> B _storePath(B nodeRoot) {
         return nodeRoot.addPathSegment(FIRST_SEGMENT_STORE);
     }
 
-    protected <B extends RequestPathBuilder<PathType,B>> B _nodePath(B nodeRoot) {
+    protected <B extends RequestPathBuilder<B>> B _nodePath(B nodeRoot) {
         return nodeRoot.addPathSegment(FIRST_SEGMENT_NODE);
     }
 
-    protected <B extends RequestPathBuilder<PathType,B>> B _syncPath(B nodeRoot) {
+    protected <B extends RequestPathBuilder<B>> B _syncPath(B nodeRoot) {
         return nodeRoot.addPathSegment(FIRST_SEGMENT_SYNC);
     }
 }

@@ -210,10 +210,9 @@ public class BasicTSKeyConverter
     /* Path handling
     /**********************************************************************
      */
-    
-    @SuppressWarnings("unchecked")
+
     @Override
-    public <B extends RequestPathBuilder> B appendToPath(B b, BasicTSKey key)
+    public <B extends RequestPathBuilder<B>> B appendToPath(B b, BasicTSKey key)
     {
         // Partition id: could be added as path segment; but for now we'll use query param instead
         int partitionIdLen = key.getPartitionIdLength();
