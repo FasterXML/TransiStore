@@ -37,7 +37,7 @@ public class TSReadCallParameters extends ReadCallParameters
      */
 
     @Override
-    public <B extends RequestPathBuilder> B appendToPath(B pathBuilder,
+    public <B extends RequestPathBuilder<B>> B appendToPath(B pathBuilder,
             EntryKey contentId)
     {
         // Nothing to do, yet!

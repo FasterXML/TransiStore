@@ -56,15 +56,13 @@ public class TSPutCallParameters extends PutCallParameters
     /* Implementation needed by base class
     /**********************************************************************
      */
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public <B extends RequestPathBuilder> B appendToPath(B pathBuilder,
-			EntryKey contentId)
-	{
-		if (_maxTTLInSeconds > 0) {
-			pathBuilder = (B) pathBuilder.addParameter(ClusterMateConstants.QUERY_PARAM_MAX_TTL, _maxTTLInSeconds);
-		}
-		return pathBuilder;
-	}
+
+    @Override
+    public <B extends RequestPathBuilder<B>> B appendToPath(B pathBuilder, EntryKey contentId)
+    {
+        if (_maxTTLInSeconds > 0) {
+            pathBuilder = (B) pathBuilder.addParameter(ClusterMateConstants.QUERY_PARAM_MAX_TTL, _maxTTLInSeconds);
+        }
+        return pathBuilder;
+    }
 }

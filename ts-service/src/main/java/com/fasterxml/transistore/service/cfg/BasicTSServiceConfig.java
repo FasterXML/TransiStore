@@ -24,7 +24,7 @@ public class BasicTSServiceConfig
         "ts"
     };
     
-    protected RequestPathStrategy _requestPathStrategy;
+    protected RequestPathStrategy<?> _requestPathStrategy;
 
     protected StoredEntryConverter<?,?,?> _entryConverter;
 
@@ -49,7 +49,7 @@ public class BasicTSServiceConfig
     }
 
     public BasicTSServiceConfig(StoredEntryConverter<?,?,?> entryConverter,
-            RequestPathStrategy paths) {
+            RequestPathStrategy<?> paths) {
         super(DEFAULT_SERVICE_ROOT);
         _entryConverter = entryConverter;
         _requestPathStrategy = paths;
@@ -62,7 +62,7 @@ public class BasicTSServiceConfig
      */
     
     @Override
-    public RequestPathStrategy getServicePathStrategy() {
+    public RequestPathStrategy<?> getServicePathStrategy() {
         return _requestPathStrategy;
     }
     

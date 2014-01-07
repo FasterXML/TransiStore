@@ -37,7 +37,7 @@ public class TSDeleteCallParameters extends DeleteCallParameters
      */
 
     @Override
-    public <B extends RequestPathBuilder> B appendToPath(B pathBuilder,
+    public <B extends RequestPathBuilder<B>> B appendToPath(B pathBuilder,
             EntryKey contentId)
     {
         // Nothing to do, yet!

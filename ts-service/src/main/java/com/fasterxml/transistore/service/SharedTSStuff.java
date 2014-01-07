@@ -12,7 +12,7 @@ import com.fasterxml.transistore.basic.BasicTSKey;
 public abstract class SharedTSStuff extends SharedServiceStuff
 {
     protected SharedTSStuff(TimeMaster timeMaster, FileManager fileManager,
-            RequestPathStrategy pathStrategy) {
+            RequestPathStrategy<?> pathStrategy) {
         super(timeMaster, fileManager, pathStrategy);
     }
 
