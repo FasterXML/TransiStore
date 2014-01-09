@@ -90,6 +90,9 @@ public class BasicTSEntryConverter
     
     @Override
     public final BasicTSEntry entryFromStorable(final Storable raw) {
+        if (raw == null) {
+            return null;
+        }
         return entryFromStorable(_key(raw.getKey()), raw);
     }
 
