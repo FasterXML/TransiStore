@@ -6,9 +6,14 @@ import java.util.Arrays;
 import static org.junit.Assert.assertArrayEquals;
 
 import com.fasterxml.storemate.shared.IpAndPort;
+import com.fasterxml.storemate.shared.compress.Compression;
+import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.store.StoreConfig;
 
+import com.fasterxml.clustermate.client.call.PutContentProvider;
+import com.fasterxml.clustermate.client.call.PutContentProviders;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
+import com.fasterxml.clustermate.client.operation.HeadOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.dw.RunMode;
 
@@ -29,7 +34,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
 
     final static int PORT_1 = PORT_BASE + 0;
     final static int PORT_2 = PORT_BASE + 1;
-    
+
     final static int MAX_PAYLOAD_IN_MEMORY = StoreConfig.DEFAULT_MIN_PAYLOAD_FOR_STREAMING-1;
     
     public void testSimpleSingleNode() throws Exception
@@ -145,6 +150,112 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should not have the data after DELETE", data);
             // and That's All, Folks!
+        } finally {
+            service._stop();
+            service.waitForStopped();
+        }        
+    }
+
+    public void testSingleNodeWithGZIPPreCompressed() throws Exception
+    {
+        initTestLogging();
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1PrecompZ", true, PORT_1);
+        StoreForTests service = StoreForTests.createTestService(serviceConfig,
+                new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
+        startServices(service);
+
+        BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                .setOptimalOks(1).setMaxOks(1).setAllowRetries(false)
+                .build();
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
+        final BasicTSKey KEY = contentKey("testSimple-precomp-gzip");
+
+        try {
+            // first: verify that we can do GET, but not find the entry:
+            HeadOperationResult head = client.headContent(null, KEY);
+            assertFalse("Should not yet have entry", head.entryFound());
+
+            int origSize = 7000;
+            final byte[] ORIG_CONTENT = biggerSomewhatCompressibleData(origSize);
+            final byte[] COMP_CONTENT = Compressors.gzipCompress(ORIG_CONTENT);
+
+            PutContentProvider prov = PutContentProviders
+                    .forBytes(COMP_CONTENT)
+                    .withCompression(Compression.GZIP, origSize);
+
+            PutOperationResult result = client.putContent(null, KEY, prov);
+            assertTrue(result.succeededOptimally());
+
+            // find it; both with GET and HEAD
+            byte[] data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should now have the data", data);
+            assertArrayEquals(ORIG_CONTENT, data);
+            
+            long len = client.getContentLength(null, KEY);
+            assertEquals(origSize, len);
+    
+            // delete:
+            DeleteOperationResult del = client.deleteContent(null, KEY);
+            assertTrue(del.succeededMinimally());
+            assertTrue(del.succeededOptimally());
+    
+            // after which content ... is no more:
+            data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should not have the data after DELETE", data);
+            
+        } finally {
+            service._stop();
+            service.waitForStopped();
+        }        
+    }
+
+    public void testSingleNodeWithLZFPreCompressed() throws Exception
+    {
+        initTestLogging();
+        BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1PrecompL", true, PORT_1);
+        StoreForTests service = StoreForTests.createTestService(serviceConfig,
+                new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
+        startServices(service);
+
+        BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                .setOptimalOks(1).setMaxOks(1).setAllowRetries(false)
+                .build();
+        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
+        final BasicTSKey KEY = contentKey("testSimple-precomp-lzf");
+
+        try {
+            // first: verify that we can do GET, but not find the entry:
+            HeadOperationResult head = client.headContent(null, KEY);
+            assertFalse("Should not yet have entry", head.entryFound());
+
+            int origSize = 135000;
+            final byte[] ORIG_CONTENT = biggerSomewhatCompressibleData(origSize);
+            final byte[] COMP_CONTENT = Compressors.lzfCompress(ORIG_CONTENT);
+
+            PutContentProvider prov = PutContentProviders
+                    .forBytes(COMP_CONTENT)
+                    .withCompression(Compression.LZF, origSize);
+
+            PutOperationResult result = client.putContent(null, KEY, prov);
+            assertTrue(result.succeededOptimally());
+
+            // find it; both with GET and HEAD
+            byte[] data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should now have the data", data);
+            assertArrayEquals(ORIG_CONTENT, data);
+            
+            long len = client.getContentLength(null, KEY);
+            assertEquals(origSize, len);
+    
+            // delete:
+            DeleteOperationResult del = client.deleteContent(null, KEY);
+            assertTrue(del.succeededMinimally());
+            assertTrue(del.succeededOptimally());
+    
+            // after which content ... is no more:
+            data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should not have the data after DELETE", data);
+            
         } finally {
             service._stop();
             service.waitForStopped();
