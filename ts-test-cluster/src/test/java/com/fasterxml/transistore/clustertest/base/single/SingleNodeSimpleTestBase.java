@@ -10,6 +10,7 @@ import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.store.StoreConfig;
 
+import com.fasterxml.clustermate.client.NodeFailure;
 import com.fasterxml.clustermate.client.call.PutContentProvider;
 import com.fasterxml.clustermate.client.call.PutContentProviders;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
@@ -184,8 +185,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
                     .withCompression(Compression.GZIP, origSize);
 
             PutOperationResult result = client.putContent(null, KEY, prov);
-            assertTrue(result.succeededOptimally());
-
+            _verifyPutResult(result);
             // find it; both with GET and HEAD
             byte[] data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should now have the data", data);
@@ -237,13 +237,13 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
                     .withCompression(Compression.LZF, origSize);
 
             PutOperationResult result = client.putContent(null, KEY, prov);
-            assertTrue(result.succeededOptimally());
+            _verifyPutResult(result);
 
             // find it; both with GET and HEAD
             byte[] data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should now have the data", data);
             assertArrayEquals(ORIG_CONTENT, data);
-            
+
             long len = client.getContentLength(null, KEY);
             assertEquals(origSize, len);
     
@@ -260,5 +260,17 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             service._stop();
             service.waitForStopped();
         }        
+    }
+
+    private void _verifyPutResult(PutOperationResult result)
+    {
+        if (!result.succeededOptimally()) {
+            NodeFailure fail = result.getFirstFail();
+            if (fail == null) {
+                fail("Did not succeed optimally; succeess: "+result.getSuccessCount()+", failed: "
+                    +result.getFailCount()+"; first fail? null -- Strange!");
+            }
+            fail("Failed to PUT content, failure: "+fail);
+        }
     }
 }
