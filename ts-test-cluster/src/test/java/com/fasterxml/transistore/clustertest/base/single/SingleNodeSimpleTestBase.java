@@ -228,10 +228,10 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             HeadOperationResult head = client.headContent(null, KEY);
             assertFalse("Should not yet have entry", head.entryFound());
 
-            int origSize = 135000;
+            int origSize = 210000; // just so it'll be above 64k mark
             final byte[] ORIG_CONTENT = biggerSomewhatCompressibleData(origSize);
             final byte[] COMP_CONTENT = Compressors.lzfCompress(ORIG_CONTENT);
-
+            
             PutContentProvider prov = PutContentProviders
                     .forBytes(COMP_CONTENT)
                     .withCompression(Compression.LZF, origSize);
@@ -243,7 +243,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             byte[] data = client.getContentAsBytes(null, KEY);
             assertNotNull("Should now have the data", data);
             assertArrayEquals(ORIG_CONTENT, data);
-
+            
             long len = client.getContentLength(null, KEY);
             assertEquals(origSize, len);
     
