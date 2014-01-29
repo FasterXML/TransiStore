@@ -2,10 +2,8 @@ package com.fasterxml.transistore.service;
 
 import com.fasterxml.storemate.shared.ByteContainer;
 import com.fasterxml.storemate.shared.StorableKey;
-import com.fasterxml.storemate.shared.util.ByteUtil;
 import com.fasterxml.storemate.shared.util.WithBytesCallback;
 import com.fasterxml.storemate.store.Storable;
-import com.fasterxml.storemate.store.lastaccess.EntryLastAccessed;
 import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
 
 import com.fasterxml.clustermate.api.EntryKeyConverter;
@@ -135,37 +133,7 @@ public class BasicTSEntryConverter
         return new BasicTSListItem(raw.getKey(), raw.getContentHash(), raw.getActualUncompressedLength(),
                 entry.creationTime, entry.maxTTLSecs);
     }
-    
-    /*
-    /**********************************************************************
-    /* Other conversions
-    /**********************************************************************
-     */
 
-    @Override
-    public EntryLastAccessed createLastAccessed(StoredEntry<BasicTSKey> entry, long accessTime)
-    {
-        return new EntryLastAccessed(accessTime, entry.calculateMaxExpirationTime(),
-                 entry.getLastAccessUpdateMethod().asByte());
-    }
-
-    @Override
-    public EntryLastAccessed createLastAccessed(byte[] raw) {
-        return createLastAccessed(raw, 0, raw.length);
-    }
-
-    @Override
-    public EntryLastAccessed createLastAccessed(byte[] raw, int offset, int length)
-    {
-        if (length != 17) {
-            throw new IllegalArgumentException("LastAccessed entry length must be 17 bytes, was: "+length);
-        }
-        long accessTime = ByteUtil.getLongBE(raw, offset);
-        long expirationTime = ByteUtil.getLongBE(raw, offset+8);
-        byte type = raw[16];
-        return new EntryLastAccessed(accessTime, expirationTime, type);
-    }
-    
     /*
     /**********************************************************************
     /* Internal methods, data extraction
