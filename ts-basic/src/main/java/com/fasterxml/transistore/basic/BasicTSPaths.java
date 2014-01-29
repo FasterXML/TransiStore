@@ -51,10 +51,10 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
 
     protected final static String SECOND_SEGMENT_SYNC_LIST = "list";
     protected final static String SECOND_SEGMENT_SYNC_PULL = "pull";
-    
+
     /*
     /**********************************************************************
-    /* Path building
+    /* Path building, external store requests
     /**********************************************************************
      */
 
@@ -63,27 +63,64 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
     {
         switch (type) {
         case NODE_METRICS:
-            return _nodePath(basePath).addPathSegment(SECOND_SEGMENT_NODE_METRICS);
+            return appendNodeMetricsPath(basePath);
         case NODE_STATUS:
-            return _nodePath(basePath).addPathSegment(SECOND_SEGMENT_NODE_STATUS);
+            return appendNodeStatusPath(basePath);
 
         case STORE_ENTRY:
-            return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRY);
+            return appendStoreEntryPath(basePath);
+        case STORE_ENTRIES:
+            return appendStoreListPath(basePath);
+
         case STORE_FIND_ENTRY:
             return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_FIND_ENTRY);
         case STORE_FIND_LIST:
             return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_FIND_ENTRIES);
-        case STORE_LIST:
-            return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRIES);
         case STORE_STATUS:
             return  _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_STATUS);
 
         case SYNC_LIST:
-            return _syncPath(basePath).addPathSegment(SECOND_SEGMENT_SYNC_LIST);
+            return appendSyncListPath(basePath);
         case SYNC_PULL:
-            return _syncPath(basePath).addPathSegment(SECOND_SEGMENT_SYNC_PULL);
+            return appendSyncPullPath(basePath);
         }
         throw new IllegalStateException();
+    }
+
+    /*
+    /**********************************************************************
+    /* Methods for building basic content access paths
+    /**********************************************************************å
+     */
+    
+    public <B extends RequestPathBuilder<B>> B appendStoreEntryPath(B basePath) {
+        return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRY);
+    }
+
+    public <B extends RequestPathBuilder<B>> B appendStoreListPath(B basePath) {
+        return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRIES);
+    }
+    
+    /*
+    /**********************************************************************
+    /* Path building, server-side sync requests
+    /**********************************************************************
+     */
+    
+    public <B extends RequestPathBuilder<B>> B appendSyncListPath(B basePath) {
+        return _syncPath(basePath).addPathSegment(SECOND_SEGMENT_SYNC_LIST);
+    }
+
+    public <B extends RequestPathBuilder<B>> B appendSyncPullPath(B basePath) {
+        return _syncPath(basePath).addPathSegment(SECOND_SEGMENT_SYNC_PULL);
+    }
+
+    public <B extends RequestPathBuilder<B>> B appendNodeStatusPath(B basePath) {
+        return _nodePath(basePath).addPathSegment(SECOND_SEGMENT_NODE_STATUS);
+    }
+
+    public <B extends RequestPathBuilder<B>> B appendNodeMetricsPath(B basePath) {
+        return _nodePath(basePath).addPathSegment(SECOND_SEGMENT_NODE_METRICS);
     }
 
     /*
@@ -101,7 +138,7 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
                 return PathType.STORE_ENTRY;
             }
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_ENTRIES)) {
-                return PathType.STORE_LIST;
+                return PathType.STORE_ENTRIES;
             }
         } else if (pathDecoder.matchPathSegment(FIRST_SEGMENT_NODE)) {
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_NODE_STATUS)) {
