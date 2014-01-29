@@ -92,33 +92,39 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
     /* Methods for building basic content access paths
     /**********************************************************************å
      */
-    
+
+    @Override
     public <B extends RequestPathBuilder<B>> B appendStoreEntryPath(B basePath) {
         return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRY);
     }
 
+    @Override
     public <B extends RequestPathBuilder<B>> B appendStoreListPath(B basePath) {
         return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRIES);
     }
-    
+
     /*
     /**********************************************************************
     /* Path building, server-side sync requests
     /**********************************************************************
      */
-    
+
+    @Override
     public <B extends RequestPathBuilder<B>> B appendSyncListPath(B basePath) {
         return _syncPath(basePath).addPathSegment(SECOND_SEGMENT_SYNC_LIST);
     }
 
+    @Override
     public <B extends RequestPathBuilder<B>> B appendSyncPullPath(B basePath) {
         return _syncPath(basePath).addPathSegment(SECOND_SEGMENT_SYNC_PULL);
     }
 
+    @Override
     public <B extends RequestPathBuilder<B>> B appendNodeStatusPath(B basePath) {
         return _nodePath(basePath).addPathSegment(SECOND_SEGMENT_NODE_STATUS);
     }
 
+    @Override
     public <B extends RequestPathBuilder<B>> B appendNodeMetricsPath(B basePath) {
         return _nodePath(basePath).addPathSegment(SECOND_SEGMENT_NODE_METRICS);
     }
