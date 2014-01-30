@@ -7,6 +7,7 @@ import org.skife.config.TimeSpan;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.clustermate.client.NodeFailure;
+import com.fasterxml.clustermate.client.operation.PutOperation;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 
 import io.airlift.command.Arguments;
@@ -182,8 +183,13 @@ public class PutCmd extends TStoreCmdBase
 
         final long nanoStart = System.nanoTime();
         
-        PutOperationResult putResult = isSmall ? client.putContent(params, key, readFile(src))
+        PutOperation put = isSmall ? client.putContent(params, key, readFile(src))
                 : client.putContent(params, key, src);
+        PutOperationResult putResult = put.completeOptimally();
+        if (putResult.succeededOptimally()) { // if it went well, try bonus round:
+            putResult = put.tryCompleteMaximally();
+        }
+
         if (!putResult.succeededMinimally()) {
             NodeFailure fail = putResult.getFirstFail();
             int status = fail.getFirstCallFailure().getStatusCode();

@@ -15,6 +15,9 @@ import io.airlift.command.Arguments;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 
+/**
+ * Test utility that can be used to generate load on a TStore instance.
+ */
 @Command(name = "generate", description = "Generate and upload test data in TStore")
 public class GenerateLoad extends TStoreCmdBase
 {
@@ -152,7 +155,7 @@ public class GenerateLoad extends TStoreCmdBase
         long startTime = System.nanoTime();
         BasicTSKey entryKey = contentKey(_prefix.getPartitionId(),
                 _prefix.getPath() + "/entry_"+Integer.toHexString(index));
-        PutOperationResult result = _client.putContent(null, entryKey, stuff);
+        PutOperationResult result = _client.putContent(null, entryKey, stuff).completeOptimally();
         int msecs = (int) ((System.nanoTime() - startTime) >> 20); // about right
         _logPut(result, threadId, msecs, entryKey.toString());
         return true;

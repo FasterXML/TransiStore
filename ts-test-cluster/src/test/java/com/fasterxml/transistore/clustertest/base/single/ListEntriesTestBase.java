@@ -161,7 +161,7 @@ public abstract class ListEntriesTestBase extends ClusterTestBase
     {
         final BasicTSKey KEY = contentKey(partition, path);
         final byte[] CONTENT = ("Content:"+path).getBytes("UTF-8");
-        PutOperationResult result = client.putContent(null, KEY, CONTENT);
+        PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
         assertTrue(result.succeededOptimally());
     }
 }

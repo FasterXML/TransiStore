@@ -71,7 +71,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             final int LENGTH = 12000;
             final byte[] CONTENT = new byte[LENGTH];
             Arrays.fill(CONTENT, (byte) 0xAC);
-            PutOperationResult result = client.putContent(null, KEY, CONTENT);
+            PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
             assertTrue(result.succeededOptimally());
 
             // find it; both with GET and HEAD
@@ -129,7 +129,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             fout.write(CONTENT);
             fout.close();
     
-            PutOperationResult result = client.putContent(null, KEY, file);
+            PutOperationResult result = client.putContent(null, KEY, file).completeOptimally();
             if (!result.succeededOptimally()) {
                 fail("PUT failed, with: "+result.getFirstFail());
             }
@@ -184,7 +184,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
                     .forBytes(COMP_CONTENT)
                     .withCompression(Compression.GZIP, origSize);
 
-            PutOperationResult result = client.putContent(null, KEY, prov);
+            PutOperationResult result = client.putContent(null, KEY, prov).completeOptimally();
             _verifyPutResult(result);
             // find it; both with GET and HEAD
             byte[] data = client.getContentAsBytes(null, KEY);
@@ -236,7 +236,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
                     .forBytes(COMP_CONTENT)
                     .withCompression(Compression.LZF, origSize);
 
-            PutOperationResult result = client.putContent(null, KEY, prov);
+            PutOperationResult result = client.putContent(null, KEY, prov).completeOptimally();
             _verifyPutResult(result);
 
             // find it; both with GET and HEAD

@@ -62,7 +62,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 			final byte[] CONTENT = new byte[LENGTH];
 			Arrays.fill(CONTENT, (byte) 0xAC);
 			
-			PutOperationResult result = client.putContent(null, KEY, CONTENT);
+			PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
 			assertTrue(result.succeededOptimally());
 
 			// find it; both with GET and HEAD
@@ -115,7 +115,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 				int origSize = MAX_PAYLOAD_IN_MEMORY + 100;
 				final byte[] CONTENT = biggerSomewhatCompressibleData(origSize);
 				PutOperationResult result = client.putContent(null,
-						KEY, CONTENT);
+						KEY, CONTENT).completeOptimally();
 				if (!result.succeededOptimally()) {
 					fail("PUT failed, with: " + result.getFirstFail());
 				}
@@ -180,7 +180,7 @@ public abstract class SingleNodeExpirationTestBase extends ClusterTestBase
 				int origSize = MAX_PAYLOAD_IN_MEMORY + 100;
 				final byte[] CONTENT = biggerSomewhatCompressibleData(origSize);
 				PutOperationResult result = client.putContent(null,
-						KEY, CONTENT);
+						KEY, CONTENT).completeOptimally();
 				if (!result.succeededOptimally()) {
 					fail("PUT failed, with: " + result.getFirstFail());
 				}

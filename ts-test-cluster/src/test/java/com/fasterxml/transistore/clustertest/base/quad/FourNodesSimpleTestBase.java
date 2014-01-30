@@ -119,7 +119,7 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             // Then add said content
             final byte[] CONTENT = new byte[12000];
             Arrays.fill(CONTENT, (byte) 0xAC);
-            PutOperationResult result = client.putContent(null, KEY, CONTENT);
+            PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
             assertTrue(result.succeededOptimally());
             assertEquals(result.getSuccessCount(), 1);
             // and advance time (to get distinct timestamps)
