@@ -29,10 +29,16 @@
       <artifactId>jackson-databind</artifactId>
     </dependency>
 
-    <!--  also using common stuff from StoreMate/ClusterMate -->
+    <!-- also using common stuff from StoreMate/ClusterMate -->
+    <!-- 01-Feb-2014, tatu: Based on BDB-JE storage, for now
+      -->
     <dependency>
       <groupId>com.fasterxml.clustermate</groupId>
       <artifactId>clustermate-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.storemate</groupId>
+      <artifactId>storemate-backend-bdb-je</artifactId>
     </dependency>
   </dependencies>
 </project>
