@@ -17,4 +17,16 @@ public class BasicTSClient
     {
         super(config, BasicTSListItem.class, statusAccessor, clusterView, httpClientImpl);
     }
+
+    protected BasicTSClient(BasicTSClient base, BasicTSClientConfig newConfig) {
+        super(base, newConfig);
+    }
+    
+    public BasicTSClient withConfig(BasicTSClientConfig config)
+    {
+        if (config == _config) { // no change? just return this instance
+            return this;
+        }
+        return new BasicTSClient(this, config);
+    }
 }

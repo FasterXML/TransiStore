@@ -13,7 +13,6 @@ import com.fasterxml.clustermate.client.operation.StoreEntryLister;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.client.BasicTSClient;
-import com.fasterxml.transistore.client.BasicTSClientConfig;
 
 import io.airlift.command.Arguments;
 import io.airlift.command.Command;
@@ -45,10 +44,6 @@ public class ListCmd extends TStoreCmdBase
     @Override
     public void run()
     {
-        // start with config file
-        SkeletalServiceConfig serviceConfig = getServiceConfig();
-        BasicTSClientConfig clientConfig = getClientConfig();
-
         // but also need prefix of some kind
         if ((pathInfo == null) || pathInfo.size() != 1) {
             throw new IllegalArgumentException("Can only take single argument, path prefix for entries to list");
@@ -60,7 +55,7 @@ public class ListCmd extends TStoreCmdBase
             System.err.println("Invalid prefix '"+pathInfo.get(0)+"', problem: "+e.getMessage());
             System.exit(1);
         }
-        BasicTSClient client = bootstrapClient(clientConfig, serviceConfig);
+        BasicTSClient client = bootstrapClient();
 
         // as JSON or text?
         ListOperationResult<?> result = null;

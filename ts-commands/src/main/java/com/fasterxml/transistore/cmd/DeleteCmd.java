@@ -16,7 +16,6 @@ import com.fasterxml.clustermate.client.operation.StoreEntryLister;
 
 import com.fasterxml.transistore.basic.*;
 import com.fasterxml.transistore.client.BasicTSClient;
-import com.fasterxml.transistore.client.BasicTSClientConfig;
 
 @Command(name = "delete", description = "DELETE entries from TStore")
 public class DeleteCmd extends TStoreCmdBase
@@ -42,9 +41,6 @@ public class DeleteCmd extends TStoreCmdBase
     @Override
     public void run()
     {
-        SkeletalServiceConfig serviceConfig = getServiceConfig();
-        BasicTSClientConfig clientConfig = getClientConfig();
-
         // and then verify that all paths are valid server references
         List<BasicTSKey> paths = new ArrayList<BasicTSKey>();
 
@@ -55,7 +51,7 @@ public class DeleteCmd extends TStoreCmdBase
                 throw new IllegalArgumentException("Invalid server entry/path reference: "+e.getMessage());
             }
         }
-        BasicTSClient client = bootstrapClient(clientConfig, serviceConfig);
+        BasicTSClient client = bootstrapClient();
         int total = 0;
         try {
             for (BasicTSKey path : paths) {

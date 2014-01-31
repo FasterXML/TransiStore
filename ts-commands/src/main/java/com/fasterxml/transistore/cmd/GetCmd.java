@@ -17,7 +17,6 @@ import com.fasterxml.clustermate.client.operation.StoreEntryLister;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.BasicTSClient;
-import com.fasterxml.transistore.client.BasicTSClientConfig;
 
 @Command(name = "get", description = "GET entries from TStore into local file system")
 public class GetCmd extends TStoreCmdBase
@@ -40,13 +39,10 @@ public class GetCmd extends TStoreCmdBase
     @Override
     public void run()
     {
-        SkeletalServiceConfig serviceConfig = getServiceConfig();
-        BasicTSClientConfig clientConfig = getClientConfig();
-
         if (arguments == null || arguments.size() != 2) {
             throw new IllegalArgumentException("Wrong number of arguments; expect two (server-prefix, target dir)");
         }
-        BasicTSClient client = bootstrapClient(clientConfig, serviceConfig);
+        BasicTSClient client = bootstrapClient();
 
         // and then verify that all server sources are valid paths as well
         BasicTSKey prefix;

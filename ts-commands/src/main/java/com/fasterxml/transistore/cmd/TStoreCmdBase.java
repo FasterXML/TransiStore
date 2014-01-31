@@ -61,6 +61,13 @@ public abstract class TStoreCmdBase implements Runnable
     public boolean isJSON = false;
 
     /**
+     * Lazily constructed client configuration
+     */
+    protected BasicTSClientConfig _clientConfig;
+    
+    protected SkeletalServiceConfig _serviceConfig;
+
+    /**
      * @param canPrintVerbose Whether this command is allowed to print things to stdout
      *   in verbose mode
      */
@@ -70,55 +77,64 @@ public abstract class TStoreCmdBase implements Runnable
     
     protected SkeletalServiceConfig getServiceConfig()
     {
-        SkeletalServiceConfig config;
-
-        // If we have server definition(s), can avoid reading config file
-        if (servers != null && !servers.isEmpty()) {
-            config = new SkeletalServiceConfig();
-            // allow both multiple entries, and comma-separated lists
-            for (String server : servers) {
-                for (String str : server.split(",")) {
-                    config.ts.cluster.addNode(new IpAndPort(str));
+        if (_serviceConfig == null) {
+            SkeletalServiceConfig config;
+    
+            // If we have server definition(s), can avoid reading config file
+            if (servers != null && !servers.isEmpty()) {
+                config = new SkeletalServiceConfig();
+                // allow both multiple entries, and comma-separated lists
+                for (String server : servers) {
+                    for (String str : server.split(",")) {
+                        config.ts.cluster.addNode(new IpAndPort(str));
+                    }
                 }
+                if (_canPrintVerbose && verbose) {
+                    System.out.printf("INFO: using %d server nodes: %s\n", config.ts.cluster.clusterNodes.size(),
+                            config.ts.cluster.clusterNodes.toString());
+                }
+            } else if (configFile != null && !configFile.isEmpty()) {
+                // Use the one specified last:
+                File f = new File(configFile);
+                if (!f.exists() || !f.canRead()) {
+                    throw new IllegalArgumentException("Can not read config file '"+f.getAbsolutePath()+"'");
+                }
+                if (_canPrintVerbose && verbose) {
+                    System.out.printf("INFO: using config file '%s'\n", f.getAbsolutePath());
+                }
+    
+                try {
+                    config = mapper.readValue(f, SkeletalServiceConfig.class);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Fail to read config file '"+f.getAbsolutePath()+"': "+e.getMessage());
+                }
+                if (config.ts.cluster.clusterNodes == null || config.ts.cluster.clusterNodes.isEmpty()) {
+                    throw new IllegalArgumentException("Missing cluster nodes definition in config file '"+f.getAbsolutePath()+"'");
+                }
+            } else {
+                throw new IllegalArgumentException("Missing settings for configuration file, or server(s) to contact; can not initialize client");
             }
-            if (_canPrintVerbose && verbose) {
-                System.out.printf("INFO: using %d server nodes: %s\n", config.ts.cluster.clusterNodes.size(),
-                        config.ts.cluster.clusterNodes.toString());
-            }
-        } else if (configFile != null && !configFile.isEmpty()) {
-            // Use the one specified last:
-            File f = new File(configFile);
-            if (!f.exists() || !f.canRead()) {
-                throw new IllegalArgumentException("Can not read config file '"+f.getAbsolutePath()+"'");
-            }
-            if (_canPrintVerbose && verbose) {
-                System.out.printf("INFO: using config file '%s'\n", f.getAbsolutePath());
-            }
-
-            try {
-                config = mapper.readValue(f, SkeletalServiceConfig.class);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Fail to read config file '"+f.getAbsolutePath()+"': "+e.getMessage());
-            }
-            if (config.ts.cluster.clusterNodes == null || config.ts.cluster.clusterNodes.isEmpty()) {
-                throw new IllegalArgumentException("Missing cluster nodes definition in config file '"+f.getAbsolutePath()+"'");
-            }
-        } else {
-            throw new IllegalArgumentException("Missing settings for configuration file, or server(s) to contact; can not initialize client");
+            _serviceConfig = config;
         }
-        return config;
+        return _serviceConfig;
     }
-
+    
     protected BasicTSClientConfig getClientConfig() {
-        return new BasicTSClientConfigBuilder()
+        if (_clientConfig == null) {
+            _clientConfig = new BasicTSClientConfigBuilder()
             .setMinimalOksToSucceed(1)
             .setOptimalOks(2)
             .setMaxOks(2)
             .build();
+        }
+        return _clientConfig;
     }
 
-    protected BasicTSClient bootstrapClient(BasicTSClientConfig clientConfig, SkeletalServiceConfig serviceConfig)
+    protected BasicTSClient bootstrapClient()
     {
+        BasicTSClientConfig clientConfig = getClientConfig();
+        SkeletalServiceConfig serviceConfig = getServiceConfig();
+        
         BasicTSClientBootstrapper bs = new AHCBasedClientBootstrapper(clientConfig);
 //        BasicTSClientBootstrapper bs = new JDKBasedClientBootstrapper(clientConfig);
         for (SkeletalServiceConfig.Node node : serviceConfig.ts.cluster.clusterNodes) {
@@ -135,6 +151,27 @@ public abstract class TStoreCmdBase implements Runnable
                 long nanos = System.nanoTime() - nanoStart;
                 double msecs = (double) (nanos >> 20);
                 System.out.printf(" bootstrap complete in %.1f msecs\n", msecs);
+            }
+            // One more thing: adapt min/optimal/max counts, if need be
+            int nodeCount = client.getCluster().getServerCount();
+            if (nodeCount > 0) {
+                clientConfig = clientConfig.verifyWithServerCount(nodeCount);
+                if (clientConfig != _clientConfig) {
+                    client = client.withConfig(clientConfig);
+                    if (verbose) {
+                        System.out.printf(" NOTE: change ClientConfig since only %d servers available: min/opt/max"
+                                +" from %d/%d/%d to %d/%d/%d\n",
+                                nodeCount,
+                                _clientConfig.getOperationConfig().getMinimalOksToSucceed(),
+                                _clientConfig.getOperationConfig().getOptimalOks(),
+                                _clientConfig.getOperationConfig().getMaxOks(),
+
+                                client.getOperationConfig().getMinimalOksToSucceed(),
+                                client.getOperationConfig().getOptimalOks(),
+                                client.getOperationConfig().getMaxOks());
+                    }
+                    _clientConfig = clientConfig;
+                }
             }
             return client;
         } catch (IOException e) {

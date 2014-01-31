@@ -66,13 +66,10 @@ public class GenerateLoad extends TStoreCmdBase
     @Override
     public void run()
     {
-        SkeletalServiceConfig serviceConfig = getServiceConfig();
-        BasicTSClientConfig clientConfig = getClientConfig();
-
         if (arguments == null || arguments.size() != 1) {
             throw new IllegalArgumentException("Wrong number of arguments; expect one (server-prefix)");
         }
-        _client = bootstrapClient(clientConfig, serviceConfig);
+        _client = bootstrapClient();
 
         // and then verify that all server sources are valid paths as well
         try {

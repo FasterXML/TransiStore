@@ -8,7 +8,6 @@ import com.fasterxml.clustermate.client.operation.GetOperationResult;
 import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.BasicTSClient;
-import com.fasterxml.transistore.client.BasicTSClientConfig;
 
 import io.airlift.command.*;
 
@@ -32,13 +31,10 @@ public class CatCmd extends TStoreCmdBase
     @Override
     public void run()
     {
-        SkeletalServiceConfig serviceConfig = getServiceConfig();
-        BasicTSClientConfig clientConfig = getClientConfig();
-
         if (paths == null || paths.size() == 0) { // or could read from stdin?
             throw new IllegalArgumentException("No entries to display");
         }
-        BasicTSClient client = bootstrapClient(clientConfig, serviceConfig);
+        BasicTSClient client = bootstrapClient();
 
         // and then verify that all paths are valid
         List<BasicTSKey> pathList = new ArrayList<BasicTSKey>(paths.size());

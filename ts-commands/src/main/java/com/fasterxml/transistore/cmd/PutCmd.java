@@ -46,13 +46,10 @@ public class PutCmd extends TStoreCmdBase
     @Override
     public void run()
     {
-        SkeletalServiceConfig serviceConfig = getServiceConfig();
-        BasicTSClientConfig clientConfig = getClientConfig();
-
         if (arguments == null || arguments.size() < 2) {
             throw new IllegalArgumentException("Nothing to PUT");
         }
-        BasicTSClient client = bootstrapClient(clientConfig, serviceConfig);
+        BasicTSClient client = bootstrapClient();
         // Ok, first, target; verify it is valid TStore path
         final int lastArgIndex = arguments.size()-1;
         try {

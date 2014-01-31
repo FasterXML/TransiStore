@@ -39,6 +39,31 @@ public class BasicTSClientConfig
         return new BasicTSClientConfigBuilder().build();
     }
 
+    /**
+     * Helper method that can be used to truncate min/optimal/max success
+     * counts, based on actual observed number of servers cluster has.
+     */
+    public BasicTSClientConfig verifyWithServerCount(int serverCount)
+    {
+        OperationConfig opConfig = getOperationConfig();
+        if ((opConfig.getMinimalOksToSucceed() > serverCount)
+                || (opConfig.getOptimalOks() > serverCount)
+                || (opConfig.getMaxOks() > serverCount)) {
+            BasicTSClientConfigBuilder builder = builder();
+            if (opConfig.getMinimalOksToSucceed() > serverCount) {
+                builder.setMinimalOksToSucceed(serverCount);
+            }
+            if (opConfig.getOptimalOks() > serverCount) {
+                builder.setOptimalOks(serverCount);
+            }
+            if (opConfig.getMaxOks() > serverCount) {
+                builder.setMaxOks(serverCount);
+            }
+            return builder.build();
+        }
+        return this;
+    }
+
     public int getMaxHttpConnections() {
         return _maxHttpConnections;
     }
