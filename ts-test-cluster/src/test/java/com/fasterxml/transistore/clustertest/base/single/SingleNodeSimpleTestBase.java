@@ -37,7 +37,7 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
     final static int PORT_2 = PORT_BASE + 1;
 
     final static int MAX_PAYLOAD_IN_MEMORY = StoreConfig.DEFAULT_MIN_PAYLOAD_FOR_STREAMING-1;
-    
+
     public void testSimpleSingleNode() throws Exception
     {
         initTestLogging(); // reduce noise

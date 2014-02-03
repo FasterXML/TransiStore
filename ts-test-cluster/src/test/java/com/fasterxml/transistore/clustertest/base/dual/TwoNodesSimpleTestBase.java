@@ -36,19 +36,18 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
 {
     final static int PORT_BASE = PORT_BASE_DUAL + PORT_DELTA_SIMPLE;
+
+    final private int TEST_PORT1 = PORT_BASE + 0;
+    final private int TEST_PORT2 = PORT_BASE + 1;
+
+    final private IpAndPort endpoint1 = new IpAndPort("localhost:"+TEST_PORT1);
+    final private IpAndPort endpoint2 = new IpAndPort("localhost:"+TEST_PORT2);
     
     // use ports that differ from other tests, just to minimize chance of
     // collision
-    
     public void testSimpleTwoNode() throws Exception
     {
-        final int TEST_PORT1 = PORT_BASE + 0;
-        final int TEST_PORT2 = PORT_BASE + 1;
-
         initTestLogging(); // reduce noise
-
-        IpAndPort endpoint1 = new IpAndPort("localhost:"+TEST_PORT1);
-        IpAndPort endpoint2 = new IpAndPort("localhost:"+TEST_PORT2);
 
         // both nodes need same (or at least similar enough) cluster config:
         ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 100);
@@ -66,72 +65,138 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
         // then start both
         startServices(service1, service2);
 
-        // require 2 OKs, to ensure both get the same data...
-        BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
-                .setMinimalOksToSucceed(2)
-                .setOptimalOks(2)
-                .setMaxOks(2)
-                .setAllowRetries(false) // let's not give tests too much slack, shouldn't need it
-                .build();
-        BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
-
-        // just for fun, use a space, slash and ampersand in key (to ensure correct encoding)
-        final BasicTSKey KEY = contentKey("testSimple2/this&that/some item");
-        
-        // first: verify that we can do GET, but not find the entry:
-        byte[] data = client.getContentAsBytes(null, KEY);
-        assertNull("Should not yet have entry", data);
-
-        // Then add said content
-        final byte[] CONTENT = new byte[12000];
-        Arrays.fill(CONTENT, (byte) 0xAC);
-        PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
-        assertTrue(result.succeededOptimally());
-        assertEquals(result.getSuccessCount(), 2);
-
-        // find it; both with GET and HEAD
-        data = client.getContentAsBytes(null, KEY);
-        assertNotNull("Should now have the data", data);
-        assertArrayEquals(CONTENT, data);
-        long len = client.getContentLength(null, KEY);
-        /* NOTE: should be getting uncompressed length, assuming we don't
-         * claim we accept things as compresed (if we did, we'd get 48)
-         */
-        assertEquals(12000L, len);
-
-        // delete:
-        DeleteOperationResult del = client.deleteContent(null, KEY);
-        assertTrue(del.succeededMinimally());
-        assertTrue(del.succeededOptimally());
-        assertEquals(del.getSuccessCount(), 2);
-
-        // after which content ... is no more:
-        data = client.getContentAsBytes(null, KEY);
-        assertNotNull("Should not have the data after DELETE", data);
-
-        // and That's All, Folks!
-        
-        service1._stop();
-        service2._stop();
-        service1.waitForStopped();
-        service2.waitForStopped();
+        try {
+            // require 2 OKs, to ensure both get the same data...
+            BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                    .setMinimalOksToSucceed(2)
+                    .setOptimalOks(2)
+                    .setMaxOks(2)
+                    .setAllowRetries(false) // let's not give tests too much slack, shouldn't need it
+                    .build();
+            BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
+    
+            // just for fun, use a space, slash and ampersand in key (to ensure correct encoding)
+            final BasicTSKey KEY = contentKey("testSimple2/this&that/some item");
+            
+            // first: verify that we can do GET, but not find the entry:
+            byte[] data = client.getContentAsBytes(null, KEY);
+            assertNull("Should not yet have entry", data);
+    
+            // Then add said content
+            final byte[] CONTENT = new byte[12000];
+            Arrays.fill(CONTENT, (byte) 0xAC);
+            PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
+            assertTrue(result.succeededOptimally());
+            assertEquals(result.getSuccessCount(), 2);
+    
+            // find it; both with GET and HEAD
+            data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should now have the data", data);
+            assertArrayEquals(CONTENT, data);
+            long len = client.getContentLength(null, KEY);
+            /* NOTE: should be getting uncompressed length, assuming we don't
+             * claim we accept things as compresed (if we did, we'd get 48)
+             */
+            assertEquals(12000L, len);
+    
+            // delete:
+            DeleteOperationResult del = client.deleteContent(null, KEY);
+            assertTrue(del.succeededMinimally());
+            assertTrue(del.succeededOptimally());
+            assertEquals(del.getSuccessCount(), 2);
+    
+            // after which content ... is no more:
+            data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should not have the data after DELETE", data);
+        } finally {
+            // and That's All, Folks!
+            service1._stop();
+            service2._stop();
+            service1.waitForStopped();
+            service2.waitForStopped();
+        }
     }
 
+    /**
+     * Test to verify that it is possible to force a partial completion,
+     * aimed at giving more control over concurrency setting.
+     */
+    public void testPartialUpdate() throws Exception
+    {
+        initTestLogging();
+        ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 100);
+
+        BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2Partial_1", true, TEST_PORT1, clusterConfig);
+        final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(200L);
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_MINIMAL);
+
+        BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2Partial_2", true, TEST_PORT2, clusterConfig);
+        serviceConfig2.getServiceConfig().cluster = clusterConfig;
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_MINIMAL);
+        startServices(service1, service2);
+
+        try {
+            BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                    .setMinimalOksToSucceed(1)
+                    .setOptimalOks(2)
+                    .setMaxOks(2)
+                    .setAllowRetries(false) // shouldnt be needed
+                    .build();
+            BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
+    
+            final BasicTSKey KEY = contentKey("testSimple2/partial/item");
+
+            assertNull("Should not yet have entry", client.getContentAsBytes(null, KEY));
+    
+            // Then add said content
+            final byte[] CONTENT = new byte[9000];
+            Arrays.fill(CONTENT, (byte) 'a');
+            // but only request minimal completion
+            PutOperationResult result = client.putContent(null, KEY, CONTENT).completeMinimally();
+            assertTrue(result.succeededMinimally());
+            int successCount = result.getSuccessCount();
+            if (result.succeededOptimally()) {
+                fail("Should not send full updates if only minimal match desired: success count = "+successCount);
+            }
+            assertFalse(result.succeededMaximally());
+            assertEquals(1, successCount);
+    
+            // at first that is. And then complete
+            result = client.putContent(null, KEY, CONTENT).completeOptimally();
+            assertTrue(result.succeededMinimally());
+            assertTrue(result.succeededOptimally());
+            // note, since opt == max, this should also be true now
+            assertFalse(result.succeededMaximally());
+            assertEquals(result.getSuccessCount(), 2);
+            
+            // find it; both with GET and HEAD
+            byte[] data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should now have the data", data);
+            assertArrayEquals(CONTENT, data);
+    
+            // delete:
+            DeleteOperationResult del = client.deleteContent(null, KEY);
+            assertTrue(del.succeededMinimally());
+            assertTrue(del.succeededOptimally());
+            assertEquals(del.getSuccessCount(), 2);
+    
+            // after which content ... is no more:
+            assertNotNull("Should not have the data after DELETE", client.getContentAsBytes(null, KEY));
+        } finally {
+            service1._stop();
+            service2._stop();
+            service1.waitForStopped();
+            service2.waitForStopped();
+        }
+    }
+    
     /**
      * Unit test that sets up 2-node fully replicated cluster, updates only one host
      * with two entries, and ensures that sync happens correctly.
      */
     public void testTwoNodeSync() throws Exception
     {
-        initTestLogging(); // reduce noise
-
-        final int TEST_PORT1 = PORT_BASE + 2;
-        final int TEST_PORT2 = PORT_BASE + 3;
-
-        IpAndPort endpoint1 = new IpAndPort("localhost:"+TEST_PORT1);
-        IpAndPort endpoint2 = new IpAndPort("localhost:"+TEST_PORT2);
-
-        // use keyspace length of 360 to force specific distribution of entries
+        initTestLogging();
         ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 360);
         
         // reduce shutdown grace period to speed up shutdown...
