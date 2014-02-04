@@ -166,7 +166,7 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             assertTrue(result.succeededMinimally());
             assertTrue(result.succeededOptimally());
             // note, since opt == max, this should also be true now
-            assertFalse(result.succeededMaximally());
+            assertTrue(result.succeededMaximally());
             assertEquals(result.getSuccessCount(), 2);
             
             // find it; both with GET and HEAD
