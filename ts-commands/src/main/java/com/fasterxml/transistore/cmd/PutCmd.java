@@ -182,11 +182,10 @@ public class PutCmd extends TStoreCmdBase
         
         PutOperation put = isSmall ? client.putContent(params, key, readFile(src))
                 : client.putContent(params, key, src);
-        PutOperationResult putResult = put.completeOptimally();
-        if (putResult.succeededOptimally()) { // if it went well, try bonus round:
-            putResult = put.tryCompleteMaximally();
-        }
-
+        // try maximal, iff it's "easy enough" (i.e. no retries to get there)
+        PutOperationResult putResult = put.completeOptimally()
+                .tryCompleteMaximally()
+                .finish();
         if (!putResult.succeededMinimally()) {
             NodeFailure fail = putResult.getFirstFail();
             int status = fail.getFirstCallFailure().getStatusCode();

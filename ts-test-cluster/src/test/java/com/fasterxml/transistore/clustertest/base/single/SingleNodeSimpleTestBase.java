@@ -55,14 +55,14 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
                 .setMaxOks(1)
                 .setAllowRetries(false) // no retries!
                 .build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
-
         /* 02-Nov-2012, tatu: Minor twist -- use non-ASCII character(s) in
          *   there to trigger possible encoding probs. Ditto for embedded slash.
          */
         final BasicTSKey KEY = contentKey("test/Stuff-\u00A9");
 
         try {
+            BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
+
             // first: verify that we can do GET, but not find the entry:
             byte[] data = client.getContentAsBytes(null, KEY);
             assertNull("Should not yet have entry", data);
@@ -71,7 +71,9 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             final int LENGTH = 12000;
             final byte[] CONTENT = new byte[LENGTH];
             Arrays.fill(CONTENT, (byte) 0xAC);
-            PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
+            PutOperationResult result = client.putContent(null, KEY, CONTENT)
+                    .completeOptimally()
+                    .finish();
             assertTrue(result.succeededOptimally());
 
             // find it; both with GET and HEAD
@@ -113,10 +115,10 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
                 .setOptimalOks(1).setMaxOks(1)
                 .setAllowRetries(false) // no retries!
                 .build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
         final BasicTSKey KEY = contentKey("testSimple-file");
 
         try {
+            BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
             // first: verify that we can do GET, but not find the entry:
             byte[] data = client.getContentAsBytes(null, KEY);
             assertNull("Should not yet have entry", data);
@@ -129,7 +131,9 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
             fout.write(CONTENT);
             fout.close();
     
-            PutOperationResult result = client.putContent(null, KEY, file).completeOptimally();
+            PutOperationResult result = client.putContent(null, KEY, file)
+                    .completeOptimally()
+                    .finish();
             if (!result.succeededOptimally()) {
                 fail("PUT failed, with: "+result.getFirstFail());
             }
@@ -168,10 +172,10 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
                 .setOptimalOks(1).setMaxOks(1).setAllowRetries(false)
                 .build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
         final BasicTSKey KEY = contentKey("testSimple-precomp-gzip");
 
         try {
+            BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
             // first: verify that we can do GET, but not find the entry:
             HeadOperationResult head = client.headContent(null, KEY);
             assertFalse("Should not yet have entry", head.entryFound());
@@ -184,7 +188,9 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
                     .forBytes(COMP_CONTENT)
                     .withCompression(Compression.GZIP, origSize);
 
-            PutOperationResult result = client.putContent(null, KEY, prov).completeOptimally();
+            PutOperationResult result = client.putContent(null, KEY, prov)
+                    .completeOptimally()
+                    .finish();
             _verifyPutResult(result);
             // find it; both with GET and HEAD
             byte[] data = client.getContentAsBytes(null, KEY);
@@ -220,10 +226,10 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
         BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
                 .setOptimalOks(1).setMaxOks(1).setAllowRetries(false)
                 .build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
         final BasicTSKey KEY = contentKey("testSimple-precomp-lzf");
 
         try {
+            BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
             // first: verify that we can do GET, but not find the entry:
             HeadOperationResult head = client.headContent(null, KEY);
             assertFalse("Should not yet have entry", head.entryFound());
@@ -236,7 +242,9 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
                     .forBytes(COMP_CONTENT)
                     .withCompression(Compression.LZF, origSize);
 
-            PutOperationResult result = client.putContent(null, KEY, prov).completeOptimally();
+            PutOperationResult result = client.putContent(null, KEY, prov)
+                    .completeOptimally()
+                    .finish();
             _verifyPutResult(result);
 
             // find it; both with GET and HEAD

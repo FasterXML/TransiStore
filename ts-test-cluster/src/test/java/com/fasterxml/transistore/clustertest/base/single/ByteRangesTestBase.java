@@ -32,68 +32,77 @@ public abstract class ByteRangesTestBase extends ClusterTestBase
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);
-        startServices(service);
 
-        // Ok: now, let's try doing some basic stuff
-        BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
-	        .setOptimalOks(1)
-	        .setMaxOks(1)
-	        .build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_BASE));
-
-        // // // Small content: inlined, not-compressed
-        
-        // Add test content
-        final BasicTSKey SMALL_KEY = contentKey("testRange-item1");
-        final byte[] SMALL_CONTENT = "Something pretty small to store, not compressed".getBytes("UTF-8");
-        PutOperationResult result = client.putContent(null, SMALL_KEY, SMALL_CONTENT).completeOptimally();
-        assertTrue(result.succeededOptimally());
-
-        // first: verify that we can do GET, but not find the entry:
-        int OFFSET = 3;
-        int LENGTH = 11;
-        byte[] data = client.getPartialContentAsBytes(null, SMALL_KEY, new ByteRange(OFFSET, LENGTH));
-        assertNotNull(data);
-        if (data.length != LENGTH) {
-        	assertEquals("Range failed for content of "+SMALL_CONTENT.length+" bytes", LENGTH, data.length);
+        try {
+            startServices(service);
+    
+            // Ok: now, let's try doing some basic stuff
+            BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+    	        .setOptimalOks(1)
+    	        .setMaxOks(1)
+    	        .build();
+            BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_BASE));
+    
+            // // // Small content: inlined, not-compressed
+            
+            // Add test content
+            final BasicTSKey SMALL_KEY = contentKey("testRange-item1");
+            final byte[] SMALL_CONTENT = "Something pretty small to store, not compressed".getBytes("UTF-8");
+            PutOperationResult result = client.putContent(null, SMALL_KEY, SMALL_CONTENT)
+                    .completeOptimally()
+                    .finish();
+            assertTrue(result.succeededOptimally());
+    
+            // first: verify that we can do GET, but not find the entry:
+            int OFFSET = 3;
+            int LENGTH = 11;
+            byte[] data = client.getPartialContentAsBytes(null, SMALL_KEY, new ByteRange(OFFSET, LENGTH));
+            assertNotNull(data);
+            if (data.length != LENGTH) {
+            	assertEquals("Range failed for content of "+SMALL_CONTENT.length+" bytes", LENGTH, data.length);
+            }
+            byte[] exp = Arrays.copyOfRange(SMALL_CONTENT, OFFSET, OFFSET+LENGTH);
+            assertArrayEquals(exp, data);
+    
+            // And then bit bigger content, to get GZIP handling tested
+            OFFSET = 2900;
+            LENGTH = 77;
+            final BasicTSKey MED_KEY = contentKey("testRange-item2");
+            final byte[] MED_CONTENT = biggerSomewhatCompressibleData(3000);
+            result = client.putContent(null, MED_KEY, MED_CONTENT)
+                    .completeOptimally()
+                    .finish();
+            assertTrue(result.succeededOptimally());
+            data = client.getPartialContentAsBytes(null, MED_KEY, new ByteRange(OFFSET, LENGTH));
+            assertNotNull(data);
+            if (data.length != LENGTH) {
+            	assertEquals("Range failed for content of "+MED_CONTENT.length+" bytes", LENGTH, data.length);
+            }
+            exp = Arrays.copyOfRange(MED_CONTENT, OFFSET, OFFSET+LENGTH);
+            assertArrayEquals(exp, data);
+            
+            // and finally, "big" content
+            final BasicTSKey BIG_KEY = contentKey("testRange-item3");
+            final byte[] BIG_CONTENT = biggerSomewhatCompressibleData(200 * 1024); // 200k
+            OFFSET = 128456;
+            LENGTH = 5600;
+            result = client.putContent(null, BIG_KEY, BIG_CONTENT)
+                    .completeOptimally()
+                    .finish();
+            assertTrue(result.succeededOptimally());
+            data = client.getPartialContentAsBytes(null, BIG_KEY, new ByteRange(OFFSET, LENGTH));
+            assertNotNull(data);
+            if (data.length != LENGTH) {
+            	assertEquals("Range failed for content of "+BIG_CONTENT.length+" bytes", LENGTH, data.length);
+            }
+            exp = Arrays.copyOfRange(BIG_CONTENT, OFFSET, OFFSET+LENGTH);
+            assertArrayEquals(exp, data);
+            
+            // and That's All, Folks!
+        } finally {
+            service._stop();
+            Thread.yield();
+            service.waitForStopped();
         }
-        byte[] exp = Arrays.copyOfRange(SMALL_CONTENT, OFFSET, OFFSET+LENGTH);
-        assertArrayEquals(exp, data);
-
-        // And then bit bigger content, to get GZIP handling tested
-        OFFSET = 2900;
-        LENGTH = 77;
-        final BasicTSKey MED_KEY = contentKey("testRange-item2");
-        final byte[] MED_CONTENT = biggerSomewhatCompressibleData(3000);
-        result = client.putContent(null, MED_KEY, MED_CONTENT).completeOptimally();
-        assertTrue(result.succeededOptimally());
-        data = client.getPartialContentAsBytes(null, MED_KEY, new ByteRange(OFFSET, LENGTH));
-        assertNotNull(data);
-        if (data.length != LENGTH) {
-        	assertEquals("Range failed for content of "+MED_CONTENT.length+" bytes", LENGTH, data.length);
-        }
-        exp = Arrays.copyOfRange(MED_CONTENT, OFFSET, OFFSET+LENGTH);
-        assertArrayEquals(exp, data);
-        
-        // and finally, "big" content
-        final BasicTSKey BIG_KEY = contentKey("testRange-item3");
-        final byte[] BIG_CONTENT = biggerSomewhatCompressibleData(200 * 1024); // 200k
-        OFFSET = 128456;
-        LENGTH = 5600;
-        result = client.putContent(null, BIG_KEY, BIG_CONTENT).completeOptimally();
-        assertTrue(result.succeededOptimally());
-        data = client.getPartialContentAsBytes(null, BIG_KEY, new ByteRange(OFFSET, LENGTH));
-        assertNotNull(data);
-        if (data.length != LENGTH) {
-        	assertEquals("Range failed for content of "+BIG_CONTENT.length+" bytes", LENGTH, data.length);
-        }
-        exp = Arrays.copyOfRange(BIG_CONTENT, OFFSET, OFFSET+LENGTH);
-        assertArrayEquals(exp, data);
-        
-        // and That's All, Folks!
-
-        service._stop();
-        Thread.yield();
-        service.waitForStopped();
     }
 }

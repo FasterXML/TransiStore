@@ -33,82 +33,82 @@ public abstract class ListEntriesTestBase extends ClusterTestBase
     public void testSimpleIdListing() throws Exception
     {
         initTestLogging(); // reduce noise
-        
+
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1ListId", true, PORT_1);
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL); // false -> minimal background tasks
         startServices(service);
 
-        BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
-             .setOptimalOks(1).setMaxOks(1).build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
-
-        // First, set up test data: 5 things to iterate, 3 others
-        addEntry(client, PARTITION2, "foo");
-        addEntry(client, PARTITION2, "bar");
-        addEntry(client, PARTITION2, "dir/abc");
-        addEntry(client, PARTITION2, "dir/def");
-        addEntry(client, PARTITION2, "zzz");
-
-        addEntry(client, null, "foo");
-        addEntry(client, PARTITION3, "foo");
-        addEntry(client, PARTITION1, "bar");
-
-        
-        // And then iterate everything under PARTITION 2, first
-        //    public final <T> StoreEntryLister<K,T> listContent(K prefix, ListType itemType) throws InterruptedException {
-
-        StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(null, contentKey(PARTITION2, ""), ListItemType.ids);
-
-        ListOperationResult<StorableKey> row = lister.listMore(2);
-        if (!row.succeeded()) {
-            fail("Failed: "+row.getFirstFail());
+        try {
+            BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                 .setOptimalOks(1).setMaxOks(1).build();
+            BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_1));
+    
+            // First, set up test data: 5 things to iterate, 3 others
+            addEntry(client, PARTITION2, "foo");
+            addEntry(client, PARTITION2, "bar");
+            addEntry(client, PARTITION2, "dir/abc");
+            addEntry(client, PARTITION2, "dir/def");
+            addEntry(client, PARTITION2, "zzz");
+    
+            addEntry(client, null, "foo");
+            addEntry(client, PARTITION3, "foo");
+            addEntry(client, PARTITION1, "bar");
+    
+            
+            // And then iterate everything under PARTITION 2, first
+            //    public final <T> StoreEntryLister<K,T> listContent(K prefix, ListType itemType) throws InterruptedException {
+    
+            StoreEntryLister<BasicTSKey, StorableKey> lister = client.listContent(null, contentKey(PARTITION2, ""), ListItemType.ids);
+    
+            ListOperationResult<StorableKey> row = lister.listMore(2);
+            if (!row.succeeded()) {
+                fail("Failed: "+row.getFirstFail());
+            }
+            List<StorableKey> ids = row.getItems();
+            assertEquals(2, ids.size());
+            assertEquals(contentKey(PARTITION2, "bar"), contentKey(ids.get(0)));
+            assertEquals(contentKey(PARTITION2, "dir/abc"), contentKey(ids.get(1)));
+            
+            row = lister.listMore(4);
+            assertTrue(row.succeeded());
+            ids = row.getItems();
+            assertEquals(3, ids.size());
+            assertEquals(contentKey(PARTITION2, "dir/def"), contentKey(ids.get(0)));
+            assertEquals(contentKey(PARTITION2, "foo"), contentKey(ids.get(1)));
+            assertEquals(contentKey(PARTITION2, "zzz"), contentKey(ids.get(2)));
+    
+            // and then no more entries
+            row = lister.listMore(4);
+            if (!row.succeeded()) {
+                fail("Failed: "+row.getFirstFail());
+            }
+            assertEquals(0, row.getItems().size());
+            
+            // // Second scan; now with longer prefix...
+    
+            lister = client.listContent(null, contentKey(PARTITION2, "dir/"), ListItemType.ids);
+            row = lister.listMore(1);
+            if (!row.succeeded()) {
+                fail("Failed: "+row.getFirstFail());
+            }
+            assertEquals(1, row.getItems().size());
+            assertEquals(contentKey(PARTITION2, "dir/abc"), contentKey(row.getItems().get(0)));
+    
+            row = lister.listMore(1);
+            assertTrue(row.succeeded());
+            assertEquals(1, row.getItems().size());
+            assertEquals(contentKey(PARTITION2, "dir/def"), contentKey(row.getItems().get(0)));
+            row = lister.listMore(1);
+            if (!row.succeeded()) {
+                fail("Failed: "+row.getFirstFail());
+            }
+            assertEquals(0, row.getItems().size());
+        } finally { 
+            service._stop();
+            Thread.yield();
+            service.waitForStopped();
         }
-        List<StorableKey> ids = row.getItems();
-        assertEquals(2, ids.size());
-        assertEquals(contentKey(PARTITION2, "bar"), contentKey(ids.get(0)));
-        assertEquals(contentKey(PARTITION2, "dir/abc"), contentKey(ids.get(1)));
-        
-        row = lister.listMore(4);
-        assertTrue(row.succeeded());
-        ids = row.getItems();
-        assertEquals(3, ids.size());
-        assertEquals(contentKey(PARTITION2, "dir/def"), contentKey(ids.get(0)));
-        assertEquals(contentKey(PARTITION2, "foo"), contentKey(ids.get(1)));
-        assertEquals(contentKey(PARTITION2, "zzz"), contentKey(ids.get(2)));
-
-        // and then no more entries
-        row = lister.listMore(4);
-        if (!row.succeeded()) {
-            fail("Failed: "+row.getFirstFail());
-        }
-        assertEquals(0, row.getItems().size());
-        
-        // // Second scan; now with longer prefix...
-
-        lister = client.listContent(null, contentKey(PARTITION2, "dir/"), ListItemType.ids);
-        row = lister.listMore(1);
-        if (!row.succeeded()) {
-            fail("Failed: "+row.getFirstFail());
-        }
-        assertEquals(1, row.getItems().size());
-        assertEquals(contentKey(PARTITION2, "dir/abc"), contentKey(row.getItems().get(0)));
-
-        row = lister.listMore(1);
-        assertTrue(row.succeeded());
-        assertEquals(1, row.getItems().size());
-        assertEquals(contentKey(PARTITION2, "dir/def"), contentKey(row.getItems().get(0)));
-        row = lister.listMore(1);
-        if (!row.succeeded()) {
-            fail("Failed: "+row.getFirstFail());
-        }
-        assertEquals(0, row.getItems().size());
-
-        // and That's All, Folks!
-        
-        service._stop();
-        Thread.yield();
-        service.waitForStopped();
     }
 
     public void testFullItemListing() throws Exception
@@ -120,40 +120,40 @@ public abstract class ListEntriesTestBase extends ClusterTestBase
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL); // false -> minimal background tasks
         startServices(service);
 
-        BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
-             .setOptimalOks(1).setMaxOks(1).build();
-        BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_2));
-
-        // First, set up test data: 5 things to iterate, 3 others
-        addEntry(client, PARTITION2, "foo");
-        addEntry(client, PARTITION2, "bar");
-        addEntry(client, PARTITION2, "dir/abc");
-        addEntry(client, PARTITION2, "dir/def");
-        addEntry(client, PARTITION2, "zzz");
-
-        addEntry(client, null, "foo");
-        addEntry(client, PARTITION3, "foo");
-        addEntry(client, PARTITION1, "bar");
-        // Also, important: need to list with other types as well; esp. full items
-
-        StoreEntryLister<BasicTSKey, BasicTSListItem> listerFull = client.listContent(null, contentKey(PARTITION2, ""),
-                ListItemType.fullEntries);
-
-        ListOperationResult<BasicTSListItem> rowFull = listerFull.listMore(2);
-        if (!rowFull.succeeded()) {
-            fail("Failed: "+rowFull.getFirstFail());
+        try {
+            BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                 .setOptimalOks(1).setMaxOks(1).build();
+            BasicTSClient client = createClient(clientConfig, new IpAndPort("http", "localhost", PORT_2));
+    
+            // First, set up test data: 5 things to iterate, 3 others
+            addEntry(client, PARTITION2, "foo");
+            addEntry(client, PARTITION2, "bar");
+            addEntry(client, PARTITION2, "dir/abc");
+            addEntry(client, PARTITION2, "dir/def");
+            addEntry(client, PARTITION2, "zzz");
+    
+            addEntry(client, null, "foo");
+            addEntry(client, PARTITION3, "foo");
+            addEntry(client, PARTITION1, "bar");
+            // Also, important: need to list with other types as well; esp. full items
+    
+            StoreEntryLister<BasicTSKey, BasicTSListItem> listerFull = client.listContent(null, contentKey(PARTITION2, ""),
+                    ListItemType.fullEntries);
+    
+            ListOperationResult<BasicTSListItem> rowFull = listerFull.listMore(2);
+            if (!rowFull.succeeded()) {
+                fail("Failed: "+rowFull.getFirstFail());
+            }
+            List<BasicTSListItem> fullItems = rowFull.getItems();
+            assertEquals(2, fullItems.size());
+            assertEquals(BasicTSListItem.class, fullItems.get(0).getClass());
+            assertEquals(BasicTSListItem.class, fullItems.get(1).getClass());
+            // should we verify contents?
+        } finally {
+            service._stop();
+            Thread.yield();
+            service.waitForStopped();
         }
-        List<BasicTSListItem> fullItems = rowFull.getItems();
-        assertEquals(2, fullItems.size());
-        assertEquals(BasicTSListItem.class, fullItems.get(0).getClass());
-        assertEquals(BasicTSListItem.class, fullItems.get(1).getClass());
-        // should we verify contents?
-        
-        // and That's All, Folks!
-        
-        service._stop();
-        Thread.yield();
-        service.waitForStopped();
     }
 
     private void addEntry(BasicTSClient client, String partition, String path)
@@ -161,7 +161,9 @@ public abstract class ListEntriesTestBase extends ClusterTestBase
     {
         final BasicTSKey KEY = contentKey(partition, path);
         final byte[] CONTENT = ("Content:"+path).getBytes("UTF-8");
-        PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
+        PutOperationResult result = client.putContent(null, KEY, CONTENT)
+                .completeOptimally()
+                .finish();
         assertTrue(result.succeededOptimally());
     }
 }

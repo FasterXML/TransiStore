@@ -17,6 +17,7 @@ import com.fasterxml.storemate.store.StoreOperationSource;
 
 import com.fasterxml.clustermate.client.NodesForKey;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
+import com.fasterxml.clustermate.client.operation.PutOperation;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.cfg.ClusterConfig;
@@ -85,7 +86,9 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             // Then add said content
             final byte[] CONTENT = new byte[12000];
             Arrays.fill(CONTENT, (byte) 0xAC);
-            PutOperationResult result = client.putContent(null, KEY, CONTENT).completeOptimally();
+            PutOperationResult result = client.putContent(null, KEY, CONTENT)
+                    .completeOptimally()
+                    .finish();
             assertTrue(result.succeededOptimally());
             assertEquals(result.getSuccessCount(), 2);
     
@@ -121,7 +124,7 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
      * Test to verify that it is possible to force a partial completion,
      * aimed at giving more control over concurrency setting.
      */
-    public void testPartialUpdate() throws Exception
+    public void testPartialOptimalUpdate() throws Exception
     {
         initTestLogging();
         ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 100);
@@ -144,7 +147,7 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
                     .build();
             BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
     
-            final BasicTSKey KEY = contentKey("testSimple2/partial/item");
+            final BasicTSKey KEY = contentKey("testSimple2/partialOpt/item");
 
             assertNull("Should not yet have entry", client.getContentAsBytes(null, KEY));
     
@@ -152,20 +155,148 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             final byte[] CONTENT = new byte[9000];
             Arrays.fill(CONTENT, (byte) 'a');
             // but only request minimal completion
-            PutOperationResult result = client.putContent(null, KEY, CONTENT).completeMinimally();
-            assertTrue(result.succeededMinimally());
-            int successCount = result.getSuccessCount();
-            if (result.succeededOptimally()) {
+            PutOperation put = client.putContent(null, KEY, CONTENT).completeMinimally();
+            assertTrue(put.result().succeededMinimally());
+            int successCount = put.result().getSuccessCount();
+            if (put.result().succeededOptimally()) {
                 fail("Should not send full updates if only minimal match desired: success count = "+successCount);
             }
-            assertFalse(result.succeededMaximally());
+            assertFalse(put.result().succeededMaximally());
             assertEquals(1, successCount);
-    
+            // at this point, no declared fails, or skipped
+            assertEquals(0, put.result().getFailCount());
+            assertEquals(0, put.result().getIgnoreCount());
+
             // at first that is. And then complete
-            result = client.putContent(null, KEY, CONTENT).completeOptimally();
+            PutOperationResult result = put.completeOptimally().finish();
             assertTrue(result.succeededMinimally());
             assertTrue(result.succeededOptimally());
             // note, since opt == max, this should also be true now
+            assertTrue(result.succeededMaximally());
+            assertEquals(result.getSuccessCount(), 2);
+            assertEquals(0, result.getFailCount());
+            assertEquals(0, result.getIgnoreCount());
+            
+            // find it; both with GET and HEAD
+            byte[] data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should now have the data", data);
+            assertArrayEquals(CONTENT, data);
+    
+            // delete:
+            DeleteOperationResult del = client.deleteContent(null, KEY);
+            assertTrue(del.succeededMinimally());
+            assertTrue(del.succeededOptimally());
+            assertEquals(del.getSuccessCount(), 2);
+    
+            // after which content ... is no more:
+            assertNotNull("Should not have the data after DELETE", client.getContentAsBytes(null, KEY));
+        } finally {
+            service1._stop();
+            service2._stop();
+            service1.waitForStopped();
+            service2.waitForStopped();
+        }
+    }
+
+    public void testPartialUpdateIncomplete() throws Exception
+    {
+        initTestLogging();
+        ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 100);
+
+        BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2Partial_1b", true, TEST_PORT1, clusterConfig);
+        final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(200L);
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_MINIMAL);
+
+        BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2Partial_2b", true, TEST_PORT2, clusterConfig);
+        serviceConfig2.getServiceConfig().cluster = clusterConfig;
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_MINIMAL);
+        startServices(service1, service2);
+
+        try {
+            BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                    .setMinimalOksToSucceed(1)
+                    .setOptimalOks(1)
+                    .setMaxOks(2)
+                    .setAllowRetries(false)
+                    .build();
+            BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
+    
+            final BasicTSKey KEY = contentKey("testSimple2/partialMax/item");
+            assertNull("Should not yet have entry", client.getContentAsBytes(null, KEY));
+            final byte[] CONTENT = new byte[1000];
+            Arrays.fill(CONTENT, (byte) 'b');
+
+            // This time, finish at minimal completion.
+            PutOperation put = client.putContent(null, KEY, CONTENT)
+                    .completeMinimally();
+            PutOperationResult result = put.result();
+            assertTrue(result.succeededMinimally());
+            int successCount = result.getSuccessCount();
+            assertTrue(result.succeededOptimally());
+            if (result.succeededMaximally()) {
+                fail("Should not send max updates if only minimal match desired: success count = "+successCount);
+            }
+            assertEquals(1, successCount);
+
+            // First: before finishing, no known fails or skips
+            assertEquals(0, result.getFailCount());
+            assertEquals(0, result.getIgnoreCount());
+
+            // but when finishing, should fill in the blanks
+            result = put.finish();
+            assertEquals(0, result.getFailCount());
+            assertEquals(1, result.getIgnoreCount());
+        } finally {
+            service1._stop();
+            service2._stop();
+            service1.waitForStopped();
+            service2.waitForStopped();
+        }
+    }
+
+    public void testPartialMaximalUpdate() throws Exception
+    {
+        initTestLogging();
+        ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 100);
+
+        BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2Partial_1b", true, TEST_PORT1, clusterConfig);
+        final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(200L);
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_MINIMAL);
+
+        BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2Partial_2b", true, TEST_PORT2, clusterConfig);
+        serviceConfig2.getServiceConfig().cluster = clusterConfig;
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_MINIMAL);
+        startServices(service1, service2);
+
+        try {
+            BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                    .setMinimalOksToSucceed(1)
+                    .setOptimalOks(1)
+                    .setMaxOks(2)
+                    .setAllowRetries(false)
+                    .build();
+            BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
+    
+            final BasicTSKey KEY = contentKey("testSimple2/partialMax/item");
+            assertNull("Should not yet have entry", client.getContentAsBytes(null, KEY));
+            final byte[] CONTENT = new byte[1000];
+            Arrays.fill(CONTENT, (byte) 'b');
+            // but only request minimal completion (which here is same as optimal)
+            PutOperation put = client.putContent(null, KEY, CONTENT).completeMinimally();
+            assertTrue(put.result().succeededMinimally());
+            int successCount = put.result().getSuccessCount();
+            assertTrue(put.result().succeededOptimally());
+            if (put.result().succeededMaximally()) {
+                fail("Should not send max updates if only minimal match desired: success count = "+successCount);
+            }
+            assertEquals(1, successCount);
+    
+            // at first that is. But should get bonus round now...
+            PutOperationResult result = client.putContent(null, KEY, CONTENT)
+                    .tryCompleteMaximally()
+                    .finish();
+            assertTrue(result.succeededMinimally());
+            assertTrue(result.succeededOptimally());
             assertTrue(result.succeededMaximally());
             assertEquals(result.getSuccessCount(), 2);
             
@@ -256,13 +387,17 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             final byte[] CONTENT1_LZF = lzfCompress(CONTENT1);
             final byte[] CONTENT2 = biggerSomewhatCompressibleData(19000);
             final byte[] CONTENT2_LZF = lzfCompress(CONTENT2);
-            PutOperationResult put = client.putContent(null, KEY1, CONTENT1).completeOptimally();
-            assertTrue(put.succeededOptimally());
-            assertEquals(put.getSuccessCount(), 1);
+            PutOperationResult result = client.putContent(null, KEY1, CONTENT1)
+                    .completeOptimally()
+                    .finish();
+            assertTrue(result.succeededOptimally());
+            assertEquals(result.getSuccessCount(), 1);
             timeMaster.advanceCurrentTimeMillis(1L); // to 202
-            put = client.putContent(null, KEY2, CONTENT2).completeOptimally();
-            assertTrue(put.succeededOptimally());
-            assertEquals(put.getSuccessCount(), 1);
+            result = client.putContent(null, KEY2, CONTENT2)
+                    .completeOptimally()
+                    .finish();
+            assertTrue(result.succeededOptimally());
+            assertEquals(result.getSuccessCount(), 1);
             
             assertEquals(0, entryCount(service1.getEntryStore()));
             assertEquals(2, entryCount(service2.getEntryStore()));

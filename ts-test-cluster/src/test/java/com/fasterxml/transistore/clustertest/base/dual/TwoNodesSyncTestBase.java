@@ -102,7 +102,9 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
                 // do occasional PUTs via real client; but mostly direct, latter
                 // to speed up test.
                 if ((i % 31) == 0) {
-                    PutOperationResult put = client.putContent(null, key, data).completeOptimally();
+                    PutOperationResult put = client.putContent(null, key, data)
+                            .completeOptimally()
+                            .finish();
                     assertEquals(put.getSuccessCount(), 1);
                 } else {
                     FakeHttpResponse response = new FakeHttpResponse();
