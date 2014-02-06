@@ -16,14 +16,13 @@ import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
 import com.fasterxml.storemate.store.state.NodeStateStore;
 
+import com.fasterxml.clustermate.api.PathType;
 import com.fasterxml.clustermate.dw.DWBasedService;
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
-import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
 import com.fasterxml.clustermate.service.cleanup.DiskUsageTracker;
 import com.fasterxml.clustermate.service.cleanup.FileCleaner;
-import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
 import com.fasterxml.clustermate.service.state.ActiveNodeState;
 import com.fasterxml.clustermate.service.store.*;
 
@@ -45,7 +44,8 @@ import com.fasterxml.transistore.service.store.BasicTSStores;
  */
 public class BasicTSServiceOnDW
     extends DWBasedService<BasicTSKey, StoredEntry<BasicTSKey>, BasicTSListItem,
-        BasicTSServiceConfig, BasicTSServiceConfigForDW>
+        BasicTSServiceConfig, BasicTSServiceConfigForDW,
+        PathType>
 {
     /*
     /**********************************************************************
@@ -54,8 +54,7 @@ public class BasicTSServiceOnDW
      */
 
     protected BasicTSServiceOnDW(TimeMaster timings, RunMode mode) {
-        super(timings, mode);
-        
+        super(timings, mode, PathType.class);
     }
 
     @Override
@@ -118,29 +117,23 @@ public class BasicTSServiceOnDW
     }
 
     @Override
-    protected StoresImpl<BasicTSKey, StoredEntry<BasicTSKey>> constructStores(SharedServiceStuff stuff,
-            BasicTSServiceConfig serviceConfig,
+    protected StoresImpl<BasicTSKey, StoredEntry<BasicTSKey>> constructStores(BasicTSServiceConfig serviceConfig,
             StorableStore store, NodeStateStore<IpAndPort, ActiveNodeState> nodeStates)
     {
-        StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> entryConv = stuff.getEntryConverter();
+        StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> entryConv = _serviceStuff.getEntryConverter();
         return new BasicTSStores(serviceConfig,
-                _timeMaster, stuff.jsonMapper(), entryConv, store, nodeStates);
+                _timeMaster, _serviceStuff.jsonMapper(), entryConv, store, nodeStates);
     }
     
     @Override
-    protected StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> constructStoreHandler(SharedServiceStuff serviceStuff,
-            Stores<BasicTSKey, StoredEntry<BasicTSKey>> stores,
-            ClusterViewByServer cluster) {
+    protected StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> constructStoreHandler() {
         // false -> no updating of last-accessed timestamps by default
-        return new BasicTSStoreHandler(serviceStuff, _stores, cluster, false);
+        return new BasicTSStoreHandler(_serviceStuff, _stores, _cluster, false);
     }
 
     @Override
-    protected BasicTSStoreEntryServlet constructStoreEntryServlet(SharedServiceStuff stuff,
-            ClusterViewByServer cluster,
-            StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> storeHandler)
-    {
-        return new BasicTSStoreEntryServlet(stuff, _cluster, storeHandler);
+    protected BasicTSStoreEntryServlet constructStoreEntryServlet() {
+        return new BasicTSStoreEntryServlet(_serviceStuff, _cluster, _storeHandler);
     }
 
     /*
@@ -150,8 +143,7 @@ public class BasicTSServiceOnDW
      */
 
     @Override
-    protected void addHealthChecks(SharedServiceStuff stuff,
-            Environment environment)
+    protected void addHealthChecks(Environment environment)
     {
         /* TODO: Once DropWizard 0.7 out, convert these, require new Metrics
          * 
@@ -190,8 +182,7 @@ public class BasicTSServiceOnDW
      * Method is overridden to provide alternate throttler
      */
     @Override
-    protected StoreOperationThrottler _constructThrottler(SharedServiceStuff stuff)
-    {
+    protected StoreOperationThrottler _constructThrottler() {
         return new BasicTSOperationThrottler();
     }
 
