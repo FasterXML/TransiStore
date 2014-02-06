@@ -120,6 +120,56 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
         }
     }
 
+    // Test case to verify that "straight to 2 copies" also works, not just partial
+    public void testSimpleOptimalUpdate() throws Exception
+    {
+        initTestLogging();
+        ClusterConfig clusterConfig = twoNodeClusterConfig(endpoint1, endpoint2, 100);
+
+        BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2Optimal_1", true, TEST_PORT1, clusterConfig);
+        final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(200L);
+        StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_MINIMAL);
+
+        BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2Optimal_2", true, TEST_PORT2, clusterConfig);
+        serviceConfig2.getServiceConfig().cluster = clusterConfig;
+        StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_MINIMAL);
+        startServices(service1, service2);
+
+        try {
+            BasicTSClientConfig clientConfig = new BasicTSClientConfigBuilder()
+                    .setMinimalOksToSucceed(1)
+                    .setOptimalOks(2)
+                    .setMaxOks(2)
+                    .setAllowRetries(false) // shouldnt be needed
+                    .build();
+            BasicTSClient client = createClient(clientConfig, endpoint1, endpoint2);
+    
+            final BasicTSKey KEY = contentKey("testSimple2/optimal/item");
+            assertNull("Should not yet have entry", client.getContentAsBytes(null, KEY));
+
+            final byte[] CONTENT = new byte[72000];
+            Arrays.fill(CONTENT, (byte) 'O');
+            PutOperation put = client.putContent(null, KEY, CONTENT).completeOptimally();
+            assertTrue(put.result().succeededMinimally());
+            assertTrue(put.result().succeededOptimally());
+            put.finish();
+            int successCount = put.result().getSuccessCount();
+            assertTrue(put.result().succeededMaximally());
+            assertEquals(2, successCount);
+            assertEquals(0, put.result().getFailCount());
+            assertEquals(0, put.result().getIgnoreCount());
+
+            byte[] data = client.getContentAsBytes(null, KEY);
+            assertNotNull("Should now have the data", data);
+            assertArrayEquals(CONTENT, data);
+        } finally {
+            service1._stop();
+            service2._stop();
+            service1.waitForStopped();
+            service2.waitForStopped();
+        }
+    }
+    
     /**
      * Test to verify that it is possible to force a partial completion,
      * aimed at giving more control over concurrency setting.
@@ -197,7 +247,7 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             service2.waitForStopped();
         }
     }
-
+    
     public void testPartialUpdateIncomplete() throws Exception
     {
         initTestLogging();
