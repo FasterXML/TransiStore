@@ -37,8 +37,22 @@
       <artifactId>clustermate-service</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.clustermate</groupId>
+      <artifactId>clustermate-servlet</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.storemate</groupId>
       <artifactId>storemate-backend-bdb-je</artifactId>
+    </dependency>
+
+    <!-- 05-Feb-2014, tatu: Not exactly sure why, but this does seem required
+        to get build going. Ok.
+      -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

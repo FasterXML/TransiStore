@@ -1,4 +1,4 @@
-package com.fasterxml.transistore.dw;
+package com.fasterxml.transistore.service;
 
 import java.io.IOException;
 
@@ -19,7 +19,8 @@ import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 
 @SuppressWarnings("serial")
-public class BasicTSStoreEntryServlet extends StoreEntryServlet<BasicTSKey, StoredEntry<BasicTSKey>>
+public class BasicTSStoreEntryServlet
+    extends StoreEntryServlet<BasicTSKey, StoredEntry<BasicTSKey>>
 {
 //    private final Logger LOG = LoggerFactory.getLogger("TIMING");
 

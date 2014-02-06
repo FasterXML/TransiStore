@@ -7,7 +7,6 @@ import com.yammer.dropwizard.cli.ServerCommand;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.metrics.core.HealthCheck;
-
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
@@ -15,8 +14,6 @@ import com.fasterxml.storemate.store.StoreOperationThrottler;
 import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
 import com.fasterxml.storemate.store.state.NodeStateStore;
-
-import com.fasterxml.clustermate.api.PathType;
 import com.fasterxml.clustermate.dw.DWBasedService;
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
@@ -25,12 +22,13 @@ import com.fasterxml.clustermate.service.cleanup.DiskUsageTracker;
 import com.fasterxml.clustermate.service.cleanup.FileCleaner;
 import com.fasterxml.clustermate.service.state.ActiveNodeState;
 import com.fasterxml.clustermate.service.store.*;
-
+import com.fasterxml.clustermate.servlet.CMServletFactory;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.dw.cmd.*;
 import com.fasterxml.transistore.service.BasicTSOperationThrottler;
 import com.fasterxml.transistore.service.SharedTSStuffImpl;
+import com.fasterxml.transistore.service.TSServletFactory;
 import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 import com.fasterxml.transistore.service.cleanup.LastAccessCleaner;
@@ -43,9 +41,10 @@ import com.fasterxml.transistore.service.store.BasicTSStores;
  * and initializing life-cycle components and resources.
  */
 public class BasicTSServiceOnDW
-    extends DWBasedService<BasicTSKey, StoredEntry<BasicTSKey>, BasicTSListItem,
-        BasicTSServiceConfig, BasicTSServiceConfigForDW,
-        PathType>
+    extends DWBasedService<
+        BasicTSKey, StoredEntry<BasicTSKey>, BasicTSListItem,
+        BasicTSServiceConfig, BasicTSServiceConfigForDW
+    >
 {
     /*
     /**********************************************************************
@@ -54,13 +53,12 @@ public class BasicTSServiceOnDW
      */
 
     protected BasicTSServiceOnDW(TimeMaster timings, RunMode mode) {
-        super(timings, mode, PathType.class);
+        super(timings, mode);
     }
 
     @Override
     public void initialize(Bootstrap<BasicTSServiceConfigForDW> bootstrap) {
         super.initialize(bootstrap);
-        // and FreeMarker for more dynamic pages?
 //      addBundle(new com.yammer.dropwizard.views.ViewBundle());
         // Some basic commands that may prove useful
         bootstrap.addCommand(new CommandDumpBDB());
@@ -92,18 +90,11 @@ public class BasicTSServiceOnDW
     /**********************************************************************
      */
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> constructEntryConverter(BasicTSServiceConfig config,
-            Environment environment) {
-        return (StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem>) config.getEntryConverter();
-    }
-
-    @Override
-    protected FileManager constructFileManager(BasicTSServiceConfig serviceConfig)
+    protected FileManager constructFileManager()
     {
         return new BasicTSFileManager(
-                new FileManagerConfig(serviceConfig.storeConfig.dataRootForFiles),
+                new FileManagerConfig(serviceConfig().storeConfig.dataRootForFiles),
                 _timeMaster);
     }
 
@@ -117,11 +108,11 @@ public class BasicTSServiceOnDW
     }
 
     @Override
-    protected StoresImpl<BasicTSKey, StoredEntry<BasicTSKey>> constructStores(BasicTSServiceConfig serviceConfig,
-            StorableStore store, NodeStateStore<IpAndPort, ActiveNodeState> nodeStates)
+    protected StoresImpl<BasicTSKey, StoredEntry<BasicTSKey>> constructStores(StorableStore store,
+            NodeStateStore<IpAndPort, ActiveNodeState> nodeStates)
     {
         StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> entryConv = _serviceStuff.getEntryConverter();
-        return new BasicTSStores(serviceConfig,
+        return new BasicTSStores(serviceConfig(),
                 _timeMaster, _serviceStuff.jsonMapper(), entryConv, store, nodeStates);
     }
     
@@ -131,17 +122,18 @@ public class BasicTSServiceOnDW
         return new BasicTSStoreHandler(_serviceStuff, _stores, _cluster, false);
     }
 
-    @Override
-    protected BasicTSStoreEntryServlet constructStoreEntryServlet() {
-        return new BasicTSStoreEntryServlet(_serviceStuff, _cluster, _storeHandler);
-    }
-
     /*
     /**********************************************************************
     /* Overrides
     /**********************************************************************
      */
 
+    @Override
+    protected CMServletFactory constructServletFactory() {
+        return new TSServletFactory(_serviceStuff, _stores,
+                _cluster, _clusterInfoHandler, _syncHandler, _storeHandler);
+    }
+    
     @Override
     protected void addHealthChecks(Environment environment)
     {
@@ -182,7 +174,7 @@ public class BasicTSServiceOnDW
      * Method is overridden to provide alternate throttler
      */
     @Override
-    protected StoreOperationThrottler _constructThrottler() {
+    protected StoreOperationThrottler constructThrottler() {
         return new BasicTSOperationThrottler();
     }
 

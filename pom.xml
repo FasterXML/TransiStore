@@ -127,6 +127,11 @@
       <artifactId>clustermate-service</artifactId>
       <version>${version.clustermate}</version>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.clustermate</groupId>
+      <artifactId>clustermate-servlet</artifactId>
+      <version>${version.clustermate}</version>
+    </dependency>
 
    </dependencies>
   </dependencyManagement>
