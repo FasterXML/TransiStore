@@ -1,0 +1,31 @@
+{
+  "http" : {
+    "shutdownGracePeriod" : "5 seconds"
+  }
+
+  ,"ts" : {
+    "metadataDirectory" : "data-tstore-nodes/"
+    ,"cfgSyncGracePeriod" : "5s"
+
+    ,"storeConfig" : {
+      "dataRootForFiles" : "data-tstore-blobs/"
+      ,"maxInlinedStorageSize" : 200
+    }
+    ,"storeBackendType" : "com.fasterxml.storemate.backend.bdbje.BDBJEBuilder"
+    ,"storeBackendConfig" : {
+      "dataRoot" : "data-tstore-entries/"
+    }
+
+    ,"cluster" : {
+      "type" : "SIMPLE_LINEAR"
+      ,"clusterKeyspaceSize" : 1024
+      ,"numberOfCopies" : 4
+      ,"clusterNodes" : [
+"localhost:6060",
+"localhost:7070",
+"localhost:8080",
+"localhost:9090"
+      ]
+    }
+  }
+}
