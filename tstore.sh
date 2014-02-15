@@ -7,8 +7,8 @@
 # let's actually use 4-node config, even for other clusters; more likely to succeed
 # bootstrapping
 
-#CONFIG=sample/single-node-9090.yml
-CONFIG=sample/four-nodes-4copies.yml
+CONFIG=sample/single-node-9090.yml
+#CONFIG=sample/four-nodes-4copies.yml
 
 ./ts-commands/target/transistore-commands-0.9.9-SNAPSHOT.jar \
  --config-file $CONFIG $@

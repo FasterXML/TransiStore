@@ -154,6 +154,9 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_ENTRIES)) {
                 return PathType.STORE_ENTRIES;
             }
+            if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_ENTRY_INFO)) {
+                return PathType.STORE_ENTRY_INFO;
+            }
         } else if (pathDecoder.matchPathSegment(FIRST_SEGMENT_NODE)) {
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_NODE_STATUS)) {
                 return PathType.NODE_STATUS;
