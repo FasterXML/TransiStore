@@ -41,7 +41,8 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
     protected final static String FIRST_SEGMENT_SYNC = "sync";
 
     protected final static String SECOND_SEGMENT_STORE_ENTRY = "entry";
-    protected final static String SECOND_SEGMENT_STORE_ENTRIES= "entries";
+    protected final static String SECOND_SEGMENT_STORE_ENTRY_INFO = "entryInfo";
+    protected final static String SECOND_SEGMENT_STORE_ENTRIES = "entries";
     protected final static String SECOND_SEGMENT_STORE_STATUS = "status";
     protected final static String SECOND_SEGMENT_STORE_FIND_ENTRY = "findEntry";
     protected final static String SECOND_SEGMENT_STORE_FIND_ENTRIES = "findEntries";
@@ -69,6 +70,8 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
 
         case STORE_ENTRY:
             return appendStoreEntryPath(basePath);
+        case STORE_ENTRY_INFO:
+            return appendStoreEntryInfoPath(basePath);
         case STORE_ENTRIES:
             return appendStoreListPath(basePath);
 
@@ -96,6 +99,11 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
     @Override
     public <B extends RequestPathBuilder<B>> B appendStoreEntryPath(B basePath) {
         return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRY);
+    }
+
+    @Override
+    public <B extends RequestPathBuilder<B>> B appendStoreEntryInfoPath(B basePath) {
+        return _storePath(basePath).addPathSegment(SECOND_SEGMENT_STORE_ENTRY_INFO);
     }
 
     @Override

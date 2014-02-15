@@ -11,7 +11,6 @@ import com.fasterxml.clustermate.servlet.DefaultCMServletFactory;
 import com.fasterxml.clustermate.servlet.ServletWithMetricsBase;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 
 public class TSServletFactory extends DefaultCMServletFactory<
