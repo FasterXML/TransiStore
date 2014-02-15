@@ -15,7 +15,7 @@ import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 
 public class TSServletFactory extends DefaultCMServletFactory<
-    BasicTSKey, StoredEntry<BasicTSKey>, BasicTSListItem,
+    BasicTSKey, StoredEntry<BasicTSKey>,
     BasicTSServiceConfig
 >
 {
@@ -24,7 +24,7 @@ public class TSServletFactory extends DefaultCMServletFactory<
             ClusterViewByServerUpdatable cluster,
             ClusterInfoHandler clusterInfoHandler,
             SyncHandler<BasicTSKey,StoredEntry<BasicTSKey>> syncHandler,
-            StoreHandler<BasicTSKey,StoredEntry<BasicTSKey>, BasicTSListItem> storeHandler)
+            StoreHandler<BasicTSKey,StoredEntry<BasicTSKey>, ?> storeHandler)
     {
         super(stuff, stores, cluster, clusterInfoHandler, syncHandler, storeHandler);
     }

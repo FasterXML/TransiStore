@@ -42,7 +42,7 @@ import com.fasterxml.transistore.service.store.BasicTSStores;
  */
 public class BasicTSServiceOnDW
     extends DWBasedService<
-        BasicTSKey, StoredEntry<BasicTSKey>, BasicTSListItem,
+        BasicTSKey, StoredEntry<BasicTSKey>,
         BasicTSServiceConfig, BasicTSServiceConfigForDW
     >
 {
@@ -100,7 +100,7 @@ public class BasicTSServiceOnDW
 
     @Override
     protected SharedServiceStuff constructServiceStuff(BasicTSServiceConfig serviceConfig,
-            TimeMaster timeMaster, StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> entryConverter,
+            TimeMaster timeMaster, StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> entryConverter,
             FileManager files)
     {
         return new SharedTSStuffImpl(serviceConfig, timeMaster,
@@ -184,7 +184,7 @@ public class BasicTSServiceOnDW
     /**********************************************************************
      */
 
-    public StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> getStoreHandler() {
+    public StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,?> getStoreHandler() {
         return _storeHandler;
     }
 }

@@ -15,7 +15,6 @@ import com.fasterxml.clustermate.servlet.ServletServiceResponse;
 import com.fasterxml.clustermate.servlet.StoreEntryServlet;
 
 import com.fasterxml.transistore.basic.BasicTSKey;
-import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 
 @SuppressWarnings("serial")
@@ -28,7 +27,7 @@ public class BasicTSStoreEntryServlet
 
     public BasicTSStoreEntryServlet(SharedServiceStuff stuff,
             ClusterViewByServer cluster,
-            StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> storeHandler)
+            StoreHandler<BasicTSKey, StoredEntry<BasicTSKey>,?> storeHandler)
     {
         super(stuff, cluster, storeHandler);
         BasicTSServiceConfig config = stuff.getServiceConfig();
