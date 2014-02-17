@@ -1,6 +1,7 @@
 package com.fasterxml.transistore.client;
 
 import com.fasterxml.clustermate.api.ClusterStatusAccessor;
+import com.fasterxml.clustermate.api.msg.ItemInfo;
 import com.fasterxml.clustermate.client.ClusterViewByClient;
 import com.fasterxml.clustermate.client.NetworkClient;
 import com.fasterxml.clustermate.client.StoreClient;
@@ -9,13 +10,14 @@ import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSListItem;
 
 public class BasicTSClient
-    extends StoreClient<BasicTSKey, BasicTSClientConfig, BasicTSListItem>
+    extends StoreClient<BasicTSKey, BasicTSClientConfig, ItemInfo>
 {
     public BasicTSClient(BasicTSClientConfig config,
             ClusterStatusAccessor statusAccessor, ClusterViewByClient<BasicTSKey> clusterView,
             NetworkClient<BasicTSKey> httpClientImpl)
     {
-        super(config, BasicTSListItem.class, statusAccessor, clusterView, httpClientImpl);
+        super(config, BasicTSListItem.class, statusAccessor, clusterView, httpClientImpl,
+                _stdItemInfoConverter(config, ItemInfo.class));
     }
 
     protected BasicTSClient(BasicTSClient base, BasicTSClientConfig newConfig) {
