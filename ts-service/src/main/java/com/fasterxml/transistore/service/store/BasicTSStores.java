@@ -40,17 +40,13 @@ public class BasicTSStores extends StoresImpl<BasicTSKey, StoredEntry<BasicTSKey
     }
 
     @Override
-    protected LastAccessStore<BasicTSKey, StoredEntry<BasicTSKey>,LastAccessUpdateMethod>
-    buildAccessStore(Environment env, LastAccessConfig config) 
-    {
-        /* 28-Dec-2013, tatu: Default to BDB-backed version for now; in future
-         *   hoping to refactor it somehow.
-         */
-//        return new BasicTSLastAccessStore(env, _entryConverter, config);
-        LastAccessStore<BasicTSKey, StoredEntry<BasicTSKey>,LastAccessUpdateMethod> lastAccessStore
-        = new BDBLastAccessStoreImpl<BasicTSKey, StoredEntry<BasicTSKey>,LastAccessUpdateMethod>(config,
-                new BasicTSLastAccessConverter(),
-                env);
-        return lastAccessStore;
+    protected boolean _openLocalStores(boolean log, boolean allowCreate, boolean writeAccess) {
+        return true;
     }
+
+    @Override
+    protected void _prepareToCloseLocalStores() { }
+
+    @Override
+    protected void _closeLocalStores() { }
 }
