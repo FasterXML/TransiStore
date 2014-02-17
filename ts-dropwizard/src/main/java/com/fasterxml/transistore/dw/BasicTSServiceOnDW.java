@@ -31,7 +31,6 @@ import com.fasterxml.transistore.service.SharedTSStuffImpl;
 import com.fasterxml.transistore.service.TSServletFactory;
 import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
-import com.fasterxml.transistore.service.cleanup.LastAccessCleaner;
 import com.fasterxml.transistore.service.cleanup.LocalEntryCleaner;
 import com.fasterxml.transistore.service.store.BasicTSStoreHandler;
 import com.fasterxml.transistore.service.store.BasicTSStores;
@@ -162,8 +161,6 @@ public class BasicTSServiceOnDW
         tasks.add(new LocalEntryCleaner());
         // then remove orphan dirs
         tasks.add(new FileCleaner());
-        // then last-accessed entries, if any
-        tasks.add(new LastAccessCleaner());
         // and finally disk space usage tracker
         tasks.add(new DiskUsageTracker());
 

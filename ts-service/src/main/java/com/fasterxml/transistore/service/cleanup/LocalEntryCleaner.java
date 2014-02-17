@@ -26,7 +26,7 @@ import com.fasterxml.transistore.service.BasicTSEntry;
 
 /**
  * Helper class used to keep track of clean up progress
- * for local BDB cleanup.
+ * for local metadata entry cleanup.
  */
 public class LocalEntryCleaner
     extends CleanupTask<LocalCleanupStats>

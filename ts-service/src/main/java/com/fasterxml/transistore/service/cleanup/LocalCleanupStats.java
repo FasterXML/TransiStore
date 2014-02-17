@@ -2,15 +2,15 @@ package com.fasterxml.transistore.service.cleanup;
 
 /**
  * Helper class used to keep track of clean up progress
- * for local BDB cleanup.
+ * for local data store (entry metadata, files) cleanup.
  */
 public class LocalCleanupStats
 {
     // Number tombstones expired
     protected int expiredTombstones = 0;
-    // Number of local BDB entries removed due to exceeding max TTL
+    // Number of metadata entries removed due to exceeding max TTL
     protected int expiredEntriesMaxTTL = 0;
-    // Number of local BDB entries removed due to exceeding TTL since last access
+    // Number of metadata entries removed due to exceeding TTL since last access
     protected int expiredEntriesLastAccess = 0;
 
     // Number of skipped (non-expired) tombstones
