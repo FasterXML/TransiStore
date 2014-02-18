@@ -1,6 +1,5 @@
 package com.fasterxml.transistore.basic;
 
-import com.fasterxml.clustermate.api.PathType;
 import com.fasterxml.clustermate.api.DecodableRequestPath;
 import com.fasterxml.clustermate.api.RequestPathBuilder;
 import com.fasterxml.clustermate.api.RequestPathStrategy;
@@ -34,7 +33,7 @@ import com.fasterxml.clustermate.api.RequestPathStrategy;
  *  </ul>
  *</ul>
  */
-public class BasicTSPaths extends RequestPathStrategy<PathType>
+public class BasicTSPaths extends RequestPathStrategy<BasicTSPath>
 {
     protected final static String FIRST_SEGMENT_STORE = "store";
     protected final static String FIRST_SEGMENT_NODE = "node";
@@ -60,7 +59,7 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
      */
 
     @Override
-    public <B extends RequestPathBuilder<B>> B appendPath(B basePath, PathType type)
+    public <B extends RequestPathBuilder<B>> B appendPath(B basePath, BasicTSPath type)
     {
         switch (type) {
         case NODE_METRICS:
@@ -144,32 +143,32 @@ public class BasicTSPaths extends RequestPathStrategy<PathType>
      */
 
     @Override
-    public PathType matchPath(DecodableRequestPath pathDecoder)
+    public BasicTSPath matchPath(DecodableRequestPath pathDecoder)
     {
         String full = pathDecoder.getPath();
         if (pathDecoder.matchPathSegment(FIRST_SEGMENT_STORE)) {
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_ENTRY)) {
-                return PathType.STORE_ENTRY;
+                return BasicTSPath.STORE_ENTRY;
             }
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_ENTRIES)) {
-                return PathType.STORE_ENTRIES;
+                return BasicTSPath.STORE_ENTRIES;
             }
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_STORE_ENTRY_INFO)) {
-                return PathType.STORE_ENTRY_INFO;
+                return BasicTSPath.STORE_ENTRY_INFO;
             }
         } else if (pathDecoder.matchPathSegment(FIRST_SEGMENT_NODE)) {
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_NODE_STATUS)) {
-                return PathType.NODE_STATUS;
+                return BasicTSPath.NODE_STATUS;
             }
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_NODE_METRICS)) {
-                return PathType.NODE_METRICS;
+                return BasicTSPath.NODE_METRICS;
             }
         } else if (pathDecoder.matchPathSegment(FIRST_SEGMENT_SYNC)) {
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_SYNC_LIST)) {
-                return PathType.SYNC_LIST;
+                return BasicTSPath.SYNC_LIST;
             }
             if (pathDecoder.matchPathSegment(SECOND_SEGMENT_SYNC_PULL)) {
-                return PathType.SYNC_PULL;
+                return BasicTSPath.SYNC_PULL;
             }
         }
         // if no match, need to reset

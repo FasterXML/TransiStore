@@ -7,6 +7,7 @@ import com.yammer.dropwizard.cli.ServerCommand;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.metrics.core.HealthCheck;
+
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
@@ -14,6 +15,7 @@ import com.fasterxml.storemate.store.StoreOperationThrottler;
 import com.fasterxml.storemate.store.file.FileManager;
 import com.fasterxml.storemate.store.file.FileManagerConfig;
 import com.fasterxml.storemate.store.state.NodeStateStore;
+
 import com.fasterxml.clustermate.dw.DWBasedService;
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
@@ -23,17 +25,18 @@ import com.fasterxml.clustermate.service.cleanup.FileCleaner;
 import com.fasterxml.clustermate.service.state.ActiveNodeState;
 import com.fasterxml.clustermate.service.store.*;
 import com.fasterxml.clustermate.servlet.CMServletFactory;
+
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.basic.BasicTSListItem;
 import com.fasterxml.transistore.dw.cmd.*;
 import com.fasterxml.transistore.service.BasicTSOperationThrottler;
 import com.fasterxml.transistore.service.SharedTSStuffImpl;
-import com.fasterxml.transistore.service.TSServletFactory;
 import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 import com.fasterxml.transistore.service.cleanup.LocalEntryCleaner;
 import com.fasterxml.transistore.service.store.BasicTSStoreHandler;
 import com.fasterxml.transistore.service.store.BasicTSStores;
+import com.fasterxml.transistore.servlet.BasicTSServletFactory;
 
 /**
  * Main service class that sets up service configuration, bootstrapping things
@@ -129,10 +132,10 @@ public class BasicTSServiceOnDW
 
     @Override
     protected CMServletFactory constructServletFactory() {
-        return new TSServletFactory(_serviceStuff, _stores,
+        return new BasicTSServletFactory(_serviceStuff, _stores,
                 _cluster, _clusterInfoHandler, _syncHandler, _storeHandler);
     }
-    
+
     @Override
     protected void addHealthChecks(Environment environment)
     {
