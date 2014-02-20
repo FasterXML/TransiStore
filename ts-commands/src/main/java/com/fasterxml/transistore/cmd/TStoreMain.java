@@ -15,6 +15,7 @@ public class TStoreMain
                 .withCommands(Help.class,
                         GetCmd.class, CatCmd.class, ListCmd.class,
                         PutCmd.class, DeleteCmd.class,
+                        InfoCmd.class,
                         // and some debug tools as well
                         GenerateLoad.class);
 

@@ -213,6 +213,68 @@ public abstract class TStoreCmdBase implements Runnable
 
     /*
     /**********************************************************************
+    /* Value formatting
+    /**********************************************************************
+     */
+    
+    protected String size(long l)
+    {
+        if (l <= 9999L) {
+            return String.format("%5d", l);
+        }
+        int kB = (int) (l >> 10);
+        if (kB < 100) {
+            return String.format("%4.1fk", l / 1024.0); // 99.9k (5 chars)
+        }
+        if (kB < 1024) {
+            return String.format(" %3dk", kB); // 999k
+        }
+        int mB = (kB >> 10);
+        if (mB < 100) {
+            return String.format("%4.1fM", kB / 1024.0); // 99.9M
+        }
+        if (mB < 1024) { // 100 - 999
+            return String.format(" %dM", mB);
+        }
+        return String.format("%5.1fG", mB / 1024.0); // 125.4G
+    }
+
+    protected String ageMsecs(long msecs) {
+        return ageSecs(msecs / 1000);
+    }
+
+    protected String ageSecs(long secs0)
+    {
+        int secs = (secs0 < Integer.MAX_VALUE) ? ((int) secs0) : Integer.MAX_VALUE;
+        if (secs < 60) {
+          if (secs < 10) {
+               return new StringBuilder(6).append(' ').append(secs).append("s   ").toString();
+          }
+          return new StringBuilder(6).append(secs).append("s   ").toString();
+        }
+        int mins = (secs / 60);
+        secs -= (mins * 60);
+        if (mins < 60) {
+            return String.format("%2dm%02d", mins, secs);
+        }
+        int h = (mins / 60);
+        mins -= (h * 60);
+        if (h < 24) { // even hours quite common, optimize
+            if (mins == 0) {
+                return String.format("%2dh  ", h);
+            }
+            return String.format("%2dh%02d", h, mins);
+        }
+        int d = (h / 24);
+        h -= (d * 24);
+        if (h == 0) { // even days common as well
+            return String.format("%2dd   ", d);
+        }
+        return String.format("%2dd%02d", d, h);
+    }
+
+    /*
+    /**********************************************************************
     /* Error reporting
     /**********************************************************************
      */

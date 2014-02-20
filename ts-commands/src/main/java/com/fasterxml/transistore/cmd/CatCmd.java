@@ -19,7 +19,7 @@ import io.airlift.command.*;
 public class CatCmd extends TStoreCmdBase
 {
     @Arguments(title="paths",
-            description = "Server path(s) for entry to show)"
+            description = "Server path(s) for entry to show"
             ,usage="[path1] ... [pathN]")
     public List<String> paths;
     

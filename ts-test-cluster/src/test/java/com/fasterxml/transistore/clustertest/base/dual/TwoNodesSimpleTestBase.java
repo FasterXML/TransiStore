@@ -15,8 +15,11 @@ import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StoreOperationSource;
 
+import com.fasterxml.clustermate.api.msg.ItemInfo;
 import com.fasterxml.clustermate.client.NodesForKey;
+import com.fasterxml.clustermate.client.call.ReadCallResult;
 import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
+import com.fasterxml.clustermate.client.operation.InfoOperationResult;
 import com.fasterxml.clustermate.client.operation.PutOperation;
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.dw.RunMode;
@@ -101,7 +104,21 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
              * claim we accept things as compresed (if we did, we'd get 48)
              */
             assertEquals(12000L, len);
-    
+
+            // Also: should be able to get ItemInfo:
+            InfoOperationResult<ItemInfo> infoResult = client.findInfo(null, KEY);
+            assertEquals(2, infoResult.getSuccessCount());
+            assertEquals(0, infoResult.getFailCount());
+
+            for (int i = 0; i < 2; ++i) {
+                ReadCallResult<ItemInfo> infoWrapper = infoResult.get(i);
+                assertNotNull(infoWrapper);
+                ItemInfo info = infoWrapper.getResult();
+                assertNotNull(info);
+                assertEquals(CONTENT.length, info.getLength());
+                verifyHash("content hash for entry #"+i, info.getHash(), CONTENT);
+            }
+            
             // delete:
             DeleteOperationResult del = client.deleteContent(null, KEY);
             assertTrue(del.succeededMinimally());

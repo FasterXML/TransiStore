@@ -36,7 +36,7 @@ public class GenerateLoad extends TStoreCmdBase
     
     @Option(name = { "--entrySize" }, description = "Size of entries to PUT")
     public long requestSize = 30000;
-    
+
     @Arguments(title="server-path",
            description = "Path prefix to use for generated entries"
            ,usage="[server-prefix]"
