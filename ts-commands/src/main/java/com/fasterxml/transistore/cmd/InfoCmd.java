@@ -69,7 +69,7 @@ public class InfoCmd extends TStoreCmdBase
                 ++i;
                 System.out.printf(" copy #%d: ", i);
                 if (result.failed()) {
-                    System.out.printf("FAILed to access, problem: %s\n"+result.getFailure());
+                    System.out.printf("FAILed to access, problem: %s", result.getFailure());
                 } else if (result.hasResult()) {
                     ItemInfo info = result.getResult();
                     Compression comp = info.getCompression();
