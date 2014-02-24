@@ -74,14 +74,15 @@ public class InfoCmd extends TStoreCmdBase
                     ItemInfo info = result.getResult();
                     Compression comp = info.getCompression();
                     if (comp == null || comp == Compression.NONE) {
-                        System.out.printf("length %s", size(info.getLength()));
+                        System.out.printf("length %s", size(info.getLength()).trim());
                     } else {
-                        System.out.printf("length %s (%s compressed with %s)",
-                                size(info.getLength()), size(info.getCompressedLength()),
+                        System.out.printf("length %s (%s/%s)",
+                                size(info.getLength()).trim(), size(info.getCompressedLength()).trim(),
                                 comp);
                     }
+                    System.out.printf(" hash %X", info.getHash());
                 } else {
-                    System.out.println("NOT FOUND");
+                    System.out.print("NOT FOUND");
                 }
                 System.out.println();
             }
