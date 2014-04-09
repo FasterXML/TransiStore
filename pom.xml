@@ -45,9 +45,6 @@
         </developer>
   </developers>
 
-  <prerequisites>
-    <maven>2.2.1</maven>
-  </prerequisites>
   <properties>
     <javac.src.version>1.7</javac.src.version>
     <javac.target.version>1.7</javac.target.version>
