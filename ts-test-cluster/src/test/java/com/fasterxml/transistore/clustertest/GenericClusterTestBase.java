@@ -107,10 +107,10 @@ public abstract class GenericClusterTestBase extends TestCase
         ClusterConfig cluster = new ClusterConfig();
         cluster.type = KeyRangeAllocationStrategy.STATIC;
         cluster.clusterKeyspaceSize = 360;
-        ArrayList<NodeConfig> nodes = new ArrayList<NodeConfig>();
-        nodes.add(new NodeConfig("localhost:"+port, 0, 360));
         // Cluster config? Set keyspace size, but nothing else yet
-        cluster.clusterNodes = nodes;
+        cluster.clusterNodes = new NodeConfig[] {
+                new NodeConfig("localhost:"+port, 0, 360)
+        };
         return createNodeConfig(testSuffix, cleanUp, port, cluster);
     }
 
@@ -123,8 +123,8 @@ public abstract class GenericClusterTestBase extends TestCase
         clusterConfig.clusterKeyspaceSize = keyspaceLength; // with 2 nodes, anything divisible by 2 is fine
         clusterConfig.numberOfCopies = 2;
         clusterConfig.type = KeyRangeAllocationStrategy.SIMPLE_LINEAR;
-        clusterConfig.clusterNodes.add(new NodeConfig(endpoint1));
-        clusterConfig.clusterNodes.add(new NodeConfig(endpoint2));
+        clusterConfig.clusterNodes = new NodeConfig[] { new NodeConfig(endpoint1),
+                new NodeConfig(endpoint2) };
         return clusterConfig;
     }
 
