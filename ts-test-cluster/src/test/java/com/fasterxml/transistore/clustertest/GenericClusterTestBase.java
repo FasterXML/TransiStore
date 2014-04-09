@@ -1,7 +1,6 @@
 package com.fasterxml.transistore.clustertest;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -123,8 +122,8 @@ public abstract class GenericClusterTestBase extends TestCase
         clusterConfig.clusterKeyspaceSize = keyspaceLength; // with 2 nodes, anything divisible by 2 is fine
         clusterConfig.numberOfCopies = 2;
         clusterConfig.type = KeyRangeAllocationStrategy.SIMPLE_LINEAR;
-        clusterConfig.clusterNodes = new NodeConfig[] { new NodeConfig(endpoint1),
-                new NodeConfig(endpoint2) };
+        clusterConfig.clusterNodes = new NodeConfig[] {
+                new NodeConfig(endpoint1), new NodeConfig(endpoint2) };
         return clusterConfig;
     }
 

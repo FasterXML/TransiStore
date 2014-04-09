@@ -256,7 +256,8 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
                 new NodeConfig(endpoint1),
                 new NodeConfig(endpoint2),
                 new NodeConfig(endpoint3),
-                new NodeConfig(endpoint4) };
+                new NodeConfig(endpoint4)
+        };
         return clusterConfig;
     }
 }
