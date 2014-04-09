@@ -43,6 +43,8 @@ public abstract class SingleNodeSimpleTestBase extends ClusterTestBase
         initTestLogging(); // reduce noise
         
         BasicTSServiceConfigForDW serviceConfig = createSingleNodeConfig("fullStack1", true, PORT_1);
+        
+        serviceConfig.overrideApplicationContextPath("/");
         // false -> don't bother with full init of background tasks:
         StoreForTests service = StoreForTests.createTestService(serviceConfig,
                 new TimeMasterForClusterTesting(100L), RunMode.TEST_MINIMAL);

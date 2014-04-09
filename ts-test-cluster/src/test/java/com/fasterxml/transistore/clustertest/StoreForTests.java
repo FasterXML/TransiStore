@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.jetty.server.Server;
 
+import io.dropwizard.jetty.HttpConnectorFactory;
 import io.dropwizard.server.SimpleServerFactory;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.setup.Bootstrap;
@@ -73,7 +74,10 @@ public class StoreForTests extends BasicTSServiceOnDW
         //bootstrap.runWithBundles(_serviceConfig, environment);
         
         // Simple-/DefaultServerFactory:
-        final Server server = new SimpleServerFactory().build(environment);
+        SimpleServerFactory serverF = new SimpleServerFactory();
+        serverF.setApplicationContextPath("/");
+        ((HttpConnectorFactory) serverF.getConnector()).setPort(_serviceConfig.getApplicationPort());
+        final Server server = serverF.build(environment);
         _jettyServer = server;
         server.start();
     }
