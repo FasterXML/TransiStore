@@ -75,6 +75,8 @@ public class StoreForTests extends BasicTSServiceOnDW
         
         // Simple-/DefaultServerFactory:
         SimpleServerFactory serverF = new SimpleServerFactory();
+        // die stupid gzip filter die
+        serverF.getGzipFilterFactory().setEnabled(false);
         serverF.setApplicationContextPath("/");
         ((HttpConnectorFactory) serverF.getConnector()).setPort(_serviceConfig.getApplicationPort());
         final Server server = serverF.build(environment);
