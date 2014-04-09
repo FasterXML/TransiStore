@@ -11,7 +11,7 @@ import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StoreOperationSource;
 
-import com.yammer.dropwizard.util.Duration;
+import io.dropwizard.util.Duration;
 
 import com.fasterxml.clustermate.client.operation.PutOperationResult;
 import com.fasterxml.clustermate.dw.RunMode;

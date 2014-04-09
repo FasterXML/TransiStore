@@ -2,9 +2,8 @@ package com.fasterxml.transistore.dw.cmd;
 
 import java.util.List;
 
+import io.dropwizard.setup.Bootstrap;
 import net.sourceforge.argparse4j.inf.Namespace;
-
-import com.yammer.dropwizard.config.Bootstrap;
 
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.clustermate.service.store.StoredEntry;

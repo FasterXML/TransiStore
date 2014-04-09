@@ -1,23 +1,23 @@
 package com.fasterxml.transistore.dw;
 
+import io.dropwizard.cli.ServerCommand;
+import io.dropwizard.Application;
+import io.dropwizard.setup.Environment;
 import net.sourceforge.argparse4j.inf.Namespace;
-
-import com.yammer.dropwizard.Service;
-import com.yammer.dropwizard.cli.ServerCommand;
-import com.yammer.dropwizard.config.Environment;
 
 public class CustomServerCommand extends ServerCommand<BasicTSServiceConfigForDW>
 {
-    public CustomServerCommand(Service<BasicTSServiceConfigForDW> service) {
+    public CustomServerCommand(Application<BasicTSServiceConfigForDW> service) {
         super(service);
     }
 
     @Override
-    protected void run(Environment environment, Namespace namespace,
+    protected void run(Environment environment,
+            Namespace namespace,
             BasicTSServiceConfigForDW configuration) throws Exception
     {
         // Ha! Begone automatic GZIP filter, you fool!
-        configuration.getHttpConfiguration().getGzipConfiguration().setEnabled(false);
+        configuration.overrideGZIPEnabled(false);
         super.run(environment, namespace, configuration);
     }
 }

@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import org.junit.Assert;
 
-import com.yammer.dropwizard.util.Duration;
+import io.dropwizard.util.Duration;
 
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.compress.Compression;

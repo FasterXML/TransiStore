@@ -20,7 +20,7 @@ import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 
-import com.yammer.dropwizard.util.Duration;
+import io.dropwizard.util.Duration;
 
 /**
  * Tests for verifying that [Issue#25] is implemented: that is, if

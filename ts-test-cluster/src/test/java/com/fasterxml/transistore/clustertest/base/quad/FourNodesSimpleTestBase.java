@@ -4,7 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.util.Arrays;
 
-import com.yammer.dropwizard.util.Duration;
+import io.dropwizard.util.Duration;
 
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.store.AdminStorableStore;

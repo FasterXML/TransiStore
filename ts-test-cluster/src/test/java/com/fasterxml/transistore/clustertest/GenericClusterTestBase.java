@@ -92,7 +92,7 @@ public abstract class GenericClusterTestBase extends TestCase
         config.overrideHttpPort(port);
         config.overrideAdminPort(port);
         // tone down logging
-        config.getLoggingConfiguration().setLevel(Level.WARN);
+        config.overrideLogLevel(Level.WARN);
         // specified cluster defs:
         config.getServiceConfig().cluster = cluster;
         // plus, important: reduce grace period (as we can use TimeMaster) to 1 millisecond:

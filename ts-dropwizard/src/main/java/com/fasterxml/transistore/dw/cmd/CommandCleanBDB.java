@@ -1,13 +1,13 @@
 package com.fasterxml.transistore.dw.cmd;
 
+import io.dropwizard.setup.Bootstrap;
+
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import com.fasterxml.clustermate.service.Stores;
 import com.fasterxml.storemate.store.AdminStorableStore;
 import com.fasterxml.storemate.store.StoreOperationSource;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
-
-import com.yammer.dropwizard.config.Bootstrap;
 
 /**
  * Command for cleaning up all the entry data from BDB (but not

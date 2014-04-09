@@ -2,12 +2,15 @@ package com.fasterxml.transistore.dw;
 
 import java.util.*;
 
-import com.yammer.dropwizard.cli.Cli;
-import com.yammer.dropwizard.cli.ServerCommand;
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.metrics.core.HealthCheck;
+import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.cli.Cli;
+import io.dropwizard.cli.ServerCommand;
+import io.dropwizard.lifecycle.Managed;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 
+import com.codahale.metrics.health.HealthCheck;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
@@ -17,8 +20,11 @@ import com.fasterxml.storemate.store.file.FileManagerConfig;
 import com.fasterxml.storemate.store.state.NodeStateStore;
 
 import com.fasterxml.clustermate.dw.DWBasedService;
+import com.fasterxml.clustermate.dw.HealthCheckForCluster;
+import com.fasterxml.clustermate.dw.HealthCheckForStore;
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
+import com.fasterxml.clustermate.service.cfg.ServiceConfig;
 import com.fasterxml.clustermate.service.cleanup.CleanupTask;
 import com.fasterxml.clustermate.service.cleanup.DiskUsageTracker;
 import com.fasterxml.clustermate.service.cleanup.FileCleaner;
@@ -73,11 +79,17 @@ public class BasicTSServiceOnDW
          *   called for; problem being that we need to post-process
          *   configuration somewhat.
          */
-        new BasicTSServiceOnDW(TimeMaster.nonTestInstance(), RunMode.FULL).customRun(args);
+        new BasicTSServiceOnDW(TimeMaster.nonTestInstance(), RunMode.FULL).run(args);
     }
 
-    /* Goddamit; original run() is final. Bah, humbug. Need to copy, modify...
-     */
+    /*
+    @Override
+    public void run(BasicTSServiceConfigForDW configuration, Environment environment) throws java.io.IOException {
+        super.run();
+    }
+    */
+
+    /*
     protected void customRun(String[] arguments) throws Exception {
         final Bootstrap<BasicTSServiceConfigForDW> bootstrap = new Bootstrap<BasicTSServiceConfigForDW>(this);
         bootstrap.addCommand(new ServerCommand<BasicTSServiceConfigForDW>(this));
@@ -85,6 +97,7 @@ public class BasicTSServiceOnDW
         final Cli cli = new Cli(this.getClass(), bootstrap);
         cli.run(arguments);
     }
+    */
     
     /*
     /**********************************************************************
@@ -139,21 +152,9 @@ public class BasicTSServiceOnDW
     @Override
     protected void addHealthChecks(Environment environment)
     {
-        /* TODO: Once DropWizard 0.7 out, convert these, require new Metrics
-         * 
-         */
-        /*
-        ServiceConfig config = stuff.getServiceConfig();
-        environment.addHealthCheck(new HealthCheckForStore(config, _stores));
-        environment.addHealthCheck(new HealthCheckForCluster(config, _cluster));
-*/
-        HealthCheck hc = new HealthCheck("bogusCheck-pre-DW-0.7") {
-            @Override
-            protected Result check() throws Exception {
-                return Result.healthy("Fine and Dandy!");
-            }
-        };
-        environment.addHealthCheck(hc);
+        ServiceConfig config = _serviceStuff.getServiceConfig();
+        environment.healthChecks().register("store-check", new HealthCheckForStore(config, _stores));
+        environment.healthChecks().register("cluster-check", new HealthCheckForCluster(config, _cluster));
     }
 
     @Override

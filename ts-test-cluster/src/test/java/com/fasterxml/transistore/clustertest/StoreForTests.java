@@ -4,11 +4,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.jetty.server.Server;
 
-import com.yammer.dropwizard.config.Bootstrap;
+import io.dropwizard.setup.Environment;
+import io.dropwizard.cli.EnvironmentCommand;
+import io.dropwizard.setup.Bootstrap;
+/*
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.config.ServerFactory;
 import com.yammer.dropwizard.json.ObjectMapperFactory;
 import com.yammer.dropwizard.validation.Validator;
+*/
 
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.file.FileManager;
@@ -66,8 +70,10 @@ public class StoreForTests extends BasicTSServiceOnDW
     public void startTestService() throws Exception
     {
         Bootstrap<BasicTSServiceConfigForDW> bootstrap = new Bootstrap<BasicTSServiceConfigForDW>(this);
-        final Environment environment = new Environment("TestService", _serviceConfig,
-                new ObjectMapperFactory(), new Validator());
+        final EnvironmentCommand environment =
+                new Environment("TestService", _serviceConfig,
+                new ObjectMapperFactory(),
+                new Validator());
         bootstrap.runWithBundles(_serviceConfig, environment);
         run(_serviceConfig, environment);
         final Server server = new ServerFactory(_serviceConfig.getHttpConfiguration(),
@@ -75,7 +81,7 @@ public class StoreForTests extends BasicTSServiceOnDW
         _jettyServer = server;
         server.start();
     }
-    
+
     /*
     /**********************************************************************
     /* Life-cycle

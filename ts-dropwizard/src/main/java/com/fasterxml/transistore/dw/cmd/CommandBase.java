@@ -2,6 +2,9 @@ package com.fasterxml.transistore.dw.cmd;
 
 import java.io.*;
 
+import io.dropwizard.Configuration;
+import io.dropwizard.cli.ConfiguredCommand;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.storemate.backend.bdbje.BDBJEBuilder;
@@ -24,10 +27,6 @@ import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
 import com.fasterxml.transistore.service.cfg.BasicTSFileManager;
 import com.fasterxml.transistore.service.cfg.BasicTSServiceConfig;
 import com.fasterxml.transistore.service.store.BasicTSStores;
-
-import com.yammer.dropwizard.cli.ConfiguredCommand;
-import com.yammer.dropwizard.config.Configuration;
-
 
 // NOTE: can NOT parametrize at this level, due to DropWizard issue #89
 public abstract class CommandBase<T extends Configuration> extends ConfiguredCommand<T>
