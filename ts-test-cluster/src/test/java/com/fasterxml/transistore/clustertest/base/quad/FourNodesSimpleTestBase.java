@@ -252,10 +252,14 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
         clusterConfig.type = KeyRangeAllocationStrategy.SIMPLE_LINEAR;
         clusterConfig.numberOfCopies = 2;
         clusterConfig.clusterKeyspaceSize = 360; // the usual 360 degrees, but divided in 4 overlapping slices
-        clusterConfig.clusterNodes.add(new NodeConfig(endpoint1));
-        clusterConfig.clusterNodes.add(new NodeConfig(endpoint2));
-        clusterConfig.clusterNodes.add(new NodeConfig(endpoint3));
-        clusterConfig.clusterNodes.add(new NodeConfig(endpoint4));
+
+        
+        clusterConfig.clusterNodes = new NodeConfig[] {
+                new NodeConfig(endpoint1),
+                new NodeConfig(endpoint2),
+                new NodeConfig(endpoint3),
+                new NodeConfig(endpoint4)
+        };
         return clusterConfig;
     }
 }

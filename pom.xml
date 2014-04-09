@@ -49,8 +49,8 @@
     <maven>2.2.1</maven>
   </prerequisites>
   <properties>
-    <javac.src.version>1.6</javac.src.version>
-    <javac.target.version>1.6</javac.target.version>
+    <javac.src.version>1.7</javac.src.version>
+    <javac.target.version>1.7</javac.target.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <version.plugin.shade>1.7.1</version.plugin.shade>

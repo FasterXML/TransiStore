@@ -4,24 +4,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.jetty.server.Server;
 
+import io.dropwizard.server.SimpleServerFactory;
 import io.dropwizard.setup.Environment;
-import io.dropwizard.cli.EnvironmentCommand;
 import io.dropwizard.setup.Bootstrap;
-/*
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.config.ServerFactory;
-import com.yammer.dropwizard.json.ObjectMapperFactory;
-import com.yammer.dropwizard.validation.Validator;
-*/
 
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.file.FileManager;
-
 import com.fasterxml.clustermate.api.EntryKeyConverter;
 import com.fasterxml.clustermate.dw.RunMode;
 import com.fasterxml.clustermate.service.SharedServiceStuff;
 import com.fasterxml.clustermate.service.cluster.ClusterViewByServer;
-
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.clustertest.util.TimeMasterForClusterTesting;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
@@ -70,16 +62,24 @@ public class StoreForTests extends BasicTSServiceOnDW
     public void startTestService() throws Exception
     {
         Bootstrap<BasicTSServiceConfigForDW> bootstrap = new Bootstrap<BasicTSServiceConfigForDW>(this);
-        final EnvironmentCommand environment =
-                new Environment("TestService", _serviceConfig,
-                new ObjectMapperFactory(),
-                new Validator());
-        bootstrap.runWithBundles(_serviceConfig, environment);
+        final Environment environment = new Environment("TestService",
+                bootstrap.getObjectMapper(), // or Jackson.newObjectMapper(),
+                bootstrap.getValidatorFactory().getValidator(),
+                bootstrap.getMetricRegistry(),
+                bootstrap.getClassLoader());
+        bootstrap.run(_serviceConfig, environment);
         run(_serviceConfig, environment);
-        final Server server = new ServerFactory(_serviceConfig.getHttpConfiguration(),
-                "StoreForTests").buildServer(environment);
+
+        //bootstrap.runWithBundles(_serviceConfig, environment);
+
+System.err.println("DEBUG: Start service... port? "+_serviceConfig.getApplicationPort());
+        
+        // Simple-/DefaultServerFactory:
+        final Server server = new SimpleServerFactory().build(environment);
         _jettyServer = server;
+System.err.println("DEBUG: Starting service "+server);
         server.start();
+System.err.println("DEBUG: Started service ok.");
     }
 
     /*
