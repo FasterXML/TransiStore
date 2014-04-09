@@ -63,16 +63,16 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
         ClusterConfig cc1 =  clusterConfig(endpoint1, endpoint2, endpoint3, endpoint4);
         
         BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack4_1", true, TEST_PORT1, cc1)
-                .setShutdownGracePeriod(shutdownDelay);
+                .overrideShutdownGracePeriod(shutdownDelay);
         StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_FULL);        
         BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack4_2", true, TEST_PORT2, cc1)
-                .setShutdownGracePeriod(shutdownDelay);
+                .overrideShutdownGracePeriod(shutdownDelay);
         StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_FULL);
         BasicTSServiceConfigForDW serviceConfig3 = createNodeConfig("fullStack4_3", true, TEST_PORT3, cc1)
-                .setShutdownGracePeriod(shutdownDelay);
+                .overrideShutdownGracePeriod(shutdownDelay);
         StoreForTests service3 = StoreForTests.createTestService(serviceConfig3, timeMaster, RunMode.TEST_FULL);
         BasicTSServiceConfigForDW serviceConfig4 = createNodeConfig("fullStack4_4", true, TEST_PORT4, cc1)
-                .setShutdownGracePeriod(shutdownDelay);
+                .overrideShutdownGracePeriod(shutdownDelay);
         StoreForTests service4 = StoreForTests.createTestService(serviceConfig4, timeMaster, RunMode.TEST_FULL);
 
         // need to do some acrobatics to only try clean shutdown when things work...

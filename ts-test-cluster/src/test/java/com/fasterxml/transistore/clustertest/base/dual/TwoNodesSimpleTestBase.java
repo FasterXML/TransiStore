@@ -400,14 +400,14 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
         // reduce shutdown grace period to speed up shutdown...
         final Duration shutdownDelay = Duration.milliseconds(100L);
         BasicTSServiceConfigForDW serviceConfig1 = createNodeConfig("fullStack2b_1", true, TEST_PORT1, clusterConfig)
-        		.setShutdownGracePeriod(shutdownDelay);
+        		.overrideShutdownGracePeriod(shutdownDelay);
         // all nodes need same (or at least similar enough) cluster config:
         final long START_TIME = 200L;
         final TimeMasterForClusterTesting timeMaster = new TimeMasterForClusterTesting(START_TIME);
         // important: last argument 'true' so that background sync thread gets started
         StoreForTests service1 = StoreForTests.createTestService(serviceConfig1, timeMaster, RunMode.TEST_FULL);
         BasicTSServiceConfigForDW serviceConfig2 = createNodeConfig("fullStack2b_2", true, TEST_PORT2, clusterConfig)
-        		.setShutdownGracePeriod(shutdownDelay);
+        		.overrideShutdownGracePeriod(shutdownDelay);
         serviceConfig2.getServiceConfig().cluster = clusterConfig;
         StoreForTests service2 = StoreForTests.createTestService(serviceConfig2, timeMaster, RunMode.TEST_FULL);
 

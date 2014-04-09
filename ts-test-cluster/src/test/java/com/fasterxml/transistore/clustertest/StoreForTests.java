@@ -71,15 +71,11 @@ public class StoreForTests extends BasicTSServiceOnDW
         run(_serviceConfig, environment);
 
         //bootstrap.runWithBundles(_serviceConfig, environment);
-
-System.err.println("DEBUG: Start service... port? "+_serviceConfig.getApplicationPort());
         
         // Simple-/DefaultServerFactory:
         final Server server = new SimpleServerFactory().build(environment);
         _jettyServer = server;
-System.err.println("DEBUG: Starting service "+server);
         server.start();
-System.err.println("DEBUG: Started service ok.");
     }
 
     /*

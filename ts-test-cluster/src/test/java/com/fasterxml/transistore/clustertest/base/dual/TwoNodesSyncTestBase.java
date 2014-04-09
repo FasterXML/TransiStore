@@ -182,8 +182,8 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
     {
         final Duration shutdownDelay = Duration.milliseconds(100L);
         return createNodeConfig(name, true, port, cluster)
-                .setShutdownGracePeriod(shutdownDelay)
-                .setSyncGracePeriod(new TimeSpan("1s"))
+                .overrideShutdownGracePeriod(shutdownDelay)
+                .overrideSyncGracePeriod(new TimeSpan("1s"))
                 .disableRequestLog();
     }
     

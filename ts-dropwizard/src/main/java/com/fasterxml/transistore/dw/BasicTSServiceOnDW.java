@@ -2,15 +2,9 @@ package com.fasterxml.transistore.dw;
 
 import java.util.*;
 
-import io.dropwizard.Application;
-import io.dropwizard.assets.AssetsBundle;
-import io.dropwizard.cli.Cli;
-import io.dropwizard.cli.ServerCommand;
-import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-import com.codahale.metrics.health.HealthCheck;
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.TimeMaster;
 import com.fasterxml.storemate.store.StorableStore;
@@ -79,7 +73,8 @@ public class BasicTSServiceOnDW
          *   called for; problem being that we need to post-process
          *   configuration somewhat.
          */
-        new BasicTSServiceOnDW(TimeMaster.nonTestInstance(), RunMode.FULL).run(args);
+        BasicTSServiceOnDW svc = new BasicTSServiceOnDW(TimeMaster.nonTestInstance(), RunMode.FULL);
+        svc.run(args);
     }
 
     /*
