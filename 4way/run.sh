@@ -6,8 +6,8 @@ if [ "$PORT" == "" ]; then
   exit 1
 fi
 
-java -Xmx1024M -Xms1024M -XX:-UseParallelOldGC \
+java -Xmx512M -Xms512M -XX:-UseParallelOldGC \
   -Ddw.http.port=$PORT \
   -Ddw.http.adminPort=$PORT \
   -jar ../../ts-server/target/transistore-server-0.11.0-SNAPSHOT.jar \
-  server ../../sample/two-leveldb-7070-9090.yml
+  server ../../sample/four-nodes-4copies.yml
