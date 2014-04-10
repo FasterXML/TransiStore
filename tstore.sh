@@ -10,6 +10,6 @@
 CONFIG=sample/single-node-9090.yml
 #CONFIG=sample/four-nodes-4copies.yml
 
-./ts-commands/target/transistore-commands-0.9.9-SNAPSHOT.jar \
+./ts-commands/target/transistore-commands-0.11.0-SNAPSHOT.jar \
  --config-file $CONFIG $@
 
