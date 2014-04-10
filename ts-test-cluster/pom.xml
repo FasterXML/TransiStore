@@ -3,10 +3,11 @@
   <parent>
     <groupId>com.fasterxml.transistore</groupId>
     <artifactId>transistore-parent</artifactId>
-    <version>0.9.9</version>
+    <version>0.10.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>transistore-test-cluster</artifactId>
+  <version>0.9.10-SNAPSHOT</version>
   <name>TransiStore Cluster Tests</name>
   <packaging>jar</packaging>
   <description>Full cluster tests for TransiStore.
