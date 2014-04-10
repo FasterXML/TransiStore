@@ -6,7 +6,6 @@
     <version>0.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>transistore-commands</artifactId>
-  <version>0.9.10-SNAPSHOT</version>
   <name>TransiStore Commands</name>
   <packaging>jar</packaging>
   <description>Package that contains CLI, commands to invoke from shell.

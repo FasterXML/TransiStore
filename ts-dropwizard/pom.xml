@@ -6,7 +6,6 @@
     <version>0.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>transistore-dropwizard</artifactId>
-  <version>0.9.10-SNAPSHOT</version>
   <name>TransiStore-on-DropWizard</name>
   <packaging>jar</packaging>
   <description>Version of TransiStore service to deploy on DropWizard

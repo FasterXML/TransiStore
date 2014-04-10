@@ -7,7 +7,6 @@
   </parent>
 
   <artifactId>transistore-test-cluster</artifactId>
-  <version>0.9.10-SNAPSHOT</version>
   <name>TransiStore Cluster Tests</name>
   <packaging>jar</packaging>
   <description>Full cluster tests for TransiStore.
