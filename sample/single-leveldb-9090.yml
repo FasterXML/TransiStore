@@ -1,23 +1,26 @@
 {
-  "http" : {
-    "port" : 9090
-    ,"adminPort" : 9090
+  "server" : {
+    "type" : "simple"
     ,"maxIdleTime" : "30 seconds"
     ,"shutdownGracePeriod" : "5 seconds"
+    ,"connector" : {
+      "type" : "http"
+      ,"port" : 9090
+    }
   }
 
   ,"ts" : {
-    "metadataDirectory" : "data-tstore-nodes/"
+    "metadataDirectory" : "tstore-data/nodes/"
     ,"cfgSyncGracePeriod" : "10s"
 
     ,"storeConfig" : {
-      "dataRootForFiles" : "data-tstore-blobs/"
+      "dataRootForFiles" : "tstore-data/blobs/"
     }
     ,"storeBackendType" : "com.fasterxml.storemate.backend.leveldb.LevelDBBuilder"
     ,"storeBackendConfig" : {
-      "dataRoot" : "data-leveldb-entries/"
-      ,"dataCacheSize" : "40MB"
-      ,"indexCacheSize" : "20MB"
+      "dataRoot" : "tstore-data/leveldb/"
+      ,"dataCacheSize" : "50MB"
+      ,"indexCacheSize" : "100MB"
     }
 
     ,"cluster" : {

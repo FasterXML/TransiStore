@@ -1,19 +1,21 @@
 {
-  "http" : {
-    "shutdownGracePeriod" : "5 seconds"
+  "server" : {
+    "type" : "simple"
+    ,"maxThreads" : 200       # default 1024
+    ,"maxQueuedRequests" : 100   # default 1024
+    ,"shutdownGracePeriod" : "5 seconds"
   }
-
   ,"ts" : {
-    "metadataDirectory" : "data-tstore-nodes/"
+    "metadataDirectory" : "tstore-data/nodes/"
     ,"cfgSyncGracePeriod" : "5s"
 
     ,"storeConfig" : {
-      "dataRootForFiles" : "data-tstore-blobs/"
+      "dataRootForFiles" : "tstore-data/blobs/"
       ,"maxInlinedStorageSize" : 200
     }
     ,"storeBackendType" : "com.fasterxml.storemate.backend.bdbje.BDBJEBuilder"
     ,"storeBackendConfig" : {
-      "dataRoot" : "data-tstore-entries/"
+      "dataRoot" : "tstore-data/bdb/"
     }
 
     ,"cluster" : {

@@ -11,14 +11,14 @@
   },
   "ts" : {
     "printTimings" : true
-    ,"metadataDirectory" : "data-tstore-nodes/"
+    ,"metadataDirectory" : "tstore-data/nodes/"
     ,"storeConfig" : {
-      "dataRootForFiles" : "data-tstore-blobs/"
+      "dataRootForFiles" : "tstore-data/blobs/"
     }
     ,"storeBackendType" : "com.fasterxml.storemate.backend.bdbje.BDBJEBuilder"
     ,"storeBackendConfig" : {
-      "dataRoot" : "data-tstore-entries/"
-      ,"cacheSize" : "200MB"
+      "dataRoot" : "tstore-data/bdb/"
+      ,"cacheSize" : "250MB"
     }
     ,"deletes" : { }
     ,"cluster" : {
