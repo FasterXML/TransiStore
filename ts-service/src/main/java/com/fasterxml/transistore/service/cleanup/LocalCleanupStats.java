@@ -1,5 +1,7 @@
 package com.fasterxml.transistore.service.cleanup;
 
+import com.fasterxml.storemate.shared.TimeMaster;
+
 /**
  * Helper class used to keep track of clean up progress
  * for local data store (entry metadata, files) cleanup.
@@ -74,8 +76,7 @@ public class LocalCleanupStats
         }
         sb = sb.append(" entries; slept extra ").append(extraSleepIntervals)
                 .append("x for ")
-                .append(extraSleepMsecs)
-                .append(" msecs");
+                .append(TimeMaster.timeDesc(extraSleepMsecs));
         return sb.toString();
     }
 }
