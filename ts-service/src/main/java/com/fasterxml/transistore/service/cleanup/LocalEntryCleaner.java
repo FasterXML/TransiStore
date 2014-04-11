@@ -101,72 +101,79 @@ public class LocalEntryCleaner
         _reportStart();
 
         final ThrottlingDeleter deleter = _constructDeleter(stats);
-        
+
         final long tombstoneThreshold = _timeMaster.currentTimeMillis() - _tombstoneTTLMsecs;
-        IterationResult r = _entryStore.iterateEntriesByModifiedTime(StoreOperationSource.CLEANUP, null,
+        IterationResult r = null;
+        try {
+            r = _entryStore.iterateEntriesByModifiedTime(StoreOperationSource.CLEANUP, null,
                 0L, new StorableLastModIterationCallback() {
-            @Override
-            public IterationAction verifyTimestamp(long timestamp) {
-                return IterationAction.PROCESS_ENTRY;
-            }
-
-            @Override
-            public IterationAction verifyKey(StorableKey key)
-            {
-                // first things first: do we need to quit?
-                // TODO: maybe consider max runtime?
-                if (shouldStop()) {
-                    _reportProblem("Stopping "+LocalEntryCleaner.class.getName()+" early due to shutdown");
-                    return IterationAction.TERMINATE_ITERATION;
+                @Override
+                public IterationAction verifyTimestamp(long timestamp) {
+                    return IterationAction.PROCESS_ENTRY;
                 }
-                return IterationAction.PROCESS_ENTRY;
-            }
-
-            @Override
-            public IterationAction processEntry(Storable raw) throws StoreException
-            {
-                // for tombstones easy, common max-TTL:
-                final StoredEntry<BasicTSKey> entry = _entryConverter.entryFromStorable(raw);
-                if (raw.isDeleted()) {
-                    if (entry.insertedBefore(tombstoneThreshold)) {
-                        deleter.deleteTombstone(entry);
-                        stats.addExpiredTombstone();
-                        return IterationAction.PROCESS_ENTRY;
+    
+                @Override
+                public IterationAction verifyKey(StorableKey key)
+                {
+                    // first things first: do we need to quit?
+                    // TODO: maybe consider max runtime?
+                    if (shouldStop()) {
+                        _reportProblem("Stopping "+LocalEntryCleaner.class.getName()+" early due to shutdown");
+                        return IterationAction.TERMINATE_ITERATION;
                     }
-                    stats.addRemainingTombstone();
-                } else {
-                    // for other entries bit more complex; basically checking following possibilities:
-                    // (a) Entry is older than its maxTTL (which varies entry by entry), can be removed
-                    // (b) Entry is younger than its minTTL since creation, can be skipped
-                    // (c) Entry needs to be retained based on local last-access time: skip
-                    // (d) Must check global last-access to determine whether to keep or skip
-                    final long currentTime = _timeMaster.currentTimeMillis();
-                    if (entry.hasExceededMaxTTL(currentTime)) { // (a) remove
-                        stats.addExpiredMaxTTLEntry();
-                        deleter.deleteExpired(entry);
-                        return IterationAction.PROCESS_ENTRY;
-                    }
-                    if (!entry.hasExceededMinTTL(currentTime)) { // (b) skip
-                        stats.addRemainingEntry();
-                    } else if (!entry.usesLastAccessTime()) { // no last-access time check; retain
-                        stats.addRemainingEntry();
-                    } else { // do need to verify last-access info...
-                        if (!entry.hasExceededLastAccessTTL(currentTime,
-                                _lastAccessStore.findLastAccessTime(entry.getKey(), entry.getLastAccessUpdateMethod()))) {
-                            stats.addRemainingEntry(); // (c) keep
-                        } else { // (d): add to list of things to check...
-                            // !!! TODO
+                    return IterationAction.PROCESS_ENTRY;
+                }
+    
+                @Override
+                public IterationAction processEntry(Storable raw) throws StoreException
+                {
+                    // for tombstones easy, common max-TTL:
+                    final StoredEntry<BasicTSKey> entry = _entryConverter.entryFromStorable(raw);
+                    if (raw.isDeleted()) {
+                        if (entry.insertedBefore(tombstoneThreshold)) {
+                            deleter.deleteTombstone(entry);
+                            stats.addExpiredTombstone();
+                            return IterationAction.PROCESS_ENTRY;
+                        }
+                        stats.addRemainingTombstone();
+                    } else {
+                        // for other entries bit more complex; basically checking following possibilities:
+                        // (a) Entry is older than its maxTTL (which varies entry by entry), can be removed
+                        // (b) Entry is younger than its minTTL since creation, can be skipped
+                        // (c) Entry needs to be retained based on local last-access time: skip
+                        // (d) Must check global last-access to determine whether to keep or skip
+                        final long currentTime = _timeMaster.currentTimeMillis();
+                        if (entry.hasExceededMaxTTL(currentTime)) { // (a) remove
+                            stats.addExpiredMaxTTLEntry();
+                            deleter.deleteExpired(entry);
+                            return IterationAction.PROCESS_ENTRY;
+                        }
+                        if (!entry.hasExceededMinTTL(currentTime)) { // (b) skip
                             stats.addRemainingEntry();
+                        } else if (!entry.usesLastAccessTime()) { // no last-access time check; retain
+                            stats.addRemainingEntry();
+                        } else { // do need to verify last-access info...
+                            if (!entry.hasExceededLastAccessTTL(currentTime,
+                                    _lastAccessStore.findLastAccessTime(entry.getKey(), entry.getLastAccessUpdateMethod()))) {
+                                stats.addRemainingEntry(); // (c) keep
+                            } else { // (d): add to list of things to check...
+                                // !!! TODO
+                                stats.addRemainingEntry();
+                            }
                         }
                     }
+                    // to effect throttling, need to denote read-only entry
+                    deleter.skippedEntry(entry);
+                    return IterationAction.PROCESS_ENTRY;
                 }
-                // to effect throttling, need to denote read-only entry
-                deleter.skippedEntry(entry);
-                return IterationAction.PROCESS_ENTRY;
-            }
-        });
-
-        deleter.finish();
+            });
+            deleter.finish();
+        } catch (Exception e) {
+            _reportEndFail(stats, e);
+            throw e;
+        }
+        final boolean fullyCompleted = (r == IterationResult.FULLY_ITERATED);
+        _reportEndSuccess(stats, fullyCompleted);
         
         return (r == IterationResult.FULLY_ITERATED);
     }

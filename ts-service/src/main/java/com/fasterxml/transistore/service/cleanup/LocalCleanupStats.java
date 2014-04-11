@@ -42,6 +42,10 @@ public class LocalCleanupStats
     
     public void addUnknownEntry() { ++unknownEntries; }
 
+    /**
+     * Method called to indicate that bit of sleep was induced to slow down
+     * progress (throttle) of cleaner-upper
+     */
     public void addSleep(long msecs) {
         extraSleepMsecs += msecs;
         ++extraSleepIntervals;
