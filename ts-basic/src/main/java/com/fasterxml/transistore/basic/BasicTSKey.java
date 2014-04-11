@@ -12,6 +12,7 @@ import com.fasterxml.storemate.shared.util.WithBytesCallback;
  */
 public class BasicTSKey
     extends EntryKey
+    implements Comparable<BasicTSKey>
 {
     /**
      * Let's model external key presentation as an URI of sort.
@@ -182,5 +183,10 @@ public class BasicTSKey
             sb.insert(KEY_PREFIX.length() + partLen, KEY_SEPARATOR);
         }
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(BasicTSKey o) {
+        return _rawKey.compareTo(o._rawKey);
     }
 }

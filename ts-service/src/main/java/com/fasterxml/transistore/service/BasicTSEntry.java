@@ -7,7 +7,9 @@ import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
 import com.fasterxml.transistore.basic.BasicTSKey;
 
-public class BasicTSEntry extends StoredEntry<BasicTSKey>
+public class BasicTSEntry
+    extends StoredEntry<BasicTSKey>
+    implements Comparable<BasicTSEntry>
 {
     /*
     /**********************************************************************
@@ -162,6 +164,11 @@ public class BasicTSEntry extends StoredEntry<BasicTSKey>
     public int routingHashUsing(EntryKeyConverter<BasicTSKey> hasher)
     {
         return hasher.routingHashFor(key);
+    }
+
+    @Override
+    public int compareTo(BasicTSEntry o) {
+        return key.compareTo(o.key);
     }
 
     /*

@@ -45,7 +45,7 @@ public class ThrottlingDeleter
      * Amount of time that we should process until taking a brief
      * break.
      */
-    private final long MSECS_UNTIL_BREAK = 500L;
+    private final long MSECS_UNTIL_BREAK = 200L;
 
     private final long MIN_BREAK_MSECS = 20L;
     private final long MAX_BREAK_MSECS = 500L;
@@ -76,7 +76,9 @@ public class ThrottlingDeleter
     
     private int _caughtExceptions;
 
-    private final List<StoredEntry<BasicTSKey>> _toDelete;
+    private final StoredEntry<?>[] _toDelete;
+
+    private int _toDeleteSize;
     
     /*
     /**********************************************************************
@@ -91,7 +93,7 @@ public class ThrottlingDeleter
         _entryStore = store;
         _stats = stats;
         _nextBreak = System.currentTimeMillis() + MSECS_UNTIL_BREAK;
-        _toDelete = new ArrayList<StoredEntry<BasicTSKey>>(100);
+        _toDelete = new StoredEntry<?>[WRITES_TO_BATCH];
         _shutdown = shutdown;
 }
 
@@ -134,16 +136,14 @@ public class ThrottlingDeleter
      */
 
     protected void _scheduleDeletion(StoredEntry<BasicTSKey> entry) throws StoreException {
-        _toDelete.add(entry);
-        if (_toDelete.size() >= WRITES_TO_BATCH) {
+        _toDelete[_toDeleteSize++] = entry;
+        if (_toDeleteSize >= WRITES_TO_BATCH) {
             _flushDeletes();
         }
     }
 
     protected void _takeABreak() {
         final long since = (System.currentTimeMillis() - _nextBreak) + MSECS_UNTIL_BREAK;
-
-System.err.println("BREAK: since == "+since+" msecs");        
         
         // sleep for 25% of time since last break, but with constraints
         long breakMsecs = (since / 4);
@@ -167,16 +167,24 @@ System.err.println("BREAK: since == "+since+" msecs");
     
     protected void _flushDeletes() throws StoreException
     {
-        StoredEntry<BasicTSKey> entry = null;
+        final int len = _toDeleteSize;
+        _toDeleteSize = 0;
+        int i = 0;
+
+        /* Minor (attempted) optimization: let's sort entries by key, in hopes
+         * that this ordering is closer to optimal sequence. Probably won't
+         * make much difference but...
+         */
+        Arrays.sort(_toDelete, 0, len);
+        
         try {
-            for (StoredEntry<BasicTSKey> e : _toDelete) {
+            for (; i < len; ++i) {
+                StoredEntry<?> entry = _toDelete[i];
                 // But since these may take a while, we need to be prepared to bail out...
                 if (_shouldStop()) {
                     break;
                 }
-                entry = e;
                 _delete(entry);
-
                 if (System.currentTimeMillis() < _nextBreak) {
                     _takeABreak();
                 }
@@ -187,15 +195,14 @@ System.err.println("BREAK: since == "+since+" msecs");
                 _reportProblem("Reached maximum exception count ("+EXCEPTIONS_TO_SKIP+"), will terminate the clean up task");
                 throw e;
             }
-            String key = (entry == null) ? "N/A" : entry.getKey().toString();
-            _reportProblem("Caught an exception during deletion of entry "+key+"; will skip up to "
-                    +_toDelete.size()+" other entries; problem: "+e);
-        } finally {
-            _toDelete.clear();
+            StoredEntry<?> entry = _toDelete[i];
+            String key = entry.getKey().toString();
+            _reportProblem("Caught an exception during deletion of entry "+key+"; will skip "
+                    +(len - i)+" remaining entries; problem: "+e);
         }
     }
     
-    protected void _delete(StoredEntry<BasicTSKey> entry) throws StoreException
+    protected void _delete(StoredEntry<?> entry) throws StoreException
     {
         final StorableKey key = entry.getStorableKey();
         try {
