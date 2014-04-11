@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import com.fasterxml.clustermate.service.store.StoredEntry;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.store.*;
-import com.fasterxml.transistore.basic.BasicTSKey;
 
 /**
  * Helper class to encapsulate details of throttling process of deleting local
@@ -110,7 +109,7 @@ public class ThrottlingDeleter
     /**
      * Method called for entry that is not being deleted
      */
-    public void skippedEntry(StoredEntry<BasicTSKey> entry) {
+    public void skippedEntry(StoredEntry<?> entry) {
         if (++_readsSinceBreak < MAX_READS_BEFORE_BREAK) {
             if (((_readsSinceBreak % 16) != 0)
                     || System.currentTimeMillis() < _nextBreak) {
@@ -120,22 +119,21 @@ public class ThrottlingDeleter
         _takeABreak();
     }
 
-    public void deleteTombstone(StoredEntry<BasicTSKey> entry) throws StoreException {
+    public void deleteTombstone(StoredEntry<?> entry) throws StoreException {
         _scheduleDeletion(entry);
     }
 
-    public void deleteExpired(StoredEntry<BasicTSKey> entry) throws StoreException {
+    public void deleteExpired(StoredEntry<?> entry) throws StoreException {
         _scheduleDeletion(entry);
     }
 
-    
     /*
     /**********************************************************************
     /* Internal methods
     /**********************************************************************
      */
 
-    protected void _scheduleDeletion(StoredEntry<BasicTSKey> entry) throws StoreException {
+    protected void _scheduleDeletion(StoredEntry<?> entry) throws StoreException {
         _toDelete[_toDeleteSize++] = entry;
         if (_toDeleteSize >= WRITES_TO_BATCH) {
             _flushDeletes();
