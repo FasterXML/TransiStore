@@ -261,22 +261,25 @@ function buildStoreMetrics(now, allMetrics)
 
   // iterate over various stores (entries/index, last-access)
   for (storeId in allMetrics.stores) {
-     var store = allMetrics.stores[storeId];
-     var tr = $("<tr class='dataRow' class='nowrap'></tr>");
-     tr.append($("<td class='logCell'></td>").text(""+storeId));
-     var cacheStr = "n/a";
-     var stats = store.stats;
-     if (stats && stats.env) {
-       var total = stats.env.cacheTotalBytes;
+    var store = allMetrics.stores[storeId];
+    var tr = $("<tr class='dataRow' class='nowrap'></tr>");
+    tr.append($("<td class='logCell'></td>").text(""+storeId));
+    var cacheStr = "n/a";
+    var env = store.env;
+    if (env) {
+       var total = env.cacheTotalBytes;
        if (total) {
-         cacheStr = size(stats.env.cacheDataBytes) + "/" + size(total);
+         cacheStr = size(env.cacheDataBytes) + "/" + size(total);
        }
-     }
-     var type = stats ? stats.type : "n/a";
-     tr.append($("<td class='logCell'></td>").text(type));
-     tr.append($("<td class='logCell'></td>").text(store.count));
-     tr.append($("<td class='logCell'></td>").text(cacheStr));
-     table.append(tr);
+    }
+    var type = store.type;
+    if (!type) {
+       type = "n/a";
+    }
+    tr.append($("<td class='logCell'></td>").text(type));
+    tr.append($("<td class='logCell'></td>").text(store.count));
+    tr.append($("<td class='logCell'></td>").text(cacheStr));
+    table.append(tr);
   }
   return table;
 }
