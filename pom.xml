@@ -50,7 +50,7 @@
     <javac.target.version>1.7</javac.target.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.plugin.shade>1.7.1</version.plugin.shade>
+    <version.plugin.shade>2.2</version.plugin.shade>
 
     <!-- Sometimes rely on SNAPSHOT version just so that we can test local updates,
          get Eclipse to show relevant sources
