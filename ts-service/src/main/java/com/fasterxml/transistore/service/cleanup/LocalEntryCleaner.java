@@ -1,16 +1,12 @@
 package com.fasterxml.transistore.service.cleanup;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.*;
 
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.storemate.shared.TimeMaster;
-import com.fasterxml.storemate.store.Storable;
-import com.fasterxml.storemate.store.StorableStore;
-import com.fasterxml.storemate.store.StoreException;
-import com.fasterxml.storemate.store.StoreOperationSource;
+import com.fasterxml.storemate.store.*;
 import com.fasterxml.storemate.store.backend.IterationAction;
 import com.fasterxml.storemate.store.backend.IterationResult;
 import com.fasterxml.storemate.store.backend.StorableLastModIterationCallback;
@@ -31,7 +27,7 @@ import com.fasterxml.transistore.service.BasicTSEntry;
 public class LocalEntryCleaner
     extends CleanupTask<LocalCleanupStats>
 {
-    private final static Logger LOG = LoggerFactory.getLogger(LocalEntryCleaner.class);
+    protected final Logger LOG;
 
     /**
      * Time-to-live for tomb stones
@@ -46,7 +42,13 @@ public class LocalEntryCleaner
     
     protected boolean _isTesting;
     
-    public LocalEntryCleaner() { }
+    public LocalEntryCleaner() {
+        this(LoggerFactory.getLogger(LocalEntryCleaner.class));
+    }
+
+    public LocalEntryCleaner(Logger log) {
+        LOG = log;
+    }
     
     @SuppressWarnings("unchecked")
     @Override
@@ -97,6 +99,8 @@ public class LocalEntryCleaner
             return false;
         }
         _reportStart();
+
+        final ThrottlingDeleter deleter = _constructDeleter(stats);
         
         final long tombstoneThreshold = _timeMaster.currentTimeMillis() - _tombstoneTTLMsecs;
         IterationResult r = _entryStore.iterateEntriesByModifiedTime(StoreOperationSource.CLEANUP, null,
@@ -125,64 +129,45 @@ public class LocalEntryCleaner
                 final StoredEntry<BasicTSKey> entry = _entryConverter.entryFromStorable(raw);
                 if (raw.isDeleted()) {
                     if (entry.insertedBefore(tombstoneThreshold)) {
-                        delete(raw.getKey());
+                        deleter.deleteTombstone(entry);
                         stats.addExpiredTombstone();
-                    } else {
-                        stats.addRemainingTombstone();
+                        return IterationAction.PROCESS_ENTRY;
                     }
-                    return IterationAction.PROCESS_ENTRY;
-                }
-                // for other entries bit more complex; basically checking following possibilities:
-                // (a) Entry is older than its maxTTL (which varies entry by entry), can be removed
-                // (b) Entry is younger than its minTTL since creation, can be skipped
-                // (c) Entry needs to be retained based on local last-access time: skip
-                // (d) Must check global last-access to determine whether to keep or skip
-                final long currentTime = _timeMaster.currentTimeMillis();
-                if (entry.hasExceededMaxTTL(currentTime)) { // (a) remove
-                    stats.addExpiredMaxTTLEntry();
-                    delete(raw.getKey());
-                } else if (!entry.hasExceededMinTTL(currentTime)) { // (b) skip
-                    stats.addRemainingEntry();
-                } else if (!entry.usesLastAccessTime()) { // no last-access time check; retain
-                    stats.addRemainingEntry();
-                } else { // do need to verify last-access info...
-                    if (!entry.hasExceededLastAccessTTL(currentTime,
-                            _lastAccessStore.findLastAccessTime(entry.getKey(), entry.getLastAccessUpdateMethod()))) {
-                        stats.addRemainingEntry(); // (c) keep
-                    } else { // (d): add to list of things to check...
-                        // !!! TODO
+                    stats.addRemainingTombstone();
+                } else {
+                    // for other entries bit more complex; basically checking following possibilities:
+                    // (a) Entry is older than its maxTTL (which varies entry by entry), can be removed
+                    // (b) Entry is younger than its minTTL since creation, can be skipped
+                    // (c) Entry needs to be retained based on local last-access time: skip
+                    // (d) Must check global last-access to determine whether to keep or skip
+                    final long currentTime = _timeMaster.currentTimeMillis();
+                    if (entry.hasExceededMaxTTL(currentTime)) { // (a) remove
+                        stats.addExpiredMaxTTLEntry();
+                        deleter.deleteExpired(entry);
+                        return IterationAction.PROCESS_ENTRY;
+                    }
+                    if (!entry.hasExceededMinTTL(currentTime)) { // (b) skip
                         stats.addRemainingEntry();
+                    } else if (!entry.usesLastAccessTime()) { // no last-access time check; retain
+                        stats.addRemainingEntry();
+                    } else { // do need to verify last-access info...
+                        if (!entry.hasExceededLastAccessTTL(currentTime,
+                                _lastAccessStore.findLastAccessTime(entry.getKey(), entry.getLastAccessUpdateMethod()))) {
+                            stats.addRemainingEntry(); // (c) keep
+                        } else { // (d): add to list of things to check...
+                            // !!! TODO
+                            stats.addRemainingEntry();
+                        }
                     }
                 }
+                // to effect throttling, need to denote read-only entry
+                deleter.skippedEntry(entry);
                 return IterationAction.PROCESS_ENTRY;
             }
-
-            private boolean delete(StorableKey key) throws StoreException
-            {
-                // TODO: should we add a wait or yield every N deletes?
-                try {
-                    _entryStore.hardDelete(StoreOperationSource.CLEANUP, null, key, true);
-                    return true;
-                } catch (StoreException.DB e) {
-                    /* 26-Sep-2013, tatu: We got some of these in production; need to be able
-                     *    to gracefully skip.
-                     */
-                    if (e.getType() != StoreException.DBProblem.SECONDARY_INDEX_CORRUPTION) {
-                        throw e;
-                    }
-                } catch (StoreException e) {
-                    throw e;
-                } catch (IOException e) {
-                    throw new StoreException.IO(key, e);
-                }
-
-                if (++stats.corruptEntries == 1) { // report only first occurence
-                    String keyStr = _entryConverter.keyConverter().rawToString(key);
-                    _reportProblem("Corrupt entry (key '"+keyStr+"'): need to skip (will only report aggregates after first fail");
-                }
-                return false;
-            }
         });
+
+        deleter.finish();
+        
         return (r == IterationResult.FULLY_ITERATED);
     }
 
@@ -192,6 +177,10 @@ public class LocalEntryCleaner
     /**********************************************************************
      */
 
+    protected ThrottlingDeleter _constructDeleter(LocalCleanupStats stats) {
+        return new ThrottlingDeleter(LOG, _entryStore, stats, _shutdown);
+    }
+    
     protected void _reportStart()
     {
         if (LOG != null) {

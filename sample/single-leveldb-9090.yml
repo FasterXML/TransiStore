@@ -1,7 +1,8 @@
 {
   "server" : {
     "type" : "simple"
-    ,"maxIdleTime" : "30 seconds"
+    ,"maxThreads" : 200       # default 1024
+    ,"maxQueuedRequests" : 100   # default 1024
     ,"shutdownGracePeriod" : "5 seconds"
     ,"connector" : {
       "type" : "http"

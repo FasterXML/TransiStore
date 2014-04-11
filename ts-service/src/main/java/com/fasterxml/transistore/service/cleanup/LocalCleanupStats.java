@@ -27,6 +27,10 @@ public class LocalCleanupStats
     // And then "something other"; should not get any hits...
     protected int unknownEntries = 0;
 
+    // Extra sleeps issued during cleanup
+    protected long extraSleepMsecs;
+    protected int extraSleepIntervals;
+    
     public void addExpiredTombstone() { ++expiredTombstones; }
     public void addExpiredMaxTTLEntry() { ++expiredEntriesMaxTTL; }
     public void addExpiredLastAccessEntry() { ++expiredEntriesLastAccess; }
@@ -38,6 +42,11 @@ public class LocalCleanupStats
     
     public void addUnknownEntry() { ++unknownEntries; }
 
+    public void addSleep(long msecs) {
+        extraSleepMsecs += msecs;
+        ++extraSleepIntervals;
+    }
+    
     @Override
     public String toString()
     {
@@ -59,7 +68,10 @@ public class LocalCleanupStats
         } else {
             sb = sb.append(", NO unknown");
         }
-        sb = sb.append(" entries");
+        sb = sb.append(" entries; slept extra ").append(extraSleepIntervals)
+                .append("x for ")
+                .append(extraSleepMsecs)
+                .append(" msecs");
         return sb.toString();
     }
 }
