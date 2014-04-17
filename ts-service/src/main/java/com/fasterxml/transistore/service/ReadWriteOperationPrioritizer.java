@@ -15,11 +15,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * without throttling. But if limit on either is reached, queuing is
  * used to apply specific ratio to try to avoid starving of either
  * reads or writes, by basically fixing ratio in which queue is drained.
+ *<p>
+ * NOTE: wouldn't it be nice to actually test that ratios work with
+ * load testing? :-)
  */
 public final class ReadWriteOperationPrioritizer
 {
 	// By default, we will use 2:1 ratio between allowing queued reads vs writes
-    private final static double READ_RATIO = 2.0 / 3.0;
+    private final static double READ_RATIO = 2.0 / (2.0 + 1.0);
 
     private final static double WRITE_RATIO = 1.0 - READ_RATIO;
 
@@ -29,7 +32,9 @@ public final class ReadWriteOperationPrioritizer
     
     public ReadWriteOperationPrioritizer()
     {
+        // allow up to 3 concurrent reads without contest; at most 6 (with contest)
         final Operation reads = new Operation("Read", 3, 6, READ_RATIO);
+        // and up to 2 no-contest concurrent writes; above which up to 5 total
         final Operation writes = new Operation("Write", 2, 5, WRITE_RATIO);
 
         final int _maxConcurrentThreads = 8;
@@ -106,7 +111,7 @@ public final class ReadWriteOperationPrioritizer
             	int primaryCount = _primary.markCompleted();
 
             	boolean q1 = _primary.couldReleaseQueued(primaryCount);
-                boolean q2 = _secondary.couldReleaseQueued();
+            	boolean q2 = _secondary.couldReleaseQueued();
             	
             	/* 23-Jul-2013, tatu: I don't think there's strict need to loop here;
             	 *  but let's play it safe and do that.
