@@ -7,7 +7,6 @@ if [ "$PORT" == "" ]; then
 fi
 
 java -Xmx1024M -Xms1024M -XX:-UseParallelOldGC \
-  -Ddw.http.port=$PORT \
-  -Ddw.http.adminPort=$PORT \
+  -Ddw.server.connector.port=$PORT \
   -jar ../../ts-server/target/transistore-server-0.11.0-SNAPSHOT.jar \
   server ../../sample/two-nodes-7070-9090.yml
