@@ -171,8 +171,8 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
             Thread.sleep(10L);
             service1._stop();
             service2._stop();
+            try { Thread.sleep(20L); } catch (InterruptedException e) { }
         }
-        try { Thread.sleep(20L); } catch (InterruptedException e) { }
         service1.waitForStopped();
         service2.waitForStopped();
     }
@@ -204,6 +204,10 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
         byte[] data = generateData(rnd);
         if (data.length != copy.getActualUncompressedLength()) {
             fail("Uncompressed entry #"+index+"/"+ENTRIES+" has wrong length ("+copy.getActualUncompressedLength()+"), expect "+data.length);
+        }
+        // 16-Apr-2014, tatu: Also, ensure that r(eplica) flag is correctly set
+        if (!copy.isReplicated()) {
+            fail("Entry #"+index+" not mark as replicated, should be");
         }
     }
 
