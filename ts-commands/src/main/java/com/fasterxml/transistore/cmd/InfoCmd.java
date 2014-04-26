@@ -5,7 +5,6 @@ import java.util.*;
 import com.fasterxml.clustermate.api.msg.ItemInfo;
 import com.fasterxml.clustermate.client.call.ReadCallResult;
 import com.fasterxml.clustermate.client.operation.InfoOperationResult;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.storemate.shared.compress.Compression;
 import com.fasterxml.transistore.basic.BasicTSKey;
 import com.fasterxml.transistore.client.BasicTSClient;
