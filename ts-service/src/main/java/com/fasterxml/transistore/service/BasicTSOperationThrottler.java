@@ -17,7 +17,6 @@ import com.fasterxml.transistore.service.ReadWriteOperationPrioritizer.Lease;
  */
 public class BasicTSOperationThrottler
     extends StoreOperationThrottler
-//    implements StartAndStoppable
 {
     private final static boolean DISABLED = false;
 
@@ -42,12 +41,11 @@ public class BasicTSOperationThrottler
      */
     protected final Semaphore _listLock = new Semaphore(8, true);
 
-    /*
-    protected final Semaphore _fsReadLock = new Semaphore(6, true);
-
-    protected final Semaphore _fsWriteLock = new Semaphore(4, true);
-    */
-
+    /**
+     * For file-system operations, use a more advanced lock that will
+     * consider throttling of combination of reads and writes; not just
+     * separately throttling each.
+     */
     protected final ReadWriteOperationPrioritizer _fsReadWrites;
 
     /*
@@ -59,20 +57,6 @@ public class BasicTSOperationThrottler
     public BasicTSOperationThrottler() {
         _fsReadWrites = new ReadWriteOperationPrioritizer();
     }
-
-    /*
-    @Override
-    public void start() throws Exception {
-    }
-
-    @Override
-    public void prepareForStop() throws Exception {
-    }
-
-    @Override
-    public void stop() throws Exception {
-    }
-    */
 
     /*
     /**********************************************************************
@@ -192,7 +176,7 @@ public class BasicTSOperationThrottler
             FileOperationCallback<T> cb)
         throws IOException, StoreException
     {
-        if (DISABLED) {
+        if (DISABLED || source != StoreOperationSource.REQUEST) {
             return cb.perform(operationTime, (value == null) ? null : value.getKey(), value, externalFile);
         }
         Lease l;  

@@ -14,6 +14,7 @@ import com.fasterxml.storemate.shared.compress.Compressors;
 import com.fasterxml.storemate.shared.hash.BlockMurmur3Hasher;
 import com.fasterxml.storemate.shared.util.UTF8Encoder;
 import com.fasterxml.storemate.store.AdminStorableStore;
+import com.fasterxml.storemate.store.Storable;
 import com.fasterxml.storemate.store.StorableStore;
 import com.fasterxml.storemate.store.StoreException;
 import com.fasterxml.storemate.store.StoreOperationSource;
@@ -29,6 +30,8 @@ import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 import com.fasterxml.transistore.clustertest.util.FakeHttpResponse;
 import com.fasterxml.transistore.dw.BasicTSServiceConfigForDW;
+import com.fasterxml.transistore.service.BasicTSEntry;
+import com.fasterxml.transistore.service.BasicTSEntryConverter;
 
 import junit.framework.TestCase;
 
@@ -38,9 +41,10 @@ import junit.framework.TestCase;
  */
 public abstract class GenericClusterTestBase extends TestCase
 {
-    // null -> require client id with key
-    protected final BasicTSKeyConverter _keyConverter = BasicTSKeyConverter.defaultInstance();
+    protected final BasicTSEntryConverter _entryConverter = new BasicTSEntryConverter();
 
+    protected final BasicTSKeyConverter _keyConverter = (BasicTSKeyConverter) _entryConverter.keyConverter();
+    
     /*
     /**********************************************************************
     /* Low-level StorableStore helpers
@@ -133,6 +137,10 @@ public abstract class GenericClusterTestBase extends TestCase
     /**********************************************************************
      */
 
+    protected BasicTSEntry contentEntry(Storable raw) {
+        return _entryConverter.entryFromStorable(raw);
+    }
+    
     protected BasicTSKey contentKey(String fullPath) {
         return _keyConverter.construct(fullPath);
     }

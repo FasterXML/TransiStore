@@ -80,7 +80,12 @@ public class InfoCmd extends TStoreCmdBase
                                 size(info.getLength()).trim(), size(info.getCompressedLength()).trim(),
                                 comp);
                     }
-                    System.out.printf(" hash %X", info.getHash());
+                    System.out.printf(", hash %X", info.getHash());
+                    System.out.printf(", flags %c/%c/%c",
+                            info.isDeleted() ? 'd':'-',
+                            info.isInlined() ? 'i':'-',
+                            info.isReplica() ? 'r':'-');
+
                 } else {
                     System.out.print("NOT FOUND");
                 }
