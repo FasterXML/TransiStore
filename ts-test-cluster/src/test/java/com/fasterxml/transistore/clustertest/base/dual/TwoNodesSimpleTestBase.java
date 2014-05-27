@@ -120,14 +120,16 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             }
             
             // delete:
-            DeleteOperationResult del = client.deleteContent(null, KEY);
+            DeleteOperationResult del = client.deleteContent(null, KEY)
+                    .completeOptimally()
+                    .result();
             assertTrue(del.succeededMinimally());
             assertTrue(del.succeededOptimally());
             assertEquals(del.getSuccessCount(), 2);
     
             // after which content ... is no more:
             data = client.getContentAsBytes(null, KEY);
-            assertNotNull("Should not have the data after DELETE", data);
+            assertNull("Should not have the data after DELETE", data);
         } finally {
             // and That's All, Folks!
             service1._stop();
@@ -249,14 +251,28 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             assertNotNull("Should now have the data", data);
             assertArrayEquals(CONTENT, data);
     
-            // delete:
-            DeleteOperationResult del = client.deleteContent(null, KEY);
+            // delete: also do incrementally
+            DeleteOperationResult del = client.deleteContent(null, KEY)
+                    .completeMinimally()
+                    .result();
             assertTrue(del.succeededMinimally());
+            assertFalse(del.succeededOptimally());
+            assertEquals(del.getSuccessCount(), 1);
+
+            // but should still have one copy
+            byte[] b = client.getContentAsBytes(null, KEY);
+            assertNotNull(b);
+            assertEquals(data.length, b.length);
+            
+            // but then complete it
+            del = client.deleteContent(null, KEY)
+                    .completeOptimally()
+                    .result();
             assertTrue(del.succeededOptimally());
             assertEquals(del.getSuccessCount(), 2);
-    
+            
             // after which content ... is no more:
-            assertNotNull("Should not have the data after DELETE", client.getContentAsBytes(null, KEY));
+            assertNull("Should not have the data after DELETE", client.getContentAsBytes(null, KEY));
         } finally {
             service1._stop();
             service2._stop();
@@ -373,13 +389,22 @@ public abstract class TwoNodesSimpleTestBase extends ClusterTestBase
             assertArrayEquals(CONTENT, data);
     
             // delete:
-            DeleteOperationResult del = client.deleteContent(null, KEY);
+            DeleteOperationResult del = client.deleteContent(null, KEY)
+                    .completeOptimally()
+                    .result();
             assertTrue(del.succeededMinimally());
             assertTrue(del.succeededOptimally());
+            assertFalse(del.succeededMaximally());
+            assertEquals(del.getSuccessCount(), 1);
+            
+            del = client.deleteContent(null, KEY)
+                    .completeMaximally()
+                    .result();
+            assertTrue(del.succeededMaximally());
             assertEquals(del.getSuccessCount(), 2);
     
             // after which content ... is no more:
-            assertNotNull("Should not have the data after DELETE", client.getContentAsBytes(null, KEY));
+            assertNull("Should not have the data after DELETE", client.getContentAsBytes(null, KEY));
         } finally {
             service1._stop();
             service2._stop();

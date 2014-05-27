@@ -9,10 +9,7 @@ import com.fasterxml.storemate.shared.StorableKey;
 
 import com.fasterxml.clustermate.api.ListItemType;
 import com.fasterxml.clustermate.client.NodeFailure;
-import com.fasterxml.clustermate.client.operation.DeleteOperationResult;
-import com.fasterxml.clustermate.client.operation.HeadOperationResult;
-import com.fasterxml.clustermate.client.operation.ListOperationResult;
-import com.fasterxml.clustermate.client.operation.StoreEntryLister;
+import com.fasterxml.clustermate.client.operation.*;
 
 import com.fasterxml.transistore.basic.*;
 import com.fasterxml.transistore.client.BasicTSClient;
@@ -113,7 +110,11 @@ public class DeleteCmd extends TStoreCmdBase
     protected boolean _deleteSingle(BasicTSClient client, BasicTSKey path)
         throws IOException, InterruptedException
     {
-        DeleteOperationResult deleteResult = client.deleteContent(null, path);
+        DeleteOperationResult deleteResult = client.deleteContent(null, path)
+                .completeOptimally()
+                .tryCompleteMaximally()
+                .finish();
+
         if (!deleteResult.succeededOptimally()) {
             if (!deleteResult.succeededMinimally()) {
                 throw new IOException("Failed to DELETE '"+path+"': "+deleteResult.getFailCount()

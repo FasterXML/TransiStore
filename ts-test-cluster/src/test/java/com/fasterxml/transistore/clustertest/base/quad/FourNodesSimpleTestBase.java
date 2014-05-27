@@ -173,7 +173,9 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
                     service1, service2, service3, service4);
 // System.err.println("Took "+rounds+" rounds to PUT");            
             // Then finally delete; will only initially delete from #4
-            DeleteOperationResult del = client.deleteContent(null, KEY);
+            DeleteOperationResult del = client.deleteContent(null, KEY)
+                    .completeOptimally()
+                    .result();
             assertTrue(del.succeededMinimally());
             assertTrue(del.succeededOptimally());
             assertEquals(del.getSuccessCount(), 1);
@@ -181,16 +183,13 @@ public abstract class FourNodesSimpleTestBase extends ClusterTestBase
             // Ok: now, keeping in mind that deletions are done by using tombstone as marker...
             assertEquals("Store #4 should now have tombstone", "0/0/1/1(1)",
                     storeCounts(service1, service2, service3, service4));
-            
-            /* At this point things are bit murky: should client try to find a copy
-             * (despite a tombstone) or not? Current implementation will consider
-             * tombstone the definite answer; so that is the "right answer" here,
-             * although it does require that client does calls in strict priority order.
+
+            /* At this point things are bit murky; since one copy exists, it is possible
+             * client will find it. But at the same time, due to eventual consistency
+             * we can not count on this being the case.
+             * So for now, let's not consider state stable yet.
              */
-            data = client.getContentAsBytes(null, KEY);
-            if (data != null && data.length > 0) {
-                fail("Should not have the data after partial DELETE: got entry with "+data.length+" bytes");
-            }
+
             // but then tombstone should propagate; faster than PUT propagation
             /*rounds =*/ expectState("0/0/1(1)/1(1)", "Entry should have tombstone for both nodes", 5, 8,
                     service1, service2, service3, service4);         

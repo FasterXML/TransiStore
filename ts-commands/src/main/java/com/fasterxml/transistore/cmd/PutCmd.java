@@ -175,11 +175,10 @@ public class PutCmd extends TStoreCmdBase
     {
         // use byte-backed for some, just to get better testing...
         boolean isSmall = (src.length() < SMALL_FILE);
-        
         BasicTSKey key = (dst == STDIN_MARKER_FILE) ? _target : keyFor(dst);
 
         final long nanoStart = System.nanoTime();
-        
+
         PutOperation put = isSmall ? client.putContent(params, key, readFile(src))
                 : client.putContent(params, key, src);
         // try maximal, iff it's "easy enough" (i.e. no retries to get there)
