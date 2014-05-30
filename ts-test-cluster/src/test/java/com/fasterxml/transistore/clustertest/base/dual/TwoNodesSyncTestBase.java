@@ -92,7 +92,10 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
             assertEquals(200, response.getStatus());
 
             // and should now have all the entries in the first store
-            assertEquals(1, entryCount(store1.getEntryStore()));
+            long count = entryCount(store1.getEntryStore());
+            if (1L != count) {
+                fail("Store 1 should have 1 entry; has "+count);
+            }
 
             // Then the second phase; start up second store, let things sync.
             // But first: move time enough to notice, by 10 minutes
@@ -102,10 +105,13 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
             final int MAX_TTL_SECS_APPROXIMATE = ORIG_MAX_TTL_SECS - (10 * 60);
             
             startServices(store2);
-            assertEquals(0, entryCount(store2.getEntryStore()));
+            count = entryCount(store2.getEntryStore());
+            if (0L != count) {
+                fail("Store 2 should not yet have entries; has "+count);
+            }
 
             // Looks like there's lots of startup overhead here, so need to be 
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 50; ++i) {
                 if (entryCount(store2.getEntryStore()) > 0) {
                     break;
                 }
@@ -113,7 +119,10 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
                 timeMaster.advanceCurrentTimeMillis(100L);
             }
             // at which point second node should have the contents...
-            assertEquals(1, entryCount(store2.getEntryStore()));
+            count = entryCount(store2.getEntryStore());
+            if (1L != count) {
+                fail("Store 2 should now have 1 entry; has "+count);
+            }
 
             // and we can verify max-TTL setting
             Storable raw = store2.getEntryStore().findEntry(StoreOperationSource.ADMIN_TOOL,
