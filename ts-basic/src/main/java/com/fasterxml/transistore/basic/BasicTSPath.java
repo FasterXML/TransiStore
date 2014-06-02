@@ -20,9 +20,14 @@ public enum BasicTSPath
     // and various metrics: just GET (for now?)
     NODE_METRICS,
 
-    // access to sync information
+    // access to (local) sync information
     SYNC_LIST, // request for change list (ids)
     SYNC_PULL, // request for specific (changed/new) entries
+
+    // access to remote sync information
+    REMOTE_STATUS, // alias for "NODE_STATUS"
+    REMOTE_SYNC_LIST, // request for change list (ids)
+    REMOTE_SYNC_PULL, // request for specific (changed/new) entries
     
     ;
 }

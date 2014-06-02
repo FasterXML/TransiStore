@@ -93,20 +93,33 @@ public class BasicTSServletFactory
     public ServletBase contructDispatcherServlet()
     {
         EnumMap<BasicTSPath, ServletBase> servlets = new EnumMap<BasicTSPath, ServletBase>(BasicTSPath.class);
-        _add(servlets, BasicTSPath.NODE_STATUS, constructNodeStatusServlet());
+
+        ServletBase statusServlet = constructNodeStatusServlet();
+
+        _add(servlets, BasicTSPath.NODE_STATUS, statusServlet);
 
         _add(servlets, BasicTSPath.SYNC_LIST, constructSyncListServlet());
         _add(servlets, BasicTSPath.SYNC_PULL, constructSyncPullServlet());
+
         _add(servlets, BasicTSPath.STORE_ENTRY, constructStoreEntryServlet());
         _add(servlets, BasicTSPath.STORE_ENTRY_INFO, constructStoreEntryInfoServlet());
         _add(servlets, BasicTSPath.STORE_ENTRIES, constructStoreListServlet());
 
+        // remote sync/pull does differ from local ones, to some degree
+        _add(servlets, BasicTSPath.REMOTE_SYNC_LIST, constructRemoteSyncListServlet());
+        _add(servlets, BasicTSPath.REMOTE_SYNC_PULL, constructRemoteSyncPullServlet());
+        
         List<AllOperationMetrics.Provider> metrics = new ArrayList<AllOperationMetrics.Provider>();
         for (ServletBase servlet : servlets.values()) {
             if (servlet instanceof AllOperationMetrics.Provider) {
                 metrics.add((AllOperationMetrics.Provider) servlet);
             }
         }
+
+        // "remote status" doesn't really differ from local status; register it now
+        // since stats shared between remote/local
+        _add(servlets, BasicTSPath.REMOTE_STATUS, statusServlet);
+        
         final BackgroundMetricsAccessor metricAcc = constructMetricsAccessor(metrics);
         servlets.put(BasicTSPath.NODE_METRICS, constructNodeMetricsServlet(metricAcc));
         return new ServiceDispatchServlet<BasicTSKey,StoredEntry<BasicTSKey>,BasicTSPath>(_cluster, null, _serviceStuff, servlets);
@@ -140,7 +153,7 @@ public class BasicTSServletFactory
     protected ServletBase constructNodeMetricsServlet(BackgroundMetricsAccessor accessor) {
         return new NodeMetricsServlet(_serviceStuff, accessor);
     }
-        
+
     protected ServletBase constructSyncListServlet() {
         return new SyncListServlet<BasicTSKey,StoredEntry<BasicTSKey>>(_serviceStuff, _cluster, _syncHandler);
     }
@@ -151,6 +164,15 @@ public class BasicTSServletFactory
 
     protected ServletBase constructStoreListServlet() {
         return new StoreListServlet<BasicTSKey,StoredEntry<BasicTSKey>>(_serviceStuff, _cluster, _storeHandler);
+    }
+
+
+    protected ServletBase constructRemoteSyncListServlet() {
+        return new RemoteSyncListServlet<BasicTSKey,StoredEntry<BasicTSKey>>(_serviceStuff, _cluster, _syncHandler);
+    }
+
+    protected ServletBase constructRemoteSyncPullServlet() {
+        return new RemoteSyncPullServlet<BasicTSKey,StoredEntry<BasicTSKey>>(_serviceStuff, _cluster, _syncHandler);
     }
 
     /*

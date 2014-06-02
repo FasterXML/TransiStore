@@ -7,6 +7,9 @@ import com.fasterxml.storemate.store.lastaccess.LastAccessUpdateMethod;
  * TransiStore implementation supports -- simply just "none" or "simple";
  * latter meaning that there is one-to-one mapping between stored entries
  * and matching last-access timestamps.
+ *<p>
+ * NOTE: no real support is implemented for using last-accessed
+ * functionality.
  */
 public enum TSLastAccess implements LastAccessUpdateMethod
 {
