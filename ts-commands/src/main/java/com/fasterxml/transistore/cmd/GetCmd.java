@@ -60,7 +60,9 @@ public class GetCmd extends TStoreCmdBase
             throw new IllegalArgumentException("No directory with name '"+target.getAbsolutePath()+"'");
         }
 
-        JsonGenerator jgen = null;        
+        final long start = System.nanoTime();
+        JsonGenerator jgen = null;
+        Exception fail = null;
         try {
             jgen = isJSON ? jsonGenerator(System.out) : null;
             if (jgen != null) {
@@ -68,7 +70,8 @@ public class GetCmd extends TStoreCmdBase
             }
             int fileCount = _getStuff(client, prefix, jgen, target);
             if (jgen == null) {
-                System.out.printf("COMPLETE: downloaded %s files\n", fileCount);
+                System.out.printf("COMPLETE: downloaded %s files", fileCount);
+                System.out.println();
             } else {
                 jgen.writeEndArray();
                 jgen.close();
@@ -77,9 +80,20 @@ public class GetCmd extends TStoreCmdBase
             if (jgen != null) {
                 try { jgen.flush(); } catch (Exception e2) { }
             }
-            terminateWith(e);
+            fail = e;
+        } finally {
+            if (verbose) {
+                if (jgen == null) {
+                    double millis = (System.nanoTime() - start) / (1000.0 * 1000.0);
+                    System.out.printf("DEBUG: took %.1f msec", millis);
+                    System.out.println();
+                }
+            }
         }
         client.stop();
+        if (fail != null) {
+            terminateWith(fail);
+        }
     }
 
     private int _getStuff(BasicTSClient client, BasicTSKey prefix, JsonGenerator jgen, File target)

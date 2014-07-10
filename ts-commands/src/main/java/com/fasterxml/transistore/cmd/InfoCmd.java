@@ -48,7 +48,13 @@ public class InfoCmd extends TStoreCmdBase
 
         BasicTSClient client = bootstrapClient();
         try {
+            final long start = System.nanoTime();
             showInfo(client, pathList);
+            if (verbose) {
+                double millis = (System.nanoTime() - start) / (1000.0 * 1000.0);
+                System.out.printf("(took %.1f msec)", millis);
+                System.out.println();
+            }
         } catch (Exception e) {
             System.err.println("ERROR: ("+e.getClass().getName()+"): "+e.getMessage());
             if (e instanceof RuntimeException || true) {

@@ -150,7 +150,7 @@ public abstract class TStoreCmdBase implements Runnable
             BasicTSClient client = bs.buildAndInitCompletely(5);
             if (verbose) {
                 long nanos = System.nanoTime() - nanoStart;
-                double msecs = (double) (nanos >> 20);
+                double msecs = nanos / (1000.0 * 1000.0);
                 System.out.printf(" bootstrap complete in %.1f msecs\n", msecs);
             }
             // One more thing: adapt min/optimal/max counts, if need be

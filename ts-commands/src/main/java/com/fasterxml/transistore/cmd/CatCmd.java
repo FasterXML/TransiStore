@@ -47,6 +47,8 @@ public class CatCmd extends TStoreCmdBase
         }
 
         final OutputStream out = System.out;
+        final long start = System.nanoTime();
+        boolean fail = false;
         for (BasicTSKey path : pathList) {
             GetOperationResult<Long> resp = null;
             try {
@@ -88,15 +90,26 @@ public class CatCmd extends TStoreCmdBase
             }
             // Failure to contact nodes? Abort
             if (resp.failed()) {
-                throw new IllegalStateException("Failed to display entry '"+path+"': "+resp.getFailCount()
-                        +" failed nodes tried -- first error: "+resp.getFirstFail());
+                System.err.printf("Failed to display entry '%s': %d failed nodes tried -- first error: %s",
+                        path, resp.getFailCount(), resp.getFirstFail());
+                fail = true;
+                break;
             }
             // Didn't find anything? Whine but continue
             if (!resp.entryFound()) {
                 warn("Entry '%s' not found",  path);
             }
         }
+        if (verbose) {
+            double millis = (System.nanoTime() - start) / (1000.0 * 1000.0);
+            System.out.println();
+            System.out.printf("DEBUG: took %.1f msec", millis);
+            System.out.println();
+        }
         
         client.stop();
+        if (fail) {
+            System.exit(1);
+        }
     }
 }
