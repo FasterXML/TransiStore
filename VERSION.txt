@@ -3,6 +3,8 @@ Project: TransiStore
 0.11.0 (xx-xxx-xxx)
 
 - Upgrade to ClusterMate 0.10.0, and thereby DropWizard 0.7.
+- Fix a minor issue with "info" command; was displaying incorrect
+ "expected number of nodes" value.
 
 0.9.8 (03-Jan-2013)
 

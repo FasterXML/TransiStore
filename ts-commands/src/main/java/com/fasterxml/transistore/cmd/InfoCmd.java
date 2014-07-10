@@ -3,6 +3,7 @@ package com.fasterxml.transistore.cmd;
 import java.util.*;
 
 import com.fasterxml.clustermate.api.msg.ItemInfo;
+import com.fasterxml.clustermate.client.NodesForKey;
 import com.fasterxml.clustermate.client.call.ReadCallResult;
 import com.fasterxml.clustermate.client.operation.InfoOperationResult;
 import com.fasterxml.storemate.shared.compress.Compression;
@@ -59,11 +60,11 @@ public class InfoCmd extends TStoreCmdBase
 
     protected void showInfo(BasicTSClient client, List<BasicTSKey> pathList) throws Exception
     {
-        final int expCount = client.getCluster().getServerCount();
-        
         for (BasicTSKey path : pathList) {
-            InfoOperationResult<ItemInfo> resp = client.findInfo(null, path);
+            NodesForKey nodes = client.getCluster().getNodesFor(path);
+            int expCount = nodes.size();
             System.out.printf("Entry '%s': expect %d copies\n", path.toString(), expCount);
+            InfoOperationResult<ItemInfo> resp = client.findInfo(null, path);
             int i = 0;
             for (ReadCallResult<ItemInfo> result : resp) {
                 ++i;
