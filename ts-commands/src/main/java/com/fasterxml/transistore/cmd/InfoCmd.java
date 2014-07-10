@@ -3,6 +3,7 @@ package com.fasterxml.transistore.cmd;
 import java.util.*;
 
 import com.fasterxml.clustermate.api.msg.ItemInfo;
+import com.fasterxml.clustermate.client.ClusterServerNode;
 import com.fasterxml.clustermate.client.NodesForKey;
 import com.fasterxml.clustermate.client.call.ReadCallResult;
 import com.fasterxml.clustermate.client.operation.InfoOperationResult;
@@ -68,7 +69,8 @@ public class InfoCmd extends TStoreCmdBase
             int i = 0;
             for (ReadCallResult<ItemInfo> result : resp) {
                 ++i;
-                System.out.printf(" copy #%d: ", i);
+                ClusterServerNode node = result.getServer();
+                System.out.printf(" copy #%d (%s): ", i, node.getAddress().toString());
                 if (result.failed()) {
                     System.out.printf("FAILed to access, problem: %s", result.getFailure());
                 } else if (result.hasResult()) {
