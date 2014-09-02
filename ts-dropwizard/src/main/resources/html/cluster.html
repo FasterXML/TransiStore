@@ -140,8 +140,13 @@ function handleStatusResults(response)
 	enableRefresh();
 
 	var loco = [ response.local ];
-	var peers = response.remote;
+        # Backwards compatibility check; name changed from "remote" to "peers"
+        # in ClusterMate 0.10.5 or so
 
+	var peers = response.peers;
+        if (!peers) {
+	  peers = response.remote;
+        }
 	$("#localTable").html(buildNodeTable(now, loco));
 	$("#remoteTable").html(buildNodeTable(now, peers));
 	$("#clusterUpdated").text(timestamp(now, response.clusterLastUpdated));
