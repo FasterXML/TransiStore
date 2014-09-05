@@ -140,15 +140,16 @@ function handleStatusResults(response)
 	enableRefresh();
 
 	var loco = [ response.local ];
-        # Backwards compatibility check; name changed from "remote" to "peers"
-        # in ClusterMate 0.10.5 or so
+    // Backwards compatibility check; name changed from "remote" to "localPeers"
+    // in ClusterMate 0.10.5 or so
 
-	var peers = response.peers;
-        if (!peers) {
+	var peers = response.localPeers;
+    if (!peers) {
 	  peers = response.remote;
-        }
+    }
 	$("#localTable").html(buildNodeTable(now, loco));
-	$("#remoteTable").html(buildNodeTable(now, peers));
+	$("#localPeers").html(buildNodeTable(now, peers));
+	$("#remotePeers").html(buildNodeTable(now, response.remotePeers));
 	$("#clusterUpdated").text(timestamp(now, response.clusterLastUpdated));
 }
 
@@ -178,7 +179,8 @@ function buildNodeTable(now, nodes)
 	 .append($("<th class='dataHeader'></th>").text("Disabled"))
   ;
   table.append(header);
-  for (var i=0, len = nodes.length; i < len; ++i) {
+  if (nodes) {
+   for (var i=0, len = nodes.length; i < len; ++i) {
     var node = nodes[i];
 
 	var tr = $("<tr class='dataRow' class='nowrap'></tr>");
@@ -191,6 +193,9 @@ function buildNodeTable(now, nodes)
 	tr.append($("<td class='logCell'></td>").text(timestamp(now, node.syncedUpTo)));
 	tr.append($("<td class='logCell'></td>").text(bool(node.disabled)));
 	table.append(tr);
+   }
+  } else {
+	table.append($("<tr class='infoRow'><td class='infoCell'><b>INVALID OR MISSING DATA</b></td><tr>"));
   }
   return table;
 }
@@ -343,7 +348,7 @@ function timestamp(currTime, ts)
 <style>
 body {
   background-color: #EFC;
-  background-image: url('../gfx/bg-green.gif');
+  background-image: url('gfx/bg-green.gif');
   /* slight greenish tilt to black to go with background */
   color: #020; 
 }
@@ -657,7 +662,7 @@ Last metrics update: <span id="metricsUpdated">-</span> ago.
 <table>
  <tr>
 <td class="tableHeaderPadding">&nbsp;</td>
-<td class="tableHeader" rowspan="2">Local Peers</td>
+<td class="tableHeader" rowspan="2">Local peers</td>
 <td class="tableHeaderPadding" colspan="1">&nbsp;</td>
 <td class="tableHeaderPadding" colspan="1">&nbsp;</td>
 </td>
@@ -671,7 +676,7 @@ Last metrics update: <span id="metricsUpdated">-</span> ago.
 <td class="edgeLeft" width="10">&nbsp;</td>
 
 <!-- peers are listed here -->
-<td colspan="3"><div id="remoteTable"></div></td>
+<td colspan="3"><div id="localPeers"></div></td>
 
 <td class="edgeRight" width="10">&nbsp;</td>
  </tr>
@@ -680,7 +685,33 @@ Last metrics update: <span id="metricsUpdated">-</span> ago.
 <td class="edgeBottomRight">&nbsp;</td></tr>
  </table>
 
-<!-- Third: Local metrics; operational, store -->
+<!-- Third: remote peer(s) -->
+<table>
+ <tr>
+<td class="tableHeaderPadding">&nbsp;</td>
+<td class="tableHeader" rowspan="2">Remote peer(s)</td>
+<td class="tableHeaderPadding" colspan="1">&nbsp;</td>
+<td class="tableHeaderPadding" colspan="1">&nbsp;</td>
+</td>
+ </tr>
+ <tr>
+<td class="edgeTopLeft">&nbsp;</td>
+<td class="edgeTop" colspan='2'>&nbsp;</td>
+<td class="edgeTopRight">&nbsp;</td>
+ </tr>
+ <tr>
+<td class="edgeLeft" width="10">&nbsp;</td>
+
+<td colspan="3"><div id="remotePeers"></div></td>
+
+<td class="edgeRight" width="10">&nbsp;</td>
+ </tr>
+ <tr><td class="edgeBottomLeft">&nbsp;</td>
+<td colspan="3" class="edgeBottom">&nbsp;</td>
+<td class="edgeBottomRight">&nbsp;</td></tr>
+ </table>
+
+<!-- Fourth: Local metrics; operational, store -->
 <table>
  <tr>
 <td class="tableHeaderPadding">&nbsp;</td>
