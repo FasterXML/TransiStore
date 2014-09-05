@@ -1,0 +1,31 @@
+{
+  "server" : {
+    "type" : "simple"
+    ,"maxThreads" : 200       # default 1024
+    ,"maxQueuedRequests" : 100   # default 1024
+    ,"shutdownGracePeriod" : "5 seconds"
+    ,"connector" : { "type":"http", "port":9090 }
+  }
+
+  ,"ts" : {
+    "metadataDirectory" : "tstore-data/nodes/"
+    ,"cfgSyncGracePeriod" : "8s"
+    ,"storeConfig" : {
+      "dataRootForFiles" : "tstore-data/blobs/"
+    }
+    ,"storeBackendType" : "com.fasterxml.storemate.backend.bdbje.BDBJEBuilder"
+    ,"storeBackendConfig" : {
+      "dataRoot" : "tstore-data/bdb"
+    }
+
+    ,"cluster" : {
+      "type" : "SIMPLE_LINEAR"
+      ,"clusterKeyspaceSize" : 1024
+      ,"numberOfCopies" : 2
+      ,"clusterNodes" : [ "localhost:6060", "localhost:8080" ]
+    }
+    ,"remoteCluster" : {
+      "nodes" : [ "localhost:7070", "localhost:9090" ]
+    }
+  }
+}
