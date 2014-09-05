@@ -119,11 +119,12 @@ public class BasicTSServiceOnDW
 
     @Override
     protected StoresImpl<BasicTSKey, StoredEntry<BasicTSKey>> constructStores(StorableStore store,
-            NodeStateStore<IpAndPort, ActiveNodeState> nodeStates)
+            NodeStateStore<IpAndPort, ActiveNodeState> nodeStates,
+            NodeStateStore<IpAndPort, ActiveNodeState> remoteNodeStates)
     {
         StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,BasicTSListItem> entryConv = _serviceStuff.getEntryConverter();
         return new BasicTSStores(serviceConfig(),
-                _timeMaster, _serviceStuff.jsonMapper(), entryConv, store, nodeStates);
+                _timeMaster, _serviceStuff.jsonMapper(), entryConv, store, nodeStates, remoteNodeStates);
     }
     
     @Override

@@ -98,7 +98,8 @@ public abstract class CommandBase<T extends Configuration> extends ConfiguredCom
                 b.buildNodeStateStore(v.metadataDirectory,
                         new JacksonBasedConverter<IpAndPort>(_mapper, IpAndPort.class),
                         new JacksonBasedConverter<ActiveNodeState>(_mapper, ActiveNodeState.class));
-        return new BasicTSStores(v, tm, new ObjectMapper(), entryConv, store, nodeStates);
+        // null -> no need to access remote nodes
+        return new BasicTSStores(v, tm, new ObjectMapper(), entryConv, store, nodeStates, null);
     }
 
     /*

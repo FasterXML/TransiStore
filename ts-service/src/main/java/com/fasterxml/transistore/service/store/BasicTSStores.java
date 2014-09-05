@@ -19,17 +19,22 @@ public class BasicTSStores extends StoresImpl<BasicTSKey, StoredEntry<BasicTSKey
 {
     public BasicTSStores(ServiceConfig config, TimeMaster timeMaster, ObjectMapper jsonMapper,
             StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> entryFactory,
-            StorableStore entryStore, NodeStateStore<IpAndPort, ActiveNodeState> nodeStates) {
+            StorableStore entryStore,
+            NodeStateStore<IpAndPort, ActiveNodeState> nodeStates,
+            NodeStateStore<IpAndPort, ActiveNodeState> remoteNodeStates)
+    {
         this(config, timeMaster, jsonMapper,
-                entryFactory, entryStore, nodeStates, null);
+                entryFactory, entryStore, nodeStates, remoteNodeStates, null);
     }
 
     public BasicTSStores(ServiceConfig config, TimeMaster timeMaster, ObjectMapper jsonMapper,
             StoredEntryConverter<BasicTSKey, StoredEntry<BasicTSKey>,?> entryConverter,
             StorableStore entryStore, NodeStateStore<IpAndPort, ActiveNodeState> nodeStates,
+            NodeStateStore<IpAndPort, ActiveNodeState> remoteNodeStates,
             File dbEnvRoot)
     {
-        super(config, timeMaster, jsonMapper, entryConverter, entryStore, nodeStates, dbEnvRoot);
+        super(config, timeMaster, jsonMapper, entryConverter,
+                entryStore, nodeStates, remoteNodeStates, dbEnvRoot);
     }
 
     @Override
