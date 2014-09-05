@@ -111,12 +111,12 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
             }
 
             // Looks like there's lots of startup overhead here, so need to set to surprisingly high value
-            for (int i = 0; i < 250; ++i) { // was 50
+            for (int i = 0; i < 500; ++i) { // was 50
                 if (entryCount(store2.getEntryStore()) > 0) {
                     break;
                 }
-                Thread.sleep(20L);
-                timeMaster.advanceCurrentTimeMillis(100L);
+                Thread.sleep(10L);
+                timeMaster.advanceCurrentTimeMillis(50L);
             }
             // at which point second node should have the contents...
             count = entryCount(store2.getEntryStore());
