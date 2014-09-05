@@ -110,8 +110,8 @@ public abstract class TwoNodesSyncTestBase extends ClusterTestBase
                 fail("Store 2 should not yet have entries; has "+count);
             }
 
-            // Looks like there's lots of startup overhead here, so need to be 
-            for (int i = 0; i < 50; ++i) {
+            // Looks like there's lots of startup overhead here, so need to set to surprisingly high value
+            for (int i = 0; i < 250; ++i) { // was 50
                 if (entryCount(store2.getEntryStore()) > 0) {
                     break;
                 }
