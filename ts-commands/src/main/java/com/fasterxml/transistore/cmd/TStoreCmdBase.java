@@ -11,9 +11,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectWriter;
-
 import com.fasterxml.clustermate.json.ClusterMateObjectMapper;
-
 import com.fasterxml.storemate.shared.IpAndPort;
 import com.fasterxml.storemate.shared.StorableKey;
 import com.fasterxml.transistore.basic.BasicTSKey;
@@ -22,7 +20,6 @@ import com.fasterxml.transistore.client.BasicTSClient;
 import com.fasterxml.transistore.client.BasicTSClientBootstrapper;
 import com.fasterxml.transistore.client.BasicTSClientConfig;
 import com.fasterxml.transistore.client.BasicTSClientConfigBuilder;
-
 import com.fasterxml.transistore.client.ahc.AHCBasedClientBootstrapper;
 //import com.fasterxml.transistore.client.jdk.JDKBasedClientBootstrapper;
 
@@ -60,6 +57,10 @@ public abstract class TStoreCmdBase implements Runnable
 
     @Option(type = GLOBAL, name = { "-j", "--json"}, description = "JSON output mode (vs textual)")
     public boolean isJSON = false;
+
+
+    @Option(type = GLOBAL, name = { "--calls"}, description = "Maximum number of calls to (try to) make (default -1 for 'maximum')")
+    public int callsToMake = -1;
 
     /**
      * Lazily constructed client configuration
@@ -122,11 +123,18 @@ public abstract class TStoreCmdBase implements Runnable
     
     protected BasicTSClientConfig getClientConfig() {
         if (_clientConfig == null) {
-            _clientConfig = new BasicTSClientConfigBuilder()
-            .setMinimalOksToSucceed(1)
-            .setOptimalOks(2)
-            .setMaxOks(2)
-            .build();
+            BasicTSClientConfigBuilder b = new BasicTSClientConfigBuilder();
+
+            if (callsToMake <= 0) {
+                b = b.setMinimalOksToSucceed(1)
+                    .setOptimalOks(2)
+                    .setMaxOks(3);
+            } else {
+                b = b.setMinimalOksToSucceed(callsToMake)
+                        .setOptimalOks(callsToMake)
+                        .setMaxOks(callsToMake);
+            }
+            _clientConfig = b.build();
         }
         return _clientConfig;
     }
