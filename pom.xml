@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.fasterxml</groupId>
     <artifactId>oss-parent</artifactId>
-    <version>16</version>
+    <version>45</version>
   </parent>
   <groupId>com.fasterxml.transistore</groupId>
   <artifactId>transistore-parent</artifactId>
@@ -46,8 +46,8 @@
   </developers>
 
   <properties>
-    <javac.src.version>1.7</javac.src.version>
-    <javac.target.version>1.7</javac.target.version>
+    <javac.src.version>1.8</javac.src.version>
+    <javac.target.version>1.8</javac.target.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <version.plugin.shade>2.2</version.plugin.shade>
@@ -55,7 +55,7 @@
     <!-- Sometimes rely on SNAPSHOT version just so that we can test local updates,
          get Eclipse to show relevant sources
       -->
-    <version.clustermate>0.10.6-SNAPSHOT</version.clustermate>
+    <version.clustermate>0.10.5</version.clustermate>
   </properties>
 
   <!-- Licensing -->
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
